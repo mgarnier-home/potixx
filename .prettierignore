@@ -1,0 +1,9 @@
+dist
+.angular
+coverage
+test-results
+playwright-report
+docs
+site.md
+package-lock.json
+.superpowers
