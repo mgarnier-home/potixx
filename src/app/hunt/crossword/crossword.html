@@ -1,0 +1,128 @@
+<div
+  class="crossword"
+  [class.solved]="isSolved()"
+  [style.--cw-keyboard-offset.px]="keyboardOffset()"
+>
+  <div class="board-area">
+    <div class="board" role="group" aria-label="Grille de mots croisés">
+      @for (cell of cells; track cell.key) {
+        <button
+          type="button"
+          class="cell"
+          [attr.data-testid]="'cw-cell-' + cell.row + '-' + cell.col"
+          [style.grid-row]="cell.row + 1"
+          [style.grid-column]="cell.col + 1"
+          [class.prefilled]="cell.prefilled"
+          [class.in-entry]="isInActiveEntry(cell.key)"
+          [class.active]="isActive(cell.key)"
+          [class.locked]="isLocked(cell.key)"
+          [class.wrong]="isWrong(cell.key)"
+          [class.lit]="isLit(cell.key)"
+          [attr.aria-label]="cellLabel(cell)"
+          (click)="selectCell(cell)"
+        >
+          @if (cell.number !== null) {
+            <span class="number" aria-hidden="true">{{ cell.number }}</span>
+          }
+          <span class="letter" aria-hidden="true">{{ letterOf(cell.key) }}</span>
+        </button>
+      }
+    </div>
+
+    @if (isSolved()) {
+      <div class="reveal">
+        <p
+          class="hidden-word"
+          data-testid="cw-hidden-word"
+          aria-live="polite"
+          [attr.aria-label]="revealComplete() ? 'Mot caché : ' + hiddenWord.join('') : null"
+        >
+          @for (letter of hiddenWord; track $index) {
+            <span class="hidden-letter" [class.shown]="$index < litCount()">{{
+              $index < litCount() ? letter : ''
+            }}</span>
+          }
+        </p>
+        @if (revealComplete()) {
+          <p class="solved-message">Bravo, moussaillon ! Le mot caché est apparu.</p>
+        }
+        @if (continueVisible()) {
+          <button
+            type="button"
+            class="button-primary"
+            data-testid="cw-continue"
+            (click)="continue()"
+          >
+            Continuer
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="actions">
+        <button type="button" class="button-primary" data-testid="cw-check" (click)="check()">
+          Vérifier la grille
+        </button>
+        @if (feedback(); as message) {
+          <p class="feedback" role="status">{{ message }}</p>
+        }
+        <app-skip-button [visible]="skipVisible()" (skipped)="onSkip()" />
+      </div>
+    }
+  </div>
+
+  <div class="clues">
+    @for (group of clueGroups; track group.title) {
+      <section class="clue-group">
+        <h3 class="clue-group-title">{{ group.title }}</h3>
+        <ol class="clue-list">
+          @for (entry of group.entries; track entry.number) {
+            <li>
+              <button
+                type="button"
+                class="clue"
+                [attr.data-testid]="'cw-clue-' + entry.number"
+                [class.active]="activeEntry() === entry.number && !isSolved()"
+                [class.locked]="isEntryLocked(entry.number)"
+                [class.wrong]="isEntryWrong(entry.number)"
+                [disabled]="isSolved()"
+                (click)="selectEntry(entry.number)"
+              >
+                <span class="clue-number">{{ entry.number }}</span>
+                <span class="clue-text">{{ entry.clue }}</span>
+              </button>
+            </li>
+          }
+        </ol>
+      </section>
+    }
+  </div>
+
+  @if (!isSolved()) {
+    <div class="bar" aria-live="polite">
+      @if (activeClue(); as clue) {
+        <p class="bar-clue">
+          <span class="bar-number">{{ clue.number }}</span>
+          <span class="bar-orientation">{{ orientationLabel(clue.orientation) }}</span>
+          <span class="bar-text">{{ clue.clue }}</span>
+        </p>
+      } @else {
+        <p class="bar-hint">Touche une case ou une définition pour écrire.</p>
+      }
+      <input
+        #hiddenInput
+        class="hidden-input"
+        data-testid="cw-input"
+        type="text"
+        aria-label="Lettre à écrire dans la case sélectionnée"
+        autocapitalize="characters"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        enterkeyhint="done"
+        [value]="sentinel"
+        (input)="onInput($event)"
+        (keydown)="onKeydown($event)"
+      />
+    </div>
+  }
+</div>

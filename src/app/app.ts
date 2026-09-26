@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { Crossword } from './hunt/crossword/crossword';
 import { MAP } from './hunt/hunt-content';
 import type { StepId } from './hunt/hunt-content';
 import { PadlockRiddle } from './hunt/padlock-riddle/padlock-riddle';
@@ -12,7 +13,7 @@ import { TreasureMap } from './hunt/treasure-map/treasure-map';
  */
 @Component({
   selector: 'app-root',
-  imports: [RiddlePanel, TreasureMap, PadlockRiddle, PasswordRiddle],
+  imports: [RiddlePanel, TreasureMap, PadlockRiddle, PasswordRiddle, Crossword],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
