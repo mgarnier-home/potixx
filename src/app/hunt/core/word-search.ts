@@ -33,10 +33,26 @@ const DIRECTION_STEPS: Record<Direction, { rowStep: number; colStep: number }> =
   'down-left': { rowStep: 1, colStep: -1 },
 };
 
+// Pas des 8 directions (y compris à l'envers), utilisés uniquement pour détecter après coup
+// qu'un mot de la liste apparaît visiblement ailleurs que sur ses cases placées.
+const ALL_SEARCH_STEPS: readonly { rowStep: number; colStep: number }[] = [
+  { rowStep: 0, colStep: 1 },
+  { rowStep: 0, colStep: -1 },
+  { rowStep: 1, colStep: 0 },
+  { rowStep: -1, colStep: 0 },
+  { rowStep: 1, colStep: 1 },
+  { rowStep: -1, colStep: -1 },
+  { rowStep: 1, colStep: -1 },
+  { rowStep: -1, colStep: 1 },
+];
+
 /**
  * Génère une grille de mots mêlés déterministe : à graine égale, le résultat est identique.
  * Place les mots du plus long au plus court, en retentant jusqu'à 50 fois avec des graines
- * dérivées si un placement échoue. Lève une Error si aucune tentative n'aboutit.
+ * dérivées si un placement échoue, ou si les lettres de remplissage reforment par accident un
+ * mot de la liste ailleurs que sur ses cases placées (dans l'une des 8 directions, y compris à
+ * l'envers) : un visiteur pourrait sélectionner cette copie visible et se voir compter un échec.
+ * Lève une Error si aucune tentative n'aboutit.
  */
 export function generateWordSearch(
   words: readonly string[],
@@ -50,11 +66,16 @@ export function generateWordSearch(
     const rand = createSeededRandom(attemptSeed);
     const attempted = tryPlaceAllWords(sortedWords, size, rand);
 
-    if (attempted) {
-      const letters = fillEmptyCells(attempted, size, rand);
-      const placedWords = attempted.placedWords;
-      return { size, seed: attemptSeed, letters, words: placedWords };
+    if (attempted === null) {
+      continue;
     }
+
+    const letters = fillEmptyCells(attempted, size, rand);
+    if (hasVisibleDuplicate(letters, size, attempted.placedWords)) {
+      continue;
+    }
+
+    return { size, seed: attemptSeed, letters, words: attempted.placedWords };
   }
 
   throw new Error('Impossible de générer la grille de mots mêlés après 50 tentatives.');
@@ -148,6 +169,52 @@ function fitsExistingLetters(
     const existing = letters[cell.row][cell.col];
     return existing === null || existing === word[index];
   });
+}
+
+/**
+ * Vrai si un mot placé apparaît ailleurs que sur ses propres cases, dans l'une des 8 directions
+ * (y compris à l'envers) : le remplissage aléatoire a reformé le mot de façon visible.
+ */
+function hasVisibleDuplicate(
+  letters: readonly string[][],
+  size: number,
+  placedWords: readonly PlacedWord[],
+): boolean {
+  return placedWords.some((placed) => countWordOccurrences(letters, size, placed.word) > 1);
+}
+
+/** Compte les occurrences exactes de `word` dans la grille remplie, dans les 8 directions. */
+function countWordOccurrences(letters: readonly string[][], size: number, word: string): number {
+  let count = 0;
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      for (const step of ALL_SEARCH_STEPS) {
+        if (matchesWordAt(letters, size, row, col, step, word)) {
+          count++;
+        }
+      }
+    }
+  }
+  return count;
+}
+
+/** Vrai si `word` se lit intégralement depuis (startRow, startCol) en suivant `step`. */
+function matchesWordAt(
+  letters: readonly string[][],
+  size: number,
+  startRow: number,
+  startCol: number,
+  step: { rowStep: number; colStep: number },
+  word: string,
+): boolean {
+  for (let i = 0; i < word.length; i++) {
+    const row = startRow + step.rowStep * i;
+    const col = startCol + step.colStep * i;
+    if (row < 0 || row >= size || col < 0 || col >= size || letters[row][col] !== word[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /** Mélange `items` sur place (Fisher-Yates) en tirant les indices avec `rand`. */

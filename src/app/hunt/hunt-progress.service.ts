@@ -16,7 +16,7 @@ import {
   entryCells,
   prefilledCells,
 } from './core/crossword';
-import { isCorrectAnswer } from './core/normalize-answer';
+import { isCorrectAnswer, normalizeAnswer } from './core/normalize-answer';
 import { randomSeed } from './core/seeded-random';
 import type { WordSearchGrid } from './core/word-search';
 import { findWordAt, generateWordSearch } from './core/word-search';
@@ -90,11 +90,91 @@ function buildCellEntryNumbers(def: CrosswordDefinition): ReadonlyMap<string, re
 }
 
 // Données dérivées de CROSSWORD, calculées une seule fois (contenu éditorial statique).
+const CROSSWORD_SOLUTION = buildSolution(CROSSWORD);
 const CROSSWORD_PREFILLED = prefilledCells(CROSSWORD);
 const CROSSWORD_CELL_ENTRY_NUMBERS = buildCellEntryNumbers(CROSSWORD);
 const CROSSWORD_ENTRY_NUMBERS = CROSSWORD.entries.map((entry) => entry.number);
 
-/** Vérifie la forme minimale attendue d'une progression chargée depuis le stockage. */
+/** Une seule lettre A-Z, après normalisation (accents, casse). */
+const SINGLE_LETTER = /^[A-Z]$/;
+
+/** Vrai si `value` est un entier ≥ 0. */
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
+}
+
+/** Vrai si `value` est un objet simple (non tableau) dont toutes les valeurs sont des chaînes. */
+function isStringRecord(value: unknown): value is Record<string, string> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.values(value).every((entry) => typeof entry === 'string')
+  );
+}
+
+/** Vrai si `value` est un tableau de nombres. */
+function isNumberArray(value: unknown): value is number[] {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'number');
+}
+
+/** Vrai si `value` est un tableau de chaînes. */
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string');
+}
+
+function isValidPadlock(value: unknown): value is HuntProgress['padlock'] {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return (
+    isNonNegativeInteger(record['digitIndex']) &&
+    record['digitIndex'] <= PADLOCK_RIDDLES.length &&
+    isNonNegativeInteger(record['failures']) &&
+    typeof record['solved'] === 'boolean'
+  );
+}
+
+function isValidPassword(value: unknown): value is HuntProgress['password'] {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return isNonNegativeInteger(record['failures']) && typeof record['solved'] === 'boolean';
+}
+
+function isValidCrossword(value: unknown): value is HuntProgress['crossword'] {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return (
+    isStringRecord(record['letters']) &&
+    isNumberArray(record['locked']) &&
+    isNonNegativeInteger(record['failures']) &&
+    typeof record['solved'] === 'boolean'
+  );
+}
+
+function isValidWordSearch(value: unknown): value is HuntProgress['wordSearch'] {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return (
+    isNonNegativeInteger(record['seed']) &&
+    isStringArray(record['found']) &&
+    isNonNegativeInteger(record['failures']) &&
+    typeof record['solved'] === 'boolean'
+  );
+}
+
+/**
+ * Vérifie en profondeur la forme d'une progression chargée depuis le stockage : les champs
+ * imbriqués doivent avoir le bon type et rester dans leurs bornes (ex. `digitIndex` du cadenas),
+ * sinon une sauvegarde corrompue produirait un TypeError persistant en cours de partie.
+ */
 function isValidProgress(value: unknown): value is HuntProgress {
   if (typeof value !== 'object' || value === null) {
     return false;
@@ -103,8 +183,12 @@ function isValidProgress(value: unknown): value is HuntProgress {
   if (record['version'] !== 1) {
     return false;
   }
-  const requiredKeys = ['padlock', 'password', 'crossword', 'wordSearch'] as const;
-  return requiredKeys.every((key) => typeof record[key] === 'object' && record[key] !== null);
+  return (
+    isValidPadlock(record['padlock']) &&
+    isValidPassword(record['password']) &&
+    isValidCrossword(record['crossword']) &&
+    isValidWordSearch(record['wordSearch'])
+  );
 }
 
 /**
@@ -161,9 +245,13 @@ export class HuntProgressService {
     return STEP_ORDER.indexOf(step) <= STEP_ORDER.indexOf(this.currentStep());
   }
 
-  /** Le bouton « Passer l'énigme » apparaît au-delà du seuil d'échecs. */
+  /**
+   * Le bouton « Passer l'énigme » apparaît au-delà du seuil d'échecs, tant que l'énigme n'est
+   * pas déjà résolue (une énigme résolue après plusieurs échecs ne doit plus proposer de passer).
+   */
   canSkip(riddle: RiddleId): boolean {
-    return this.state()[riddle].failures >= MAX_FAILURES_BEFORE_SKIP;
+    const state = this.state()[riddle];
+    return !state.solved && state.failures >= MAX_FAILURES_BEFORE_SKIP;
   }
 
   /** Répond au chiffre courant du cadenas. `false` sans effet si le cadenas est déjà résolu. */
@@ -209,11 +297,14 @@ export class HuntProgressService {
   }
 
   /**
-   * Écrit une lettre dans la grille de mots croisés. Ignoré pour les cases pré-remplies et
-   * pour les cases appartenant à un mot déjà verrouillé. `''` efface la case.
+   * Écrit une lettre dans la grille de mots croisés. Ignoré pour les clés hors grille (cases
+   * noires), les cases pré-remplies et les cases appartenant à un mot déjà verrouillé. `''`
+   * efface la case. La lettre est normalisée (accents, casse) et n'est acceptée que si elle se
+   * réduit à une seule lettre A-Z ; toute autre saisie (plusieurs caractères, chiffre, espace) est
+   * ignorée sans modifier la case.
    */
   setCrosswordLetter(key: string, letter: string): void {
-    if (CROSSWORD_PREFILLED.has(key)) {
+    if (!CROSSWORD_SOLUTION.has(key) || CROSSWORD_PREFILLED.has(key)) {
       return;
     }
 
@@ -223,15 +314,27 @@ export class HuntProgressService {
       return;
     }
 
-    this.state.update((progress) => {
-      const letters = { ...progress.crossword.letters };
-      if (letter === '') {
+    if (letter === '') {
+      this.state.update((progress) => {
+        const letters = { ...progress.crossword.letters };
         delete letters[key];
-      } else {
-        letters[key] = letter;
-      }
-      return { ...progress, crossword: { ...progress.crossword, letters } };
-    });
+        return { ...progress, crossword: { ...progress.crossword, letters } };
+      });
+      return;
+    }
+
+    const normalized = normalizeAnswer(letter).toUpperCase();
+    if (!SINGLE_LETTER.test(normalized)) {
+      return;
+    }
+
+    this.state.update((progress) => ({
+      ...progress,
+      crossword: {
+        ...progress.crossword,
+        letters: { ...progress.crossword.letters, [key]: normalized },
+      },
+    }));
   }
 
   /** Vérifie la grille : verrouille les mots justes, compte un échec sinon marque résolu. */

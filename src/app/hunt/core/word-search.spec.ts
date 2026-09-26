@@ -71,6 +71,54 @@ describe('generateWordSearch', () => {
   });
 });
 
+// Pas des 8 directions (y compris à l'envers) utilisées pour détecter un mot visible par accident.
+const ALL_SEARCH_STEPS: { rowStep: number; colStep: number }[] = [
+  { rowStep: 0, colStep: 1 },
+  { rowStep: 0, colStep: -1 },
+  { rowStep: 1, colStep: 0 },
+  { rowStep: -1, colStep: 0 },
+  { rowStep: 1, colStep: 1 },
+  { rowStep: -1, colStep: -1 },
+  { rowStep: 1, colStep: -1 },
+  { rowStep: -1, colStep: 1 },
+];
+
+/** Compte les occurrences exactes de `word` dans `letters`, dans les 8 directions. */
+function countOccurrences(letters: string[][], size: number, word: string): number {
+  let count = 0;
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      for (const step of ALL_SEARCH_STEPS) {
+        let matches = true;
+        for (let i = 0; i < word.length; i++) {
+          const r = row + step.rowStep * i;
+          const c = col + step.colStep * i;
+          if (r < 0 || r >= size || c < 0 || c >= size || letters[r][c] !== word[i]) {
+            matches = false;
+            break;
+          }
+        }
+        if (matches) {
+          count++;
+        }
+      }
+    }
+  }
+  return count;
+}
+
+describe('generateWordSearch — pas de mot dupliqué visible', () => {
+  it("chaque mot n'apparaît qu'une seule fois dans la grille, sur 200 graines, dans les 8 directions", () => {
+    for (let seed = 1; seed <= 200; seed++) {
+      const grid = generateWordSearch(WORDS, SIZE, seed);
+
+      for (const word of WORDS) {
+        expect(countOccurrences(grid.letters, SIZE, word)).toBe(1);
+      }
+    }
+  });
+});
+
 describe('findWordAt', () => {
   let grid: WordSearchGrid;
   let target: PlacedWord;

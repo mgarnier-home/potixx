@@ -103,6 +103,18 @@ describe('HuntProgressService', () => {
     expect(service.progress().padlock.failures).toBe(0);
   });
 
+  it('padlock: skip ne fait rien si canSkip est faux (2 échecs seulement)', () => {
+    const { service } = setup();
+
+    service.answerPadlockDigit('9');
+    service.answerPadlockDigit('9');
+    expect(service.canSkip('padlock')).toBe(false);
+
+    service.skip('padlock');
+
+    expect(service.progress().padlock.digitIndex).toBe(0);
+  });
+
   it('password: accepte "Famille"', () => {
     const { service } = setup();
 
@@ -121,6 +133,19 @@ describe('HuntProgressService', () => {
     expect(service.canSkip('password')).toBe(false);
     service.answerPassword('faux');
     expect(service.canSkip('password')).toBe(true);
+  });
+
+  it('password: canSkip redevient faux une fois résolu, même après 3 échecs', () => {
+    const { service } = setup();
+
+    service.answerPassword('faux');
+    service.answerPassword('faux');
+    service.answerPassword('faux');
+    expect(service.canSkip('password')).toBe(true);
+
+    service.answerPassword('Famille');
+    expect(service.progress().password.solved).toBe(true);
+    expect(service.canSkip('password')).toBe(false);
   });
 
   it('crossword: les échecs comptent, les mots verrouillés sont protégés, solved global à la fin', () => {
@@ -161,6 +186,59 @@ describe('HuntProgressService', () => {
     const finalCheck = service.checkCrossword();
     expect(finalCheck.solved).toBe(true);
     expect(service.progress().crossword.solved).toBe(true);
+  });
+
+  it('crossword: canSkip redevient faux une fois résolu, même après 3 échecs', () => {
+    const { service } = setup();
+
+    service.checkCrossword();
+    service.checkCrossword();
+    service.checkCrossword();
+    expect(service.canSkip('crossword')).toBe(true);
+
+    const solution = buildSolution(CROSSWORD);
+    solution.forEach((letter, key) => {
+      if (letter !== '-') {
+        service.setCrosswordLetter(key, letter);
+      }
+    });
+    service.checkCrossword();
+
+    expect(service.progress().crossword.solved).toBe(true);
+    expect(service.canSkip('crossword')).toBe(false);
+  });
+
+  it('setCrosswordLetter: normalise la lettre saisie (casse, accents) et rejette les saisies invalides', () => {
+    const { service } = setup();
+    const key = '0,1'; // première case de COUSIN, modifiable
+
+    service.setCrosswordLetter(key, 'c');
+    expect(service.progress().crossword.letters[key]).toBe('C');
+
+    service.setCrosswordLetter(key, 'é');
+    expect(service.progress().crossword.letters[key]).toBe('E');
+
+    // Saisies invalides : ignorées, la case garde sa dernière valeur valide.
+    service.setCrosswordLetter(key, 'ab');
+    expect(service.progress().crossword.letters[key]).toBe('E');
+
+    service.setCrosswordLetter(key, '1');
+    expect(service.progress().crossword.letters[key]).toBe('E');
+
+    service.setCrosswordLetter(key, ' ');
+    expect(service.progress().crossword.letters[key]).toBe('E');
+
+    // '' efface toujours la case.
+    service.setCrosswordLetter(key, '');
+    expect(service.progress().crossword.letters[key]).toBeUndefined();
+  });
+
+  it('setCrosswordLetter: ignore une clé hors grille (case noire, absente de la solution)', () => {
+    const { service } = setup();
+
+    service.setCrosswordLetter('0,0', 'C');
+
+    expect(service.progress().crossword.letters['0,0']).toBeUndefined();
   });
 
   it('wordSearch: sélectionner un mot placé le marque trouvé ; resélection = échec', () => {
@@ -235,6 +313,57 @@ describe('HuntProgressService', () => {
 
       expect(service?.currentStep()).toBe('padlock');
       expect(service?.progress().padlock.solved).toBe(false);
+    }
+  });
+
+  it('ignore une sauvegarde de forme imbriquée invalide : état neuf, aucune exception ensuite', () => {
+    const validPadlock = { digitIndex: 0, failures: 0, solved: false };
+    const validPassword = { failures: 0, solved: false };
+    const validCrossword = { letters: {}, locked: [], failures: 0, solved: false };
+    const validWordSearch = { seed: 1, found: [], failures: 0, solved: false };
+
+    const invalidPayloads = [
+      // crossword.locked absent.
+      {
+        version: 1,
+        padlock: validPadlock,
+        password: validPassword,
+        crossword: { letters: {}, failures: 0, solved: false },
+        wordSearch: validWordSearch,
+      },
+      // padlock.digitIndex hors bornes.
+      {
+        version: 1,
+        padlock: { digitIndex: 99, failures: 0, solved: false },
+        password: validPassword,
+        crossword: validCrossword,
+        wordSearch: validWordSearch,
+      },
+      // wordSearch.found n'est pas un tableau.
+      {
+        version: 1,
+        padlock: validPadlock,
+        password: validPassword,
+        crossword: validCrossword,
+        wordSearch: { seed: 1, found: 'oops', failures: 0, solved: false },
+      },
+    ];
+
+    for (const payload of invalidPayloads) {
+      TestBed.resetTestingModule();
+      const storage = new FakeStorage();
+      storage.setItem(STORAGE_KEY, JSON.stringify(payload));
+
+      let service: HuntProgressService | undefined;
+      expect(() => {
+        service = setup({ storage }).service;
+      }).not.toThrow();
+
+      expect(service?.currentStep()).toBe('padlock');
+      expect(service?.progress().padlock.solved).toBe(false);
+
+      // Une réponse ensuite ne doit lever aucune exception.
+      expect(() => service?.answerPadlockDigit('0')).not.toThrow();
     }
   });
 
