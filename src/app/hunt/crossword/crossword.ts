@@ -111,6 +111,10 @@ export class Crossword {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly hiddenInput = viewChild<ElementRef<HTMLInputElement>>('hiddenInput');
   private readonly timers: ReturnType<typeof setTimeout>[] = [];
+  /** Texte de la composition en cours (clavier prédictif) déjà écrit dans la grille. */
+  private composedText = '';
+  /** Vrai juste après un keydown Backspace/Delete, pour ignorer un input delete* en doublon. */
+  private eraseHandledByKeydown = false;
 
   /** Émis au clic sur « Continuer », après l'illumination (jamais si déjà résolu à l'ouverture). */
   readonly solved = output<void>();
@@ -261,14 +265,32 @@ export class Crossword {
    * Saisie dans le champ caché. Les claviers de téléphone envoient souvent la valeur entière au
    * lieu d'événements clavier : on compare la valeur à la sentinelle pour en déduire les lettres
    * tapées (ou un effacement), puis on remet la sentinelle.
+   *
+   * Composition (texte prédictif de Gboard, clavier Samsung…) : le clavier réécrit tout le mot en
+   * cours à chaque touche (« c », puis « co », puis « cou ») et peut ignorer la remise à zéro du
+   * champ. Pendant une composition, on ne remet donc pas la sentinelle : on compare le mot composé
+   * à ce qui a déjà été consommé et on n'écrit que les lettres nouvelles (ou on efface si le mot a
+   * raccourci). La sentinelle est remise à la fin de la composition.
    */
   protected onInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const value = input.value;
     const inputType = (event as Partial<InputEvent>).inputType ?? '';
+    const composing =
+      (event as Partial<InputEvent>).isComposing === true || inputType === 'insertCompositionText';
+
+    if (composing && value !== '') {
+      this.consumeComposition(value.startsWith(SENTINEL) ? value.slice(SENTINEL.length) : value);
+      return;
+    }
 
     if (value === '' || inputType.startsWith('delete')) {
-      this.erase();
+      // Un clavier peut envoyer un vrai keydown Backspace ET un input delete* malgré
+      // preventDefault : l'effacement déjà fait par le keydown ne doit pas être répété.
+      if (!this.eraseHandledByKeydown) {
+        this.erase();
+      }
+      this.eraseHandledByKeydown = false;
     } else {
       const typed = value.startsWith(SENTINEL) ? value.slice(SENTINEL.length) : value;
       for (const char of typed) {
@@ -279,6 +301,11 @@ export class Crossword {
     this.resetInput(input);
   }
 
+  /** Fin de composition : on repart d'un champ ne contenant que la sentinelle. */
+  protected onCompositionEnd(event: CompositionEvent): void {
+    this.resetInput(event.target as HTMLInputElement);
+  }
+
   /** Touches physiques (ordinateur) : effacement et flèches. Les lettres passent par `input`. */
   protected onKeydown(event: KeyboardEvent): void {
     switch (event.key) {
@@ -286,6 +313,9 @@ export class Crossword {
       case 'Delete':
         event.preventDefault();
         this.erase();
+        // Garde contre un input delete* envoyé en plus dans la foulée (voir `onInput`).
+        this.eraseHandledByKeydown = true;
+        setTimeout(() => (this.eraseHandledByKeydown = false));
         break;
       case 'ArrowLeft':
         event.preventDefault();
@@ -328,6 +358,26 @@ export class Crossword {
 
   protected continue(): void {
     this.solved.emit();
+  }
+
+  /** Compare le mot en cours de composition à ce qui a déjà été consommé. */
+  private consumeComposition(current: string): void {
+    const consumed = this.composedText;
+    if (current.startsWith(consumed)) {
+      for (const char of current.slice(consumed.length)) {
+        this.typeLetter(char);
+      }
+    } else if (consumed.startsWith(current)) {
+      for (let index = current.length; index < consumed.length; index++) {
+        this.erase();
+      }
+    } else {
+      // Le clavier a repris une composition neuve (après notre remise à zéro) : tout est nouveau.
+      for (const char of current) {
+        this.typeLetter(char);
+      }
+    }
+    this.composedText = current;
   }
 
   /** Écrit une lettre dans la première case modifiable à partir du curseur, puis avance. */
@@ -470,7 +520,9 @@ export class Crossword {
     }
   }
 
+  /** Remet la sentinelle seule dans le champ ; toute composition en cours est oubliée. */
   private resetInput(input: HTMLInputElement): void {
+    this.composedText = '';
     input.value = SENTINEL;
     try {
       input.setSelectionRange(SENTINEL.length, SENTINEL.length);

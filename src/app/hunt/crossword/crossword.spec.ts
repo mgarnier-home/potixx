@@ -50,6 +50,14 @@ describe('Crossword', () => {
     fixture.detectChanges();
   }
 
+  /** Événement `input` tel qu'envoyé par un clavier de téléphone, avec la valeur complète du champ. */
+  function inputEvent(value: string, init: InputEventInit): void {
+    const input = testid('cw-input') as HTMLInputElement;
+    input.value = value;
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, ...init }));
+    fixture.detectChanges();
+  }
+
   function createFixture(): void {
     fixture = TestBed.createComponent(Crossword);
     solvedCount = 0;
@@ -167,6 +175,97 @@ describe('Crossword', () => {
 
     expect(letterAt(1, 1)).toBe('');
     expect(cell(1, 1).classList).toContain('active');
+  });
+
+  it('effacement façon Android (input deleteContentBackward, champ vidé) sur case vide : recule et vide', () => {
+    createFixture();
+
+    click('cw-clue-1');
+    type('co');
+
+    inputEvent('', { inputType: 'deleteContentBackward' });
+
+    expect(cell(1, 1).classList).toContain('active');
+    expect(letterAt(1, 1)).toBe('');
+    expect(letterAt(0, 1)).toBe('C');
+  });
+
+  it('effacement façon Android sur case remplie : la vide sans reculer', () => {
+    createFixture();
+
+    click('cw-clue-1');
+    type('co');
+    cell(1, 1).click();
+    fixture.detectChanges();
+
+    inputEvent('', { inputType: 'deleteContentBackward' });
+
+    expect(letterAt(1, 1)).toBe('');
+    expect(letterAt(0, 1)).toBe('C');
+    expect(cell(1, 1).classList).toContain('active');
+  });
+
+  it('keydown Backspace suivi d’un input delete* (preventDefault ignoré) : un seul effacement', () => {
+    createFixture();
+
+    click('cw-clue-1');
+    type('cou');
+
+    pressKey('Backspace');
+    inputEvent('', { inputType: 'deleteContentBackward' });
+
+    // Un seul effacement : le curseur recule de 3-1 à 2-1 et ne vide que « U ».
+    expect(letterAt(2, 1)).toBe('');
+    expect(letterAt(1, 1)).toBe('O');
+    expect(cell(2, 1).classList).toContain('active');
+  });
+
+  it('composition (texte prédictif) : chaque mise à jour du mot composé n’ajoute que la nouvelle lettre', () => {
+    createFixture();
+
+    click('cw-clue-1');
+    // Le clavier recompose le mot entier à chaque touche et ignore la remise à zéro du champ.
+    inputEvent(' c', { inputType: 'insertCompositionText', data: 'c', isComposing: true });
+    inputEvent(' co', { inputType: 'insertCompositionText', data: 'co', isComposing: true });
+    inputEvent(' cou', { inputType: 'insertCompositionText', data: 'cou', isComposing: true });
+
+    expect(letterAt(0, 1)).toBe('C');
+    expect(letterAt(1, 1)).toBe('O');
+    expect(letterAt(2, 1)).toBe('U');
+    expect(letterAt(3, 1)).toBe('');
+  });
+
+  it('composition : raccourcir le mot composé efface la dernière lettre', () => {
+    createFixture();
+
+    click('cw-clue-1');
+    inputEvent(' c', { inputType: 'insertCompositionText', data: 'c', isComposing: true });
+    inputEvent(' co', { inputType: 'insertCompositionText', data: 'co', isComposing: true });
+    inputEvent(' c', { inputType: 'insertCompositionText', data: 'c', isComposing: true });
+
+    expect(letterAt(0, 1)).toBe('C');
+    expect(letterAt(1, 1)).toBe('');
+    expect(cell(1, 1).classList).toContain('active');
+  });
+
+  it('fin de composition : la saisie suivante repart de zéro sans rien répéter', () => {
+    createFixture();
+
+    click('cw-clue-1');
+    const input = testid('cw-input') as HTMLInputElement;
+    input.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }));
+    inputEvent(' c', { inputType: 'insertCompositionText', data: 'c', isComposing: true });
+    inputEvent(' co', { inputType: 'insertCompositionText', data: 'co', isComposing: true });
+    input.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: 'co' }));
+    fixture.detectChanges();
+    // Certains navigateurs envoient encore un `input` non composé après compositionend.
+    inputEvent(input.value, { inputType: 'insertText', data: 'co' });
+    inputEvent(input.value + 'u', { inputType: 'insertText', data: 'u' });
+
+    expect(letterAt(0, 1)).toBe('C');
+    expect(letterAt(1, 1)).toBe('O');
+    expect(letterAt(2, 1)).toBe('U');
+    expect(letterAt(3, 1)).toBe('');
   });
 
   it("toucher à nouveau une case partagée bascule entre l'horizontal et le vertical", () => {

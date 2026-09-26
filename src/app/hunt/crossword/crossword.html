@@ -121,6 +121,7 @@
         enterkeyhint="done"
         [value]="sentinel"
         (input)="onInput($event)"
+        (compositionend)="onCompositionEnd($event)"
         (keydown)="onKeydown($event)"
       />
     </div>
