@@ -128,12 +128,20 @@ function isValidPadlock(value: unknown): value is HuntProgress['padlock'] {
     return false;
   }
   const record = value as Record<string, unknown>;
-  return (
-    isNonNegativeInteger(record['digitIndex']) &&
-    record['digitIndex'] <= PADLOCK_RIDDLES.length &&
-    isNonNegativeInteger(record['failures']) &&
-    typeof record['solved'] === 'boolean'
-  );
+  if (
+    !isNonNegativeInteger(record['digitIndex']) ||
+    record['digitIndex'] > PADLOCK_RIDDLES.length ||
+    !isNonNegativeInteger(record['failures']) ||
+    typeof record['solved'] !== 'boolean'
+  ) {
+    return false;
+  }
+  // digitIndex et solved doivent rester cohérents : non résolu implique un chiffre restant à
+  // deviner, résolu implique que tous les chiffres ont été franchis (sinon `answerPadlockDigit`
+  // indexerait PADLOCK_RIDDLES hors bornes).
+  return record['solved']
+    ? record['digitIndex'] === PADLOCK_RIDDLES.length
+    : record['digitIndex'] < PADLOCK_RIDDLES.length;
 }
 
 function isValidPassword(value: unknown): value is HuntProgress['password'] {

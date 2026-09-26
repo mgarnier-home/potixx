@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import type { Cell } from './core/cell';
 import { cellKey } from './core/cell';
 import { buildSolution, entryCells } from './core/crossword';
-import { CROSSWORD, WORD_SEARCH } from './hunt-content';
+import { CROSSWORD, PADLOCK_RIDDLES, WORD_SEARCH } from './hunt-content';
 import {
   HuntProgressService,
   PROGRESS_STORAGE,
@@ -365,6 +365,25 @@ describe('HuntProgressService', () => {
       // Une réponse ensuite ne doit lever aucune exception.
       expect(() => service?.answerPadlockDigit('0')).not.toThrow();
     }
+  });
+
+  it('rejette une sauvegarde de cadenas incohérente (digitIndex au bout mais solved = false) : état neuf', () => {
+    const storage = new FakeStorage();
+    storage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        padlock: { digitIndex: PADLOCK_RIDDLES.length, failures: 0, solved: false },
+        password: { failures: 0, solved: false },
+        crossword: { letters: {}, locked: [], failures: 0, solved: false },
+        wordSearch: { seed: 1, found: [], failures: 0, solved: false },
+      }),
+    );
+
+    const { service } = setup({ storage });
+
+    expect(service.progress().padlock.digitIndex).toBe(0);
+    expect(() => service.answerPadlockDigit('0')).not.toThrow();
   });
 
   it('works without storage : token null, aucune exception', () => {
