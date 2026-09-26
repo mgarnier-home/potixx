@@ -5,6 +5,9 @@
       @case ('padlock') {
         <app-padlock-riddle (solved)="backToMap()" />
       }
+      @case ('password') {
+        <app-password-riddle (solved)="backToMap()" />
+      }
       @default {
         <p class="coming-soon">Cette étape se prépare encore. Revenez bientôt, moussaillon !</p>
       }
