@@ -1,0 +1,33 @@
+<div class="map">
+  <img class="map-image" [src]="imageSrc" alt="" width="600" height="800" />
+  @for (step of steps(); track step.id) {
+    <button
+      type="button"
+      class="step"
+      [class]="step.status"
+      [class.treasure]="step.id === 'treasure'"
+      [style.left.%]="step.x"
+      [style.top.%]="step.y"
+      [attr.data-testid]="'step-' + step.id"
+      [attr.aria-label]="step.label"
+      [attr.aria-disabled]="step.status === 'locked'"
+      [attr.aria-current]="step.status === 'current' ? 'step' : null"
+      (click)="select(step)"
+    >
+      <span class="seal" aria-hidden="true">
+        @if (step.status === 'solved') {
+          <svg viewBox="0 0 24 24" class="seal-icon">
+            <path d="M5 12.5l4.5 4.5L19 7.5" />
+          </svg>
+        } @else if (step.number === null) {
+          <svg viewBox="0 0 24 24" class="seal-icon">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        } @else {
+          {{ step.number }}
+        }
+      </span>
+      <span class="caption" aria-hidden="true">{{ step.label }}</span>
+    </button>
+  }
+</div>

@@ -1,0 +1,168 @@
+:host {
+  display: block;
+}
+
+/* La carte garde le format 3:4 de l'image : les étapes y sont placées en pourcentage. */
+.map {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  border-radius: var(--radius-paper);
+  filter: drop-shadow(0 18px 24px rgb(20 12 4 / 0.55));
+}
+
+.map-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* Une étape : un sceau de cire centré sur sa position, avec son nom écrit dessous. */
+.step {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  width: 9.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  transform: translate(-50%, calc(-1 * var(--seal-size) / 2));
+  --seal-size: 3.25rem;
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus-visible {
+    outline: none;
+
+    .seal {
+      outline: 3px solid var(--color-focus);
+      outline-offset: 4px;
+    }
+  }
+}
+
+.seal {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--seal-size);
+  height: var(--seal-size);
+  border-radius: var(--radius-round);
+  border: 3px solid var(--color-parchment-light);
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--color-parchment-light);
+  background: radial-gradient(circle at 35% 30%, #c4473f, var(--color-treasure) 55%, #6d1c17);
+  box-shadow: var(--shadow-seal);
+  transition: transform 150ms ease;
+}
+
+.seal-icon {
+  width: 60%;
+  height: 60%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.caption {
+  max-width: 100%;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-control);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--color-ink);
+  background: var(--color-parchment-light);
+  box-shadow: 0 1px 3px rgb(58 39 21 / 0.3);
+}
+
+/* En cours : le sceau rouge « respire » pour inviter au toucher. */
+.current {
+  .seal::after {
+    content: '';
+    position: absolute;
+    inset: -9px;
+    border: 3px solid var(--color-gold-light);
+    border-radius: inherit;
+    animation: beckon 1.8s ease-out infinite;
+  }
+
+  &:hover .seal {
+    transform: scale(1.06);
+  }
+
+  .caption {
+    font-weight: 700;
+  }
+}
+
+/* Résolue : sceau vert olive coché. */
+.solved {
+  .seal {
+    background: radial-gradient(circle at 35% 30%, #7aa05f, var(--color-success) 55%, #2f4f22);
+  }
+
+  &:hover .seal {
+    transform: scale(1.06);
+  }
+}
+
+/* Verrouillée : sceau terne, sans réaction. */
+.locked {
+  cursor: default;
+
+  .seal {
+    background: radial-gradient(circle at 35% 30%, #b3a894, var(--color-locked) 60%, #6f6555);
+    border-color: rgb(243 230 196 / 0.7);
+    color: rgb(243 230 196 / 0.85);
+    box-shadow: 0 2px 0 rgb(58 39 21 / 0.25);
+  }
+
+  .caption {
+    color: var(--color-ink-soft);
+    background: #e9dcb8;
+    box-shadow: none;
+  }
+}
+
+/* Le trésor : sceau plus grand, frappé de la croix. */
+.treasure {
+  --seal-size: 3.75rem;
+
+  &.locked .seal {
+    background: radial-gradient(circle at 35% 30%, #c6a15a, var(--color-gold) 60%, #7d5a1a);
+    color: var(--color-treasure-dark);
+  }
+}
+
+@keyframes beckon {
+  0% {
+    opacity: 0.95;
+    transform: scale(0.85);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@media (min-width: 700px) {
+  .step {
+    --seal-size: 3.75rem;
+  }
+
+  .treasure {
+    --seal-size: 4.25rem;
+  }
+
+  .caption {
+    font-size: 1.15rem;
+  }
+}

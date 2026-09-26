@@ -155,8 +155,10 @@ export const TREASURE: { videoSrc: string; posterSrc: string; message: string } 
 };
 
 /**
- * Carte de la chasse (spec §4.1) : positions en pourcentage de l'image, provisoires, ajustées
- * en tâche 7.
+ * Carte de la chasse (spec §4.1) : positions du centre de chaque étape, en pourcentage de
+ * l'image (0 = bord gauche/haut, 100 = bord droit/bas). Elles suivent le chemin dessiné dans
+ * `assets/map.svg` (600 × 800) ; le trésor est posé sur la croix rouge. Si l'image change, ces
+ * positions doivent être ajustées.
  */
 export const MAP: {
   imageSrc: string;
@@ -164,10 +166,10 @@ export const MAP: {
 } = {
   imageSrc: '/assets/map.svg',
   steps: {
-    padlock: { x: 20, y: 12, label: 'Le cadenas' },
-    password: { x: 75, y: 28, label: 'Le mot de passe' },
-    crossword: { x: 22, y: 48, label: 'Les mots croisés' },
-    wordSearch: { x: 72, y: 68, label: 'Les mots mêlés' },
-    treasure: { x: 50, y: 88, label: 'Le trésor' },
+    padlock: { x: 29.2, y: 18.75, label: 'Le cadenas' },
+    password: { x: 71.7, y: 31.25, label: 'Le mot de passe' },
+    crossword: { x: 28.3, y: 50, label: 'Les mots croisés' },
+    wordSearch: { x: 70, y: 67.5, label: 'Les mots mêlés' },
+    treasure: { x: 45, y: 85, label: 'Le trésor' },
   },
 };

@@ -1,0 +1,53 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+/* Écran de la carte : titre en haut, carte en dessous, centrées. */
+.map-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-3) var(--space-6);
+}
+
+.intro {
+  max-width: 26rem;
+  text-align: center;
+}
+
+.title {
+  font-size: var(--font-size-display);
+  color: var(--color-parchment-light);
+  text-shadow: 0 2px 0 rgb(20 12 4 / 0.6);
+}
+
+.lead {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-body);
+  color: rgb(243 230 196 / 0.9);
+}
+
+/* La carte occupe toute la largeur sur téléphone et la hauteur restante sur ordinateur. */
+.map {
+  width: 100%;
+  max-width: calc((100dvh - 9.5rem) * 3 / 4);
+  min-width: min(100%, 20rem);
+}
+
+.coming-soon {
+  font-size: var(--font-size-lead);
+  font-style: italic;
+  color: var(--color-ink-soft);
+}
+
+@media (min-width: 700px) {
+  .map-screen {
+    padding-top: var(--space-4);
+  }
+
+  .title {
+    font-size: 2.75rem;
+  }
+}
