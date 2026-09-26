@@ -1,0 +1,53 @@
+<div class="word-search" [class.solved]="isSolved()">
+  <div class="puzzle">
+    <div class="board" role="group" aria-label="Grille de mots mêlés">
+      @for (cell of cells(); track cell.key) {
+        <button
+          type="button"
+          class="cell"
+          [attr.data-testid]="'ws-cell-' + cell.row + '-' + cell.col"
+          [class.anchor]="isAnchor(cell)"
+          [class.found]="isFound(cell.key)"
+          [class.preview]="isPreview(cell.key)"
+          [class.failed]="isFailed(cell.key)"
+          [style.--ws-word-color]="cellColor(cell.key)"
+          [attr.aria-label]="cellLabel(cell)"
+          (click)="selectCell(cell)"
+          (mouseenter)="hoverCell(cell)"
+          (mouseleave)="hoverCell(null)"
+          (animationend)="onFailedAnimationEnd(cell.key)"
+        >
+          {{ cell.letter }}
+        </button>
+      }
+    </div>
+
+    <ul class="word-list" aria-label="Mots à trouver">
+      @for (word of words; track word) {
+        <li>
+          <span
+            class="word-chip"
+            [attr.data-testid]="'ws-word-' + word"
+            [class.found]="isWordFound(word)"
+            [style.--ws-word-color]="colorOf(word)"
+          >
+            {{ word }}
+          </span>
+        </li>
+      }
+    </ul>
+  </div>
+
+  @if (isSolved()) {
+    <div class="reveal">
+      <p class="solved-message">Bravo, moussaillon ! Tous les mots sont trouvés.</p>
+      @if (continueVisible()) {
+        <button type="button" class="button-primary" data-testid="ws-continue" (click)="continue()">
+          Continuer
+        </button>
+      }
+    </div>
+  } @else {
+    <app-skip-button [visible]="skipVisible()" (skipped)="onSkip()" />
+  }
+</div>

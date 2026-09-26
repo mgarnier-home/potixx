@@ -11,6 +11,9 @@
       @case ('crossword') {
         <app-crossword (solved)="backToMap()" />
       }
+      @case ('wordSearch') {
+        <app-word-search (solved)="backToMap()" />
+      }
       @default {
         <p class="coming-soon">Cette étape se prépare encore. Revenez bientôt, moussaillon !</p>
       }
