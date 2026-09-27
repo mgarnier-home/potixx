@@ -58,3 +58,35 @@ test('crossword: typing through the hidden input fills the grid and a check lock
   await expect(page.getByTestId('cw-cell-0-1')).toHaveClass(/locked/);
   await expect(page.getByTestId('cw-cell-11-1')).toHaveClass(/wrong/);
 });
+
+test('treasure: shows the reveal and restart sends back to a fresh map', async ({ page }) => {
+  // Les quatre énigmes déjà résolues : le trésor est l'étape courante.
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      'potixx.progress.v1',
+      JSON.stringify({
+        version: 1,
+        padlock: { digitIndex: 4, failures: 0, solved: true },
+        password: { failures: 0, solved: true },
+        crossword: { letters: {}, locked: [], failures: 0, solved: true },
+        wordSearch: { seed: 42, found: [], failures: 0, solved: true },
+      }),
+    ),
+  );
+  await page.goto('/');
+
+  await page.getByTestId('step-treasure').click();
+  await expect(page.getByTestId('treasure-message')).toHaveText(
+    "Notre famille s'agrandira en Avril 2027",
+  );
+  await expect(page.getByTestId('treasure-video')).toBeVisible();
+
+  page.once('dialog', (dialog) => dialog.dismiss());
+  await page.getByTestId('restart').click();
+  await expect(page.getByTestId('treasure-message')).toBeVisible();
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.getByTestId('restart').click();
+  await expect(page.getByTestId('step-padlock')).toBeVisible();
+  await expect(page.getByTestId('step-padlock')).toHaveClass(/current/);
+});

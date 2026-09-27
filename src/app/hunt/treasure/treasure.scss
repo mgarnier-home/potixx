@@ -1,0 +1,243 @@
+:host {
+  display: block;
+}
+
+.treasure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+}
+
+/*
+ * Le coffre : une seule scène orchestrée au chargement (le coffre s'ouvre, une lueur dorée
+ * grandit dans son ouverture) plutôt que des animations éparses. Purement décoratif (aria-hidden) :
+ * le contenu réel (vidéo, message) est indépendant du rendu de cette animation.
+ */
+.chest {
+  position: relative;
+  width: 9rem;
+}
+
+.chest-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chest-glow {
+  fill: url(#treasure-glow);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: glow-in 1100ms ease-out both;
+}
+
+.chest-body {
+  fill: var(--color-gold);
+  stroke: var(--color-treasure-dark);
+  stroke-width: 2;
+}
+
+.chest-band {
+  fill: var(--color-treasure-dark);
+}
+
+.chest-lid {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: lid-open 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.chest-lid-shape {
+  fill: var(--color-treasure);
+  stroke: var(--color-treasure-dark);
+  stroke-width: 2;
+}
+
+.chest-lock {
+  fill: var(--color-gold-light);
+  stroke: var(--color-treasure-dark);
+  stroke-width: 1.5;
+}
+
+@keyframes lid-open {
+  from {
+    transform: rotate(0deg) translateY(0);
+  }
+  to {
+    transform: rotate(-32deg) translateY(-4px);
+  }
+}
+
+@keyframes glow-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60% {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+}
+
+/* Quelques sparkles et pièces, discrets : ils apparaissent puis s'installent, sans clignoter. */
+.sparkle,
+.coin {
+  position: absolute;
+  opacity: 0;
+}
+
+.sparkle {
+  width: 12px;
+  height: 12px;
+  background: var(--color-gold-light);
+  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+  animation: sparkle-pop 900ms ease-out both;
+}
+
+.sparkle-1 {
+  top: 6%;
+  left: 4%;
+  animation-delay: 150ms;
+}
+
+.sparkle-2 {
+  top: 2%;
+  right: 8%;
+  width: 9px;
+  height: 9px;
+  animation-delay: 380ms;
+}
+
+.coin {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-round);
+  background: radial-gradient(circle at 35% 30%, var(--color-gold-light), var(--color-gold) 70%);
+  box-shadow: var(--shadow-seal);
+  animation: coin-rise 900ms ease-out both;
+}
+
+.coin-1 {
+  bottom: 22%;
+  left: 10%;
+  animation-delay: 250ms;
+}
+
+.coin-2 {
+  bottom: 30%;
+  right: 6%;
+  width: 13px;
+  height: 13px;
+  animation-delay: 420ms;
+}
+
+.coin-3 {
+  bottom: 6%;
+  left: 46%;
+  width: 11px;
+  height: 11px;
+  animation-delay: 550ms;
+}
+
+@keyframes sparkle-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4) rotate(-15deg);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.85;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes coin-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* La révélation : vidéo + message, mis en scène en même temps que le coffre s'ouvre. */
+.reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+  animation: reveal-in 700ms ease-out both;
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.video {
+  width: 100%;
+  max-width: 20rem;
+  max-height: 40vh;
+  aspect-ratio: 9 / 16;
+  margin: 0 auto;
+  border-radius: var(--radius-paper);
+  background: var(--color-ink);
+  box-shadow: var(--shadow-paper);
+  object-fit: contain;
+}
+
+/*
+ * Le message : la grande annonce, la seule chose vraiment audacieuse de l'écran. Grand, chaleureux,
+ * très lisible (pas d'italique) — le reste (coffre, bouton) reste discret pour ne pas lui faire
+ * concurrence.
+ */
+.message {
+  max-width: 24rem;
+  padding: var(--space-5) var(--space-6);
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-paper);
+  background: var(--color-parchment-light);
+  box-shadow: var(--shadow-paper);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 5.5vw, 2.25rem);
+  line-height: 1.25;
+  color: var(--color-treasure-dark);
+}
+
+.restart {
+  margin-top: var(--space-2);
+}
+
+@media (min-width: 700px) {
+  .chest {
+    width: 11rem;
+  }
+
+  .video {
+    max-width: 24rem;
+    max-height: 46vh;
+  }
+
+  .message {
+    max-width: 30rem;
+    font-size: clamp(2rem, 3.2vw, 2.5rem);
+  }
+}

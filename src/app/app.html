@@ -1,6 +1,5 @@
 @if (openStep(); as step) {
   <app-riddle-panel [title]="stepLabel(step)" (closed)="backToMap()">
-    <!-- Chaque tâche 9 à 12 ajoute ici un @case avec son composant, branché sur (solved)="backToMap()". -->
     @switch (step) {
       @case ('padlock') {
         <app-padlock-riddle (solved)="backToMap()" />
@@ -14,8 +13,8 @@
       @case ('wordSearch') {
         <app-word-search (solved)="backToMap()" />
       }
-      @default {
-        <p class="coming-soon">Cette étape se prépare encore. Revenez bientôt, moussaillon !</p>
+      @case ('treasure') {
+        <app-treasure (restarted)="backToMap()" />
       }
     }
   </app-riddle-panel>

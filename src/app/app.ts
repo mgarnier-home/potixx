@@ -5,6 +5,7 @@ import type { StepId } from './hunt/hunt-content';
 import { PadlockRiddle } from './hunt/padlock-riddle/padlock-riddle';
 import { PasswordRiddle } from './hunt/password-riddle/password-riddle';
 import { RiddlePanel } from './hunt/shared/riddle-panel/riddle-panel';
+import { Treasure } from './hunt/treasure/treasure';
 import { TreasureMap } from './hunt/treasure-map/treasure-map';
 import { WordSearch } from './hunt/word-search/word-search';
 
@@ -14,7 +15,15 @@ import { WordSearch } from './hunt/word-search/word-search';
  */
 @Component({
   selector: 'app-root',
-  imports: [RiddlePanel, TreasureMap, PadlockRiddle, PasswordRiddle, Crossword, WordSearch],
+  imports: [
+    RiddlePanel,
+    TreasureMap,
+    PadlockRiddle,
+    PasswordRiddle,
+    Crossword,
+    WordSearch,
+    Treasure,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,51 @@
+<div class="treasure">
+  <div class="chest" data-testid="treasure-chest" aria-hidden="true">
+    <svg class="chest-svg" viewBox="0 0 160 130" focusable="false">
+      <defs>
+        <radialGradient id="treasure-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#fff1c4" />
+          <stop offset="55%" stop-color="#e2b85a" />
+          <stop offset="100%" stop-color="#b8862b" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <ellipse class="chest-glow" cx="80" cy="50" rx="46" ry="24" />
+      <path
+        class="chest-body"
+        d="M14 60 h132 v46 a10 10 0 0 1 -10 10 h-112 a10 10 0 0 1 -10 -10 z"
+      />
+      <rect class="chest-band chest-band-v" x="72" y="60" width="16" height="56" />
+      <rect class="chest-band chest-band-h" x="14" y="86" width="132" height="10" />
+      <g class="chest-lid">
+        <path class="chest-lid-shape" d="M14 60 q0 -46 66 -46 q66 0 66 46 z" />
+        <circle class="chest-lock" cx="80" cy="58" r="7" />
+      </g>
+    </svg>
+    <span class="sparkle sparkle-1"></span>
+    <span class="sparkle sparkle-2"></span>
+    <span class="coin coin-1"></span>
+    <span class="coin coin-2"></span>
+    <span class="coin coin-3"></span>
+  </div>
+
+  <div class="reveal">
+    <video
+      class="video"
+      data-testid="treasure-video"
+      [src]="videoSrc"
+      [poster]="posterSrc"
+      muted
+      playsinline
+      controls
+    ></video>
+    <p class="message" data-testid="treasure-message">{{ message }}</p>
+  </div>
+
+  <button
+    type="button"
+    class="button-secondary restart"
+    data-testid="restart"
+    (click)="onRestart()"
+  >
+    Recommencer
+  </button>
+</div>
