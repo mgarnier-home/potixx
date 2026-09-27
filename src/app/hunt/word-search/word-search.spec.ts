@@ -6,9 +6,9 @@ import { WordSearch } from './word-search';
 
 // Graine fixée à 42 : avec cette graine, la grille générée (voir `word-search.ts` /
 // `core/word-search.ts`) place notamment :
-//  - NAISSANCE : (1,1) → (1,9), horizontale
-//  - PARENTS   : (0,1) → (0,7), horizontale
-//  - DOUDOUS   : (0,0) → (6,0), verticale
+//  - NAISSANCE : (9,0) → (9,8), horizontale
+//  - PARENTS   : (8,2) → (8,8), horizontale
+//  - DOUDOUS   : (2,8) → (8,8), verticale
 // (positions relevées une fois avec `generateWordSearch(WORD_SEARCH.words, WORD_SEARCH.size, 42)`).
 
 describe('WordSearch', () => {
@@ -77,21 +77,21 @@ describe('WordSearch', () => {
     createFixture();
     const service = TestBed.inject(HuntProgressService);
 
-    tap(0, 1);
-    expect(cell(0, 1).classList).toContain('anchor');
+    tap(8, 2);
+    expect(cell(8, 2).classList).toContain('anchor');
 
-    tap(0, 7);
+    tap(8, 8);
 
     expect(testid('ws-word-PARENTS')?.classList).toContain('found');
     expect(service.progress().wordSearch.found).toContain('PARENTS');
-    expect(cell(0, 1).classList).not.toContain('anchor');
+    expect(cell(8, 2).classList).not.toContain('anchor');
   });
 
   it('touche NAISSANCE dans l’ordre inverse (dernière puis première case) : trouvé aussi', () => {
     createFixture();
 
-    tap(1, 9);
-    tap(1, 1);
+    tap(9, 8);
+    tap(9, 0);
 
     expect(testid('ws-word-NAISSANCE')?.classList).toContain('found');
   });

@@ -97,17 +97,22 @@ export async function readWordSearchGrid(page: Page): Promise<string[][]> {
   return grid;
 }
 
-// Les mots ne sont placés que dans ces 4 directions (spec §4.6) ; leur sens inverse n'est jamais
-// utilisé, et `HuntProgressService.selectWordSearch` accepte de toute façon les deux extrémités
-// dans n'importe quel ordre.
+// Les mots sont placés dans les 8 directions (spec §4.6, dont au moins 2 « à l'envers ») ; comme
+// `HuntProgressService.selectWordSearch` accepte de toute façon les deux extrémités dans
+// n'importe quel ordre, il suffit de chercher `word` en avant depuis une case de départ dans
+// chacune de ces 8 directions pour retrouver son placement, à l'endroit ou à l'envers.
 const WORD_SEARCH_DIRECTIONS: readonly CellPosition[] = [
   { row: 0, col: 1 }, // droite
+  { row: 0, col: -1 }, // gauche
   { row: 1, col: 0 }, // bas
+  { row: -1, col: 0 }, // haut
   { row: 1, col: 1 }, // bas-droite
+  { row: -1, col: -1 }, // haut-gauche
   { row: 1, col: -1 }, // bas-gauche
+  { row: -1, col: 1 }, // haut-droite
 ];
 
-/** Cherche `word` dans `grid` selon les 4 directions autorisées ; renvoie ses deux extrémités. */
+/** Cherche `word` dans `grid` selon les 8 directions autorisées ; renvoie ses deux extrémités. */
 export function findWordEndpoints(
   grid: readonly string[][],
   word: string,
