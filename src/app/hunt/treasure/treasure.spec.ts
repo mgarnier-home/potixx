@@ -93,7 +93,9 @@ describe('Treasure', () => {
     it('affiche la vidéo sans son, adaptée à iOS, avec contrôles et affiche', () => {
       const video = testid('treasure-video') as HTMLVideoElement;
       expect(video).not.toBeNull();
-      expect(video.hasAttribute('muted')).toBe(true);
+      // La propriété `muted`, pas seulement l'attribut : un attribut statique ne coupe le son
+      // qu'à la création, `defaultMuted` restant vrai mais `video.muted` pouvant valoir faux.
+      expect(video.muted).toBe(true);
       expect(video.hasAttribute('playsinline')).toBe(true);
       expect(video.hasAttribute('controls')).toBe(true);
       expect(video.src).toContain(TREASURE.videoSrc);

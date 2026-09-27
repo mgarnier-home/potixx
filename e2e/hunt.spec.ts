@@ -183,6 +183,8 @@ test('full hunt by skipping every riddle', async ({ page }) => {
 
   await page.getByTestId('step-password').click();
   await skipRiddle(page, failPassword);
+  await expect(page.getByTestId('password-continue')).toBeVisible();
+  await page.getByTestId('password-continue').click();
   await expect(page.getByTestId('back-to-map')).toBeHidden();
 
   await page.getByTestId('step-crossword').click();

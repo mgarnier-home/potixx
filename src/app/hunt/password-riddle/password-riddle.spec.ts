@@ -122,6 +122,49 @@ describe('PasswordRiddle', () => {
     expect(testid('skip')).not.toBeNull();
   });
 
+  it("« Passer l'énigme » affiche la réponse sans félicitations, puis « Continuer » émet `solved`", async () => {
+    createFixture();
+    fixture.detectChanges();
+
+    await answer('pirate');
+    await answer('pirate');
+    await answer('pirate');
+    testid('skip')?.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+
+    expect(el().textContent).not.toContain('Bravo');
+    expect(el().textContent?.toLowerCase()).toContain('famille');
+    expect(solvedCount).toBe(0);
+
+    const continueButton = testid('password-continue') as HTMLButtonElement | null;
+    expect(continueButton).not.toBeNull();
+    continueButton?.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+
+    expect(solvedCount).toBe(1);
+  });
+
+  it("détruit le composant pendant l'animation de succès : la minuterie est annulée (pas de NG0953)", async () => {
+    vi.useFakeTimers();
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      createFixture();
+      fixture.detectChanges();
+
+      await answer('FAMILLE');
+      expect(solvedCount).toBe(0);
+
+      fixture.destroy();
+      vi.advanceTimersByTime(1500);
+
+      expect(solvedCount).toBe(0);
+      expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining('NG0953'));
+    } finally {
+      warnSpy.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
   it('« FAMILLE » émet `solved` après la brève animation de succès', async () => {
     vi.useFakeTimers();
     try {

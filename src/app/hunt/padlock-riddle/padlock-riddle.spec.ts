@@ -135,6 +135,30 @@ describe('PadlockRiddle', () => {
     }
   });
 
+  it("détruit le composant pendant l'animation d'ouverture : la minuterie est annulée (pas de NG0953)", async () => {
+    vi.useFakeTimers();
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      createFixture();
+      fixture.detectChanges();
+
+      await answer('0');
+      await answer('4');
+      await answer('2');
+      await answer('7');
+      expect(solvedCount).toBe(0);
+
+      fixture.destroy();
+      vi.advanceTimersByTime(1500);
+
+      expect(solvedCount).toBe(0);
+      expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining('NG0953'));
+    } finally {
+      warnSpy.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
   it('ouvert alors que le cadenas est déjà résolu : affiche 0-4-2-7 sans rien émettre', async () => {
     const service = TestBed.inject(HuntProgressService);
     for (const value of ['0', '4', '2', '7']) {

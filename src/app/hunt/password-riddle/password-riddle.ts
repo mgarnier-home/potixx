@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   computed,
   inject,
   output,
@@ -37,6 +38,11 @@ const REBUS_HALF_STEP = 9;
 /** Abscisse de la tête de note, après la clé. */
 const REBUS_NOTE_X = 140;
 
+/** Met en majuscule la première lettre (réponse affichée après un « Passer l'énigme »). */
+function capitalizeFirst(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 /** Vrai si le visiteur a demandé de réduire les animations (faux si l'API est indisponible). */
 function prefersReducedMotion(): boolean {
   return (
@@ -62,12 +68,23 @@ function prefersReducedMotion(): boolean {
 })
 export class PasswordRiddle {
   private readonly progress = inject(HuntProgressService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** Minuterie du message de succès en cours, annulée si le composant est détruit avant. */
+  private successTimer: ReturnType<typeof setTimeout> | undefined;
 
   /** Émis une fois le mot de passe trouvé (jamais si déjà résolu à l'ouverture de l'écran). */
   readonly solved = output<void>();
 
-  /** Vrai si l'énigme était déjà résolue à l'ouverture : pas d'animation, pas d'émission. */
-  private readonly alreadySolvedOnOpen = this.progress.progress().password.solved;
+  /**
+   * Vrai si l'énigme était déjà résolue à l'ouverture : pas d'animation, pas d'émission. Sert
+   * aussi à distinguer, une fois résolue, un passage (`onSkip`, réponse affichée avec un bouton
+   * « Continuer ») d'une énigme déjà résolue avant l'ouverture de l'écran (réponse affichée seule).
+   */
+  protected readonly alreadySolvedOnOpen = this.progress.progress().password.solved;
+
+  /** Réponse attendue, première lettre en majuscule, pour l'afficher après un passage. */
+  protected readonly answerLabel = capitalizeFirst(PASSWORD.answer);
 
   protected readonly clues = PASSWORD.clues;
 
@@ -96,6 +113,10 @@ export class PasswordRiddle {
     }
     return Math.min(this.password().failures + 1, this.clues.length);
   });
+
+  constructor() {
+    this.destroyRef.onDestroy(() => clearTimeout(this.successTimer));
+  }
 
   protected isClueVisible(index: number): boolean {
     return index < this.cluesVisibleCount();
@@ -134,10 +155,18 @@ export class PasswordRiddle {
     }
   }
 
+  /**
+   * Passe l'énigme : contrairement à une bonne réponse, aucune félicitation ni émission
+   * automatique. La réponse s'affiche avec un bouton « Continuer » (spec §4.2 et §4.4).
+   */
   protected onSkip(): void {
     this.progress.skip('password');
     this.errorMessage.set(null);
-    this.startSuccess();
+  }
+
+  /** Clic sur « Continuer » après un passage : émet `solved` (jamais de félicitation ici). */
+  protected continueAfterSkip(): void {
+    this.solved.emit();
   }
 
   /** Lance le bref message de succès puis émet `solved`, sauf si déjà résolu à l'ouverture. */
@@ -148,7 +177,7 @@ export class PasswordRiddle {
 
     this.success.set(true);
     const duration = prefersReducedMotion() ? 0 : SUCCESS_ANIMATION_MS;
-    setTimeout(() => {
+    this.successTimer = setTimeout(() => {
       this.solved.emit();
     }, duration);
   }

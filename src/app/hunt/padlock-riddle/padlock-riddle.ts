@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   computed,
   inject,
   output,
@@ -40,6 +41,10 @@ function prefersReducedMotion(): boolean {
 })
 export class PadlockRiddle {
   private readonly progress = inject(HuntProgressService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** Minuterie de l'animation d'ouverture en cours, annulée si le composant est détruit avant. */
+  private openingTimer: ReturnType<typeof setTimeout> | undefined;
 
   /** Émis une fois le cadenas ouvert (jamais si déjà résolu à l'ouverture de l'écran). */
   readonly solved = output<void>();
@@ -59,6 +64,10 @@ export class PadlockRiddle {
     return state.solved ? null : PADLOCK_RIDDLES[state.digitIndex].question;
   });
   protected readonly skipVisible = computed(() => this.progress.canSkip('padlock'));
+
+  constructor() {
+    this.destroyRef.onDestroy(() => clearTimeout(this.openingTimer));
+  }
 
   /** Chiffre affiché sur une molette : révélé si déjà trouvé (ou cadenas résolu), sinon « ? ». */
   protected digitValue(index: number): string {
@@ -102,7 +111,7 @@ export class PadlockRiddle {
 
     this.opening.set(true);
     const duration = prefersReducedMotion() ? 0 : OPENING_ANIMATION_MS;
-    setTimeout(() => {
+    this.openingTimer = setTimeout(() => {
       this.opening.set(false);
       this.solved.emit();
     }, duration);
