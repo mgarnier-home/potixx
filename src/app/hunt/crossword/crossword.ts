@@ -157,6 +157,18 @@ export class Crossword {
   });
   private readonly litKeys = computed(() => new Set(HIGHLIGHT_KEYS.slice(0, this.litCount())));
 
+  /** Case active partagée par deux mots : le bouton « Changer de sens » est alors proposé. */
+  protected readonly toggleTarget = computed(() => {
+    const key = this.activeKey();
+    const entry = this.activeEntry();
+    const cell = key === null ? undefined : GRID_CELLS_BY_KEY.get(key);
+    if (cell === undefined || cell.entries.length < 2 || this.isSolved()) {
+      return null;
+    }
+    const other = cell.entries.find((number) => number !== entry);
+    return other === undefined ? null : (ENTRIES.get(other) ?? null);
+  });
+
   protected readonly activeClue = computed(() => {
     const number = this.activeEntry();
     return number === null ? null : (ENTRIES.get(number) ?? null);
@@ -221,7 +233,11 @@ export class Crossword {
     return `Ligne ${cell.row + 1}, colonne ${cell.col + 1} : ${letter === '' ? 'vide' : letter}`;
   }
 
-  /** Toucher une case : sélectionne son mot ; retoucher la case active bascule de sens. */
+  /**
+   * Toucher une case (spec §4.5). Case d'un seul mot : ce mot. Case partagée : retoucher la case
+   * active bascule vers l'autre mot ; sinon le mot actif est gardé s'il passe par la case ; sinon
+   * on prend le mot qui commence sur la case, à défaut le mot non verrouillé, à défaut l'horizontal.
+   */
   protected selectCell(cell: GridCell): void {
     if (this.isSolved()) {
       return;
@@ -234,10 +250,7 @@ export class Crossword {
     } else if (current !== null && cell.entries.includes(current)) {
       entry = current;
     } else {
-      const orientation = current === null ? null : ENTRIES.get(current)?.orientation;
-      entry =
-        cell.entries.find((number) => ENTRIES.get(number)?.orientation === orientation) ??
-        cell.entries[0];
+      entry = this.preferredEntry(cell);
     }
 
     this.activeEntry.set(entry);
@@ -245,17 +258,23 @@ export class Crossword {
     this.focusInput();
   }
 
-  /** Toucher une définition : sélectionne le mot, curseur sur sa première case vide modifiable. */
+  /** Bouton « Changer de sens » : passe à l'autre mot de la case active, curseur inchangé. */
+  protected toggleDirection(): void {
+    const other = this.toggleTarget();
+    if (other !== null) {
+      this.activeEntry.set(other.number);
+    }
+    this.focusInput();
+  }
+
+  /** Toucher une définition : sélectionne toujours ce mot, curseur sur sa première case. */
   protected selectEntry(number: number): void {
     if (this.isSolved()) {
       return;
     }
 
-    const keys = ENTRY_KEYS.get(number) ?? [];
-    const editable = keys.filter((key) => this.isEditable(key));
-    const firstEmpty = editable.find((key) => this.letterOf(key) === '');
+    const target = ENTRY_KEYS.get(number)?.[0] ?? null;
     this.activeEntry.set(number);
-    const target = firstEmpty ?? editable[0] ?? keys[0] ?? null;
     this.activeKey.set(target);
     this.focusInput();
     this.scrollCellIntoView(target);
@@ -380,7 +399,12 @@ export class Crossword {
     this.composedText = current;
   }
 
-  /** Écrit une lettre dans la première case modifiable à partir du curseur, puis avance. */
+  /**
+   * Écrit une lettre dans la case active puis avance d'une case (spec §4.5). Une case verrouillée
+   * ou préremplie n'est jamais sautée d'avance : la lettre tapée dessus est ignorée et le curseur
+   * avance, pour que taper le mot entier remplisse chaque lettre à sa place. Seul le « - » est
+   * sauté en avançant, puisque le joueur tape GRANDPERE sans tiret.
+   */
   private typeLetter(char: string): void {
     const letter = normalizeAnswer(char).toUpperCase();
     const entry = this.activeEntry();
@@ -389,19 +413,18 @@ export class Crossword {
       return;
     }
 
-    const keys = ENTRY_KEYS.get(entry) ?? [];
-    const index = keys.indexOf(active);
-    const target = keys.slice(index).find((key) => this.isEditable(key));
-    if (target === undefined) {
-      return;
+    if (this.isEditable(active)) {
+      this.writeLetter(active, letter);
     }
-
-    this.writeLetter(target, letter);
-    const next = keys.slice(keys.indexOf(target) + 1).find((key) => this.isEditable(key));
-    this.activeKey.set(next ?? target);
+    const keys = ENTRY_KEYS.get(entry) ?? [];
+    const next = keys.slice(keys.indexOf(active) + 1).find((key) => !PREFILLED.has(key));
+    this.activeKey.set(next ?? active);
   }
 
-  /** Efface la case active si elle est remplie ; sinon recule d'une case modifiable et la vide. */
+  /**
+   * Efface la case active si elle est modifiable et remplie ; sinon recule d'une case (en sautant
+   * le « - ») et la vide si elle est modifiable. Une case verrouillée n'est jamais vidée.
+   */
   private erase(): void {
     const entry = this.activeEntry();
     const active = this.activeKey();
@@ -418,10 +441,12 @@ export class Crossword {
     const previous = keys
       .slice(0, keys.indexOf(active))
       .reverse()
-      .find((key) => this.isEditable(key));
+      .find((key) => !PREFILLED.has(key));
     if (previous !== undefined) {
       this.activeKey.set(previous);
-      this.writeLetter(previous, '');
+      if (this.isEditable(previous)) {
+        this.writeLetter(previous, '');
+      }
     }
   }
 
@@ -462,6 +487,24 @@ export class Crossword {
       next.entries[0];
     this.activeEntry.set(entry);
     this.activeKey.set(next.key);
+  }
+
+  /** Mot choisi sur une case partagée hors mot actif : qui commence ici, non verrouillé, horizontal. */
+  private preferredEntry(cell: GridCell): number {
+    const [first, ...others] = cell.entries;
+    if (others.length === 0) {
+      return first;
+    }
+
+    const startsHere = cell.entries.filter((number) => ENTRY_KEYS.get(number)?.[0] === cell.key);
+    if (startsHere.length === 1) {
+      return startsHere[0];
+    }
+    const unlocked = cell.entries.filter((number) => !this.lockedEntries().has(number));
+    if (unlocked.length === 1) {
+      return unlocked[0];
+    }
+    return cell.entries.find((number) => ENTRIES.get(number)?.orientation === 'across') ?? first;
   }
 
   private isEditable(key: string): boolean {

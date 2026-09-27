@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { PADLOCK_RIDDLES, TREASURE, WORD_SEARCH } from '../src/app/hunt/hunt-content';
 import {
+  crosswordEntryCells,
   failCrossword,
   failPadlockDigit,
   failPassword,
@@ -12,6 +13,7 @@ import {
   solvePadlock,
   solvePassword,
   solveWordSearch,
+  typeCrosswordEntry,
 } from './helpers';
 
 // Chaque test Playwright s'exécute dans un contexte de navigateur neuf (comportement par défaut) :
@@ -62,8 +64,9 @@ test('crossword: typing through the hidden input fills the grid and a check lock
   await expect(page.getByTestId('cw-cell-0-1')).toHaveText('1C');
   await expect(page.getByTestId('cw-cell-5-1')).toHaveText('N');
 
+  // Une définition place toujours le curseur sur la première case du mot (spec §4.5).
   await page.getByTestId('cw-clue-3').click();
-  await page.keyboard.type('oeuz');
+  await page.keyboard.type('soeuz');
   await page.keyboard.press('Backspace');
   await page.keyboard.type('r');
   await expect(page.getByTestId('cw-cell-3-5')).toHaveText('R');
@@ -71,6 +74,48 @@ test('crossword: typing through the hidden input fills the grid and a check lock
   await page.getByTestId('cw-check').click();
   await expect(page.getByTestId('cw-cell-0-1')).toHaveClass(/locked/);
   await expect(page.getByTestId('cw-cell-11-1')).toHaveClass(/wrong/);
+});
+
+test('crossword: whole words typed from their clues stay aligned across locked words and solve the grid', async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      'potixx.progress.v1',
+      JSON.stringify({
+        version: 1,
+        padlock: { digitIndex: 4, failures: 0, solved: true },
+        password: { failures: 0, solved: true },
+        crossword: { letters: {}, locked: [], failures: 0, solved: false },
+        wordSearch: { seed: 42, found: [], failures: 0, solved: false },
+      }),
+    ),
+  );
+  await page.goto('/');
+  await page.getByTestId('step-crossword').click();
+
+  // COUSIN, SOEUR et ONCLE juste verrouillés ; GRAND-PERE les croise tous les trois.
+  await typeCrosswordEntry(page, 1);
+  await page.getByTestId('cw-check').click();
+  await expect(page.getByTestId('cw-cell-3-1')).toHaveClass(/locked/);
+
+  await typeCrosswordEntry(page, 3); // SOEUR : le S verrouillé est tapé par-dessus.
+  await typeCrosswordEntry(page, 4);
+  await page.getByTestId('cw-check').click();
+  await expect(page.getByTestId('cw-cell-5-5')).toHaveClass(/locked/);
+
+  await typeCrosswordEntry(page, 2); // GRANDPERE : croise R et N verrouillés, saute le « - ».
+  for (const number of [1, 2, 3, 4]) {
+    for (const { testId, letter } of crosswordEntryCells(number)) {
+      await expect(page.getByTestId(testId)).toContainText(letter);
+    }
+  }
+
+  for (const number of [5, 6, 7, 8, 9]) {
+    await typeCrosswordEntry(page, number);
+  }
+  await page.getByTestId('cw-check').click();
+  await expect(page.getByTestId('cw-continue')).toBeVisible();
 });
 
 test('treasure: shows the reveal and restart sends back to a fresh map', async ({ page }) => {

@@ -95,6 +95,12 @@ describe('Crossword', () => {
     expect(el().querySelectorAll('[data-testid^="cw-clue-"]').length).toBe(9);
   });
 
+  it('définition 8 (TATA) : « Ta tante, comme l’appellent les petits »', () => {
+    createFixture();
+
+    expect(testid('cw-clue-8')?.textContent).toContain("Ta tante, comme l'appellent les petits");
+  });
+
   it("ne rend que les cases blanches, avec le numéro dans la première case d'un mot", () => {
     createFixture();
 
@@ -345,15 +351,253 @@ describe('Crossword', () => {
     expect(el().querySelectorAll('.cell.active').length).toBe(0);
   });
 
-  it('la saisie saute les cases verrouillées par un mot croisé', () => {
-    createFixture();
-
-    click('cw-clue-1');
-    type('cousin');
+  /** Tape le mot depuis sa définition puis « Vérifier » : le mot juste est verrouillé. */
+  function lockWord(clue: number, word: string): void {
+    click(`cw-clue-${clue}`);
+    type(word);
     click('cw-check');
+  }
 
-    click('cw-clue-3');
-    expect(cell(3, 2).classList).toContain('active');
+  function tapCell(row: number, col: number): void {
+    cell(row, col).click();
+    fixture.detectChanges();
+  }
+
+  function activeClueNumber(): string | null {
+    return (
+      el().querySelector('.clue.active')?.getAttribute('data-testid')?.replace('cw-clue-', '') ??
+      null
+    );
+  }
+
+  describe('sélection (spec §4.5)', () => {
+    it('toucher une définition place le curseur sur la première case, même déjà remplie', () => {
+      createFixture();
+
+      click('cw-clue-1');
+      type('cousin');
+      click('cw-clue-3');
+
+      expect(activeClueNumber()).toBe('3');
+      expect(cell(3, 1).classList).toContain('active');
+    });
+
+    it('toucher une définition dont la première case est verrouillée : curseur sur cette case', () => {
+      createFixture();
+      lockWord(1, 'cousin');
+
+      click('cw-clue-3');
+
+      expect(cell(3, 1).classList).toContain('active');
+    });
+
+    it('case partagée sans mot actif : choisit le mot qui commence sur la case (SOEUR en 3-1)', () => {
+      createFixture();
+
+      tapCell(3, 1);
+
+      expect(activeClueNumber()).toBe('3');
+      expect(cell(3, 1).classList).toContain('active');
+    });
+
+    it('case partagée sans mot actif : choisit AMIS (qui commence) plutôt que TATA en 11-0', () => {
+      createFixture();
+
+      tapCell(11, 0);
+
+      expect(activeClueNumber()).toBe('9');
+    });
+
+    it('case partagée où aucun mot ne commence : choisit le mot non verrouillé', () => {
+      createFixture();
+      lockWord(2, 'grandpere');
+
+      tapCell(3, 5);
+
+      expect(activeClueNumber()).toBe('3');
+    });
+
+    it('case partagée, aucun mot ne commence ni verrouillé : choisit le mot horizontal', () => {
+      createFixture();
+
+      tapCell(9, 2);
+
+      expect(activeClueNumber()).toBe('7');
+    });
+
+    it('case partagée contenue dans le mot actif : le mot actif reste, le curseur se déplace', () => {
+      createFixture();
+
+      click('cw-clue-5');
+      tapCell(9, 2);
+
+      expect(activeClueNumber()).toBe('5');
+      expect(cell(9, 2).classList).toContain('active');
+    });
+
+    it('toucher de nouveau la même case partagée bascule vers l’autre mot, puis revient', () => {
+      createFixture();
+
+      tapCell(9, 2);
+      expect(activeClueNumber()).toBe('7');
+
+      tapCell(9, 2);
+      expect(activeClueNumber()).toBe('5');
+      expect(cell(9, 2).classList).toContain('active');
+
+      tapCell(9, 2);
+      expect(activeClueNumber()).toBe('7');
+    });
+
+    it('case d’un seul mot : sélectionne ce mot', () => {
+      createFixture();
+
+      click('cw-clue-3');
+      tapCell(1, 1);
+
+      expect(activeClueNumber()).toBe('1');
+      expect(cell(1, 1).classList).toContain('active');
+    });
+  });
+
+  describe('bouton « Changer de sens »', () => {
+    it('absent sans sélection et sur une case d’un seul mot', () => {
+      createFixture();
+      expect(testid('cw-toggle')).toBeNull();
+
+      click('cw-clue-1');
+      expect(testid('cw-toggle')).toBeNull();
+    });
+
+    it('visible sur une case partagée ; le toucher bascule vers l’autre mot sans bouger le curseur', () => {
+      createFixture();
+
+      tapCell(3, 1);
+      expect(testid('cw-toggle')).not.toBeNull();
+      expect(testid('cw-toggle')?.textContent).toContain('Changer de sens');
+
+      click('cw-toggle');
+      expect(activeClueNumber()).toBe('1');
+      expect(cell(3, 1).classList).toContain('active');
+
+      click('cw-toggle');
+      expect(activeClueNumber()).toBe('3');
+      expect(cell(3, 1).classList).toContain('active');
+    });
+
+    it('après bascule, la saisie suit le nouveau sens', () => {
+      createFixture();
+
+      tapCell(3, 1);
+      click('cw-toggle');
+      type('si');
+
+      expect(letterAt(3, 1)).toBe('S');
+      expect(letterAt(4, 1)).toBe('I');
+    });
+  });
+
+  describe('saisie sans décalage', () => {
+    it('taper « SOEUR » après avoir verrouillé COUSIN remplit chaque lettre à sa place', () => {
+      createFixture();
+      lockWord(1, 'cousin');
+
+      click('cw-clue-3');
+      type('soeur');
+
+      expect(['S', 'O', 'E', 'U', 'R']).toEqual([1, 2, 3, 4, 5].map((col) => letterAt(3, col)));
+      expect(cell(3, 1).classList).toContain('locked');
+    });
+
+    it('une lettre tapée sur une case verrouillée est ignorée et le curseur avance d’une case', () => {
+      createFixture();
+      lockWord(1, 'cousin');
+
+      click('cw-clue-3');
+      type('x');
+
+      expect(letterAt(3, 1)).toBe('S');
+      expect(cell(3, 2).classList).toContain('active');
+    });
+
+    it('taper « GRANDPERE » depuis la définition 2 saute le « - » et remplit tout à sa place', () => {
+      createFixture();
+
+      click('cw-clue-2');
+      type('grandpere');
+
+      const column = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((row) => letterAt(row, 5)).join('');
+      expect(column).toBe('GRAND-PERE');
+    });
+
+    it('taper « GRANDPERE » en croisant SOEUR et ONCLE verrouillés : tout reste aligné', () => {
+      createFixture();
+      lockWord(3, 'soeur');
+      lockWord(4, 'oncle');
+
+      click('cw-clue-2');
+      type('grandpere');
+
+      const column = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((row) => letterAt(row, 5)).join('');
+      expect(column).toBe('GRAND-PERE');
+    });
+
+    it('une lettre tapée sur la case « - » est ignorée et le curseur avance', () => {
+      createFixture();
+
+      tapCell(7, 5);
+      expect(activeClueNumber()).toBe('6');
+      type('a');
+
+      expect(letterAt(7, 5)).toBe('-');
+      expect(letterAt(7, 6)).toBe('');
+      expect(cell(7, 6).classList).toContain('active');
+    });
+
+    it('effacement sur une case verrouillée : ne la vide pas, recule et vide la case précédente', () => {
+      createFixture();
+      lockWord(3, 'soeur');
+
+      click('cw-clue-1');
+      type('cou');
+      expect(cell(3, 1).classList).toContain('active');
+
+      pressKey('Backspace');
+
+      expect(letterAt(3, 1)).toBe('S');
+      expect(letterAt(2, 1)).toBe('');
+      expect(cell(2, 1).classList).toContain('active');
+    });
+
+    it('effacement sur une case vide après une case verrouillée : recule sur elle sans la vider', () => {
+      createFixture();
+      lockWord(1, 'cousin');
+
+      click('cw-clue-3');
+      type('x');
+      expect(cell(3, 2).classList).toContain('active');
+
+      pressKey('Backspace');
+
+      expect(letterAt(3, 1)).toBe('S');
+      expect(cell(3, 1).classList).toContain('active');
+    });
+
+    it('effacement juste après le « - » : le saute et vide la case d’avant', () => {
+      createFixture();
+
+      click('cw-clue-2');
+      type('grandp');
+      expect(cell(9, 5).classList).toContain('active');
+
+      pressKey('Backspace');
+      pressKey('Backspace');
+
+      expect(letterAt(8, 5)).toBe('');
+      expect(letterAt(7, 5)).toBe('-');
+      expect(letterAt(6, 5)).toBe('');
+      expect(cell(6, 5).classList).toContain('active');
+    });
   });
 
   it('grille complète et juste : illumine les cases puis affiche AGRANDIRA et « Continuer »', async () => {

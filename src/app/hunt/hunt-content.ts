@@ -115,7 +115,7 @@ export const CROSSWORD: CrosswordDefinition = {
       answer: 'TATA',
       orientation: 'down',
       start: { row: 10, col: 0 },
-      clue: 'La sœur de papa ou de maman, en plus tendre',
+      clue: "Ta tante, comme l'appellent les petits",
     },
     {
       number: 9,

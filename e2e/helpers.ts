@@ -38,29 +38,42 @@ export async function solvePassword(page: Page): Promise<void> {
 }
 
 /**
- * Remplit toute la grille de mots croisés avec la solution, case par case (et non mot par mot) :
- * une entrée déjà partiellement remplie par un mot croisé écrit avant elle décalerait la saisie si
- * on tapait la réponse entière depuis le début. Toucher directement la case cible place le curseur
- * dessus, quel que soit l'ordre de remplissage. Vérifie, attend l'illumination du mot caché puis
- * clique sur « Continuer ».
+ * Remplit toute la grille de mots croisés comme un visiteur : toucher chaque définition puis taper
+ * le mot entier, sans tiret (spec §4.5 : le curseur part de la première case, saute le « - » et
+ * ne décale jamais les lettres). Vérifie, attend l'illumination du mot caché puis clique sur
+ * « Continuer ».
  */
 export async function solveCrossword(page: Page): Promise<void> {
   for (const entry of CROSSWORD.entries) {
-    const cells = entryCells(entry);
-    for (const [index, cell] of cells.entries()) {
-      const letter = entry.answer[index];
-      if (letter === '-') {
-        continue; // Case pré-remplie (GRAND-MERE / GRAND-PERE), non modifiable.
-      }
-      await page.getByTestId(`cw-cell-${cell.row}-${cell.col}`).click();
-      await page.keyboard.type(letter);
-    }
+    await typeCrosswordEntry(page, entry.number);
   }
 
   await page.getByTestId('cw-check').click();
   await expect(page.getByTestId('cw-continue')).toBeVisible();
   await page.getByTestId('cw-continue').click();
   await expect(page.getByTestId('back-to-map')).toBeHidden();
+}
+
+/** Touche la définition `number` puis tape sa réponse entière, sans le tiret pré-rempli. */
+export async function typeCrosswordEntry(page: Page, number: number): Promise<void> {
+  const entry = CROSSWORD.entries.find((candidate) => candidate.number === number);
+  if (entry === undefined) {
+    throw new Error(`Définition ${number} introuvable dans CROSSWORD.`);
+  }
+  await page.getByTestId(`cw-clue-${number}`).click();
+  await page.keyboard.type(entry.answer.replaceAll('-', ''));
+}
+
+/** Texte attendu d'une entrée, case par case (pour vérifier que les lettres sont à leur place). */
+export function crosswordEntryCells(number: number): { testId: string; letter: string }[] {
+  const entry = CROSSWORD.entries.find((candidate) => candidate.number === number);
+  if (entry === undefined) {
+    throw new Error(`Définition ${number} introuvable dans CROSSWORD.`);
+  }
+  return entryCells(entry).map((cell, index) => ({
+    testId: `cw-cell-${cell.row}-${cell.col}`,
+    letter: entry.answer[index],
+  }));
 }
 
 /**

@@ -105,6 +105,26 @@
           <span class="bar-orientation">{{ orientationLabel(clue.orientation) }}</span>
           <span class="bar-text">{{ clue.clue }}</span>
         </p>
+        @if (toggleTarget(); as other) {
+          <button
+            type="button"
+            class="bar-toggle"
+            data-testid="cw-toggle"
+            [attr.aria-label]="
+              'Changer de sens : mot ' +
+              other.number +
+              ', ' +
+              orientationLabel(other.orientation).toLowerCase()
+            "
+            (mousedown)="$event.preventDefault()"
+            (click)="toggleDirection()"
+          >
+            <span class="bar-toggle-icon" aria-hidden="true">{{
+              other.orientation === 'across' ? '↔' : '↕'
+            }}</span>
+            <span class="bar-toggle-text">Changer de sens</span>
+          </button>
+        }
       } @else {
         <p class="bar-hint">Touche une case ou une définition pour écrire.</p>
       }

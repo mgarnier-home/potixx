@@ -7,7 +7,7 @@
 /*
  * Mise en page : sur téléphone, tout s'empile (grille, bouton, définitions) et une barre collée
  * en bas rappelle la définition du mot en cours au-dessus du clavier. Quand la place le permet,
- * les définitions passent à droite de la grille et la barre devient inutile.
+ * les définitions passent à droite de la grille et la barre s'étend sous les deux colonnes.
  */
 .crossword {
   position: relative;
@@ -282,6 +282,7 @@
   z-index: 3;
   display: flex;
   align-items: center;
+  gap: var(--space-2);
   min-height: 3.75rem;
   margin: 0 calc(-1 * var(--space-4));
   padding: var(--space-2) var(--space-4);
@@ -292,6 +293,8 @@
 
 .bar-clue,
 .bar-hint {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -322,6 +325,46 @@
 }
 
 /*
+ * « Changer de sens » : proposé seulement sur une case partagée par deux mots, pour ceux qui ne
+ * devinent pas le double toucher. Contour doré sur l'encre de la barre, flèche du sens d'arrivée.
+ */
+.bar-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 2.5rem;
+  margin-left: auto;
+  padding: var(--space-1) var(--space-3);
+  border: 2px solid var(--color-gold-light);
+  border-radius: var(--radius-round);
+  background: transparent;
+  color: var(--color-parchment-light);
+  font-family: var(--font-body);
+  font-size: var(--font-size-small);
+  font-weight: 700;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover,
+  &:active {
+    background: rgb(226 184 90 / 0.18);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-gold-light);
+    outline-offset: 2px;
+  }
+}
+
+.bar-toggle-icon {
+  color: var(--color-gold-light);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/*
  * Champ caché qui reçoit la saisie : invisible mais focalisable (sinon le clavier du téléphone
  * ne s'ouvre pas). 16 px évite le zoom automatique d'iOS au focus.
  */
@@ -339,7 +382,7 @@
   pointer-events: none;
 }
 
-/* Assez de place : définitions à droite de la grille, barre du bas masquée (champ conservé). */
+/* Assez de place : définitions à droite de la grille, barre de définition sur toute la largeur. */
 @container (min-width: 36rem) {
   .crossword {
     display: grid;
@@ -365,14 +408,10 @@
     font-size: var(--font-size-small);
   }
 
+  /* La barre reste visible (sous la grille et les définitions) pour le bouton « Changer de sens ». */
   .bar {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    min-height: 0;
+    grid-column: 1 / -1;
     margin: 0;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
+    border-radius: var(--radius-control);
   }
 }
