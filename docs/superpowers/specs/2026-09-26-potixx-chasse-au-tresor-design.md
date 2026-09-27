@@ -159,10 +159,10 @@ Interaction :
   l'autre mot quand la case active est partagée, pour ceux qui ne devinent pas le double toucher.
 - La saisie passe par un champ caché qui ouvre le clavier du téléphone ; le curseur avance
   automatiquement et recule avec la touche d'effacement.
-- Taper le mot entier depuis sa première case remplit chaque lettre **à sa place** : le curseur ne
-  saute jamais de case. Une case préremplie (« - ») ou appartenant à un mot verrouillé est
-  « tapée par-dessus » : la lettre saisie est ignorée pour cette case et le curseur avance d'une
-  case.
+- Taper le mot entier depuis sa première case remplit chaque lettre **à sa place** : une case
+  appartenant à un mot verrouillé n'est plus sautée, elle est « tapée par-dessus » (la lettre
+  saisie est ignorée pour cette case et le curseur avance d'une case). Seule la case préremplie
+  « - » est sautée automatiquement, puisque le joueur tape GRANDPERE sans tiret.
 - Bouton « Vérifier » : si la grille contient des erreurs, les mots faux passent en rouge et un
   échec est compté. Les mots justes sont verrouillés.
 - Grille juste (ou énigme passée) : les 9 cases s'illuminent une à une dans l'ordre ci-dessus, puis
