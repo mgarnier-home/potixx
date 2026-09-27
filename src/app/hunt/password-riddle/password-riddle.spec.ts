@@ -61,7 +61,7 @@ describe('PasswordRiddle', () => {
     expect(testid('password-clue-2')).toBeNull();
   });
 
-  it('deux mauvaises réponses : révèle le troisième indice (le rébus)', async () => {
+  it('deux mauvaises réponses : révèle le troisième indice (le rébus dessiné)', async () => {
     createFixture();
     fixture.detectChanges();
 
@@ -70,9 +70,43 @@ describe('PasswordRiddle', () => {
 
     const rebus = testid('password-clue-2');
     expect(rebus).not.toBeNull();
-    expect(rebus?.textContent).toContain('Fa');
-    expect(rebus?.textContent).toContain('+');
+    // Le rébus ne doit jamais écrire le mot « Fa » : c'est au joueur de lire la note dessinée.
+    expect(rebus?.textContent).not.toContain('Fa');
     expect(rebus?.textContent).toContain('1000');
+
+    const svg = rebus?.querySelector('svg');
+    expect(svg).not.toBeNull();
+    expect(svg?.getAttribute('role')).toBe('img');
+    const labelledText =
+      svg?.getAttribute('aria-label') ?? svg?.querySelector('title')?.textContent ?? '';
+    expect(labelledText).toBe('Rébus : une note de musique sur une portée, plus 1000');
+
+    // Une note dessinée (tête de note) et une portée à 5 lignes, pas juste la clé.
+    expect(svg?.querySelectorAll('line').length).toBe(5);
+    expect(svg?.querySelector('ellipse')).not.toBeNull();
+  });
+
+  it('le champ de réponse est conçu pour ne jamais déclencher un gestionnaire de mots de passe', async () => {
+    createFixture();
+    fixture.detectChanges();
+
+    const input = testid('password-input') as HTMLInputElement;
+    expect(input.type).toBe('text');
+    expect(input.getAttribute('autocomplete')).toBe('off');
+    expect(input.getAttribute('autocapitalize')).toBe('none');
+    expect(input.getAttribute('spellcheck')).toBe('false');
+    expect(input.hasAttribute('data-bwignore')).toBe(true);
+    expect(input.getAttribute('data-1p-ignore')).not.toBeNull();
+    expect(input.getAttribute('data-lpignore')).toBe('true');
+
+    // Ni l'id, ni le name, ni le libellé ne doivent contenir « password » ou « mot de passe » :
+    // c'est ce qui fait apparaître Bitwarden/1Password/LastPass sur le champ.
+    expect((input.id ?? '').toLowerCase()).not.toContain('password');
+    expect((input.getAttribute('name') ?? '').toLowerCase()).not.toContain('password');
+    expect((input.getAttribute('autocomplete') ?? '').toLowerCase()).not.toContain('password');
+
+    const label = el().querySelector(`label[for="${input.id}"]`);
+    expect(label?.textContent?.trim()).toBe('Le mot secret');
   });
 
   it("fait apparaître « Passer l'énigme » après 3 mauvaises réponses", async () => {

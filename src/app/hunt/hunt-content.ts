@@ -23,11 +23,16 @@ export const PADLOCK_RIDDLES: readonly { question: string; answer: string }[] = 
   { question: 'Je corresponds au nombre de jours dans une semaine', answer: '7' },
 ];
 
-/** Un indice de l'énigme du mot de passe, affiché progressivement (spec §4.4). */
+/**
+ * Un indice de l'énigme du mot de passe, affiché progressivement (spec §4.4). L'indice « rébus »
+ * est dessiné (portée + clé de sol + note) par le composant à partir de `note` (ex. `'F4'`, voir
+ * `core/music-staff.ts`) ; `suffix` est le texte affiché à côté (ex. « + 1000 ») et `alt` le texte
+ * alternatif du rébus complet.
+ */
 export type PasswordClue =
   | { kind: 'image'; src: string; alt: string }
   | { kind: 'text'; text: string }
-  | { kind: 'rebus'; parts: string[] };
+  | { kind: 'rebus'; note: string; suffix: string; alt: string };
 
 /** Énigme du mot de passe : réponse et indices affichés un par un (spec §4.4). */
 export const PASSWORD: { answer: string; clues: readonly PasswordClue[] } = {
@@ -38,7 +43,12 @@ export const PASSWORD: { answer: string; clues: readonly PasswordClue[] } = {
       kind: 'text',
       text: "L'équipage que l'on ne choisit pas toujours, mais que l'on garde toute sa vie.",
     },
-    { kind: 'rebus', parts: ['♪ Fa', '+', '1000'] },
+    {
+      kind: 'rebus',
+      note: 'F4',
+      suffix: '+ 1000',
+      alt: 'Rébus : une note de musique sur une portée, plus 1000',
+    },
   ],
 };
 
