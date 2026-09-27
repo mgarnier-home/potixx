@@ -3,182 +3,293 @@
 }
 
 .treasure {
+  /* Durée totale de l'ouverture, fournie par le composant (CHEST_OPENING_MS). */
+  --opening-duration: 1800ms;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-6);
   text-align: center;
+  /* La lueur et le couvercle en perspective peuvent dépasser : jamais de défilement horizontal. */
+  overflow-x: clip;
 }
 
 /*
- * Le coffre : une seule scène orchestrée au chargement (le coffre s'ouvre, une lueur dorée
- * grandit dans son ouverture) plutôt que des animations éparses. Purement décoratif (aria-hidden) :
- * le contenu réel (vidéo, message) est indépendant du rendu de cette animation.
+ * La scène du coffre : un seul moment orchestré. Le coffre tressaille, le couvercle bascule vers
+ * l'arrière, l'intérieur de velours se relève derrière l'or, la lueur monte, quelques pièces
+ * roulent au sol. Toutes les étapes sont en pourcentage de `--opening-duration`.
  */
-.chest {
+.scene {
   position: relative;
-  width: 9rem;
+  width: min(19rem, 100%);
+  aspect-ratio: 320 / 280;
 }
 
-.chest-svg {
-  display: block;
+.layer {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
   overflow: visible;
+
+  > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
 }
 
-.chest-glow {
-  fill: url(#treasure-glow);
-  opacity: 0;
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  animation: glow-in 1100ms ease-out both;
+.chest {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 88%;
+  animation: chest-shake var(--opening-duration) ease-in-out both;
 }
 
-.chest-body {
-  fill: var(--color-gold);
-  stroke: var(--color-treasure-dark);
-  stroke-width: 2;
+/* Trait d'encre commun, comme sur la carte. */
+.ink {
+  stroke: var(--color-ink);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
 }
 
-.chest-band {
-  fill: var(--color-treasure-dark);
+.gold {
+  fill: url(#tc-gold);
 }
 
-.chest-lid {
+.wood-dark {
+  fill: #6e4220;
+}
+
+.inside {
+  fill: #2a1b0e;
+}
+
+.shadow {
+  fill: rgb(58 39 21 / 0.28);
+}
+
+.rivet {
+  fill: var(--color-gold-light);
+  stroke: var(--color-ink);
+  stroke-width: 1.2;
+}
+
+.grain {
+  fill: none;
+  stroke: #5e3a1b;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+.seam {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 1.6;
+}
+
+.pearls circle {
+  fill: #fbf6ea;
+  stroke: var(--color-ink);
+  stroke-width: 1;
+}
+
+.pearls .pendant {
+  fill: var(--color-treasure);
+}
+
+/* Couvercle fermé : il bascule autour de sa charnière (haut du dôme) puis disparaît. */
+.lid-outer {
+  transform-origin: 50% 36%;
+  animation: lid-outer-open var(--opening-duration) both;
+}
+
+/* Intérieur du couvercle : il se relève depuis le bord arrière du coffre. */
+.lid-inner {
+  transform-origin: 50% 47%;
+  animation: lid-inner-open var(--opening-duration) both;
+}
+
+.glow {
+  transform-origin: 50% 45%;
+  animation: glow-in var(--opening-duration) ease-out both;
+}
+
+.rays {
+  fill: #e9bd55;
+  opacity: 0.4;
+}
+
+.spill {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: lid-open 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: spill-in var(--opening-duration) ease-out both;
 }
 
-.chest-lid-shape {
-  fill: var(--color-treasure);
-  stroke: var(--color-treasure-dark);
-  stroke-width: 2;
+.sparkle {
+  fill: #fff4cf;
+  stroke: var(--color-gold);
+  stroke-width: 0.8;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: sparkle-pop var(--opening-duration) ease-out both;
 }
 
-.chest-lock {
-  fill: var(--color-gold-light);
-  stroke: var(--color-treasure-dark);
-  stroke-width: 1.5;
+.s2 {
+  animation-delay: 80ms;
 }
 
-@keyframes lid-open {
-  from {
-    transform: rotate(0deg) translateY(0);
+.s3 {
+  animation-delay: 160ms;
+}
+
+.s4 {
+  animation-delay: 240ms;
+}
+
+@keyframes chest-shake {
+  0% {
+    transform: rotate(0deg);
   }
-  to {
-    transform: rotate(-32deg) translateY(-4px);
+  5% {
+    transform: rotate(-2.2deg);
+  }
+  10% {
+    transform: rotate(2deg);
+  }
+  15% {
+    transform: rotate(-1.4deg);
+  }
+  20% {
+    transform: rotate(0.8deg);
+  }
+  25%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes lid-outer-open {
+  0%,
+  22% {
+    transform: perspective(700px) rotateX(0deg);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.6);
+  }
+  48% {
+    transform: perspective(700px) rotateX(88deg);
+    opacity: 1;
+  }
+  49%,
+  100% {
+    transform: perspective(700px) rotateX(90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes lid-inner-open {
+  0%,
+  47% {
+    transform: perspective(700px) rotateX(-88deg);
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.25);
+  }
+  48% {
+    transform: perspective(700px) rotateX(-86deg);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.25);
+  }
+  100% {
+    transform: perspective(700px) rotateX(-22deg);
+    opacity: 1;
   }
 }
 
 @keyframes glow-in {
-  from {
+  0%,
+  40% {
     opacity: 0;
     transform: scale(0.5);
   }
-  60% {
-    opacity: 0.9;
+  80% {
+    opacity: 1;
   }
-  to {
-    opacity: 0.7;
+  100% {
+    opacity: 0.85;
     transform: scale(1);
   }
 }
 
-/* Quelques sparkles et pièces, discrets : ils apparaissent puis s'installent, sans clignoter. */
-.sparkle,
-.coin {
-  position: absolute;
-  opacity: 0;
-}
-
-.sparkle {
-  width: 12px;
-  height: 12px;
-  background: var(--color-gold-light);
-  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
-  animation: sparkle-pop 900ms ease-out both;
-}
-
-.sparkle-1 {
-  top: 6%;
-  left: 4%;
-  animation-delay: 150ms;
-}
-
-.sparkle-2 {
-  top: 2%;
-  right: 8%;
-  width: 9px;
-  height: 9px;
-  animation-delay: 380ms;
-}
-
-.coin {
-  width: 16px;
-  height: 16px;
-  border-radius: var(--radius-round);
-  background: radial-gradient(circle at 35% 30%, var(--color-gold-light), var(--color-gold) 70%);
-  box-shadow: var(--shadow-seal);
-  animation: coin-rise 900ms ease-out both;
-}
-
-.coin-1 {
-  bottom: 22%;
-  left: 10%;
-  animation-delay: 250ms;
-}
-
-.coin-2 {
-  bottom: 30%;
-  right: 6%;
-  width: 13px;
-  height: 13px;
-  animation-delay: 420ms;
-}
-
-.coin-3 {
-  bottom: 6%;
-  left: 46%;
-  width: 11px;
-  height: 11px;
-  animation-delay: 550ms;
+@keyframes spill-in {
+  0%,
+  55% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes sparkle-pop {
-  from {
+  0%,
+  70% {
     opacity: 0;
-    transform: scale(0.4) rotate(-15deg);
+    transform: scale(0.2) rotate(-30deg);
   }
-  60% {
+  88% {
     opacity: 1;
+    transform: scale(1.2) rotate(0deg);
   }
-  to {
-    opacity: 0.85;
+  100% {
+    opacity: 0.9;
     transform: scale(1) rotate(0deg);
   }
 }
 
-@keyframes coin-rise {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.6);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* La révélation : vidéo + message, mis en scène en même temps que le coffre s'ouvre. */
+/*
+ * La révélation : l'annonce d'abord (visible sans défiler sous le coffre), puis la vidéo. Invisible
+ * (et ignorée des lecteurs d'écran) tant que le coffre n'est pas ouvert, mais sa place est réservée
+ * pour que rien ne saute à l'apparition.
+ */
 .reveal {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-5);
   width: 100%;
-  animation: reveal-in 700ms ease-out both;
+  margin-top: var(--space-4);
+  visibility: hidden;
+
+  > * {
+    opacity: 0;
+  }
+}
+
+.is-revealed .reveal {
+  visibility: visible;
+
+  > * {
+    animation: reveal-in 700ms ease-out both;
+  }
+
+  > .flourish {
+    animation-delay: 120ms;
+  }
+
+  > .video {
+    animation-delay: 260ms;
+  }
+
+  > .restart {
+    animation-delay: 400ms;
+  }
 }
 
 @keyframes reveal-in {
@@ -192,52 +303,77 @@
   }
 }
 
+/* L'annonce : la seule chose vraiment audacieuse de l'écran, grande et très lisible. */
+.message {
+  max-width: 22rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 8.4vw, 2.4rem);
+  line-height: 1.15;
+  color: var(--color-treasure-dark);
+  text-wrap: balance;
+}
+
+.flourish {
+  width: 11rem;
+  height: auto;
+  margin-top: var(--space-2);
+
+  path {
+    fill: none;
+    stroke: var(--color-gold);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .flourish-gem {
+    fill: var(--color-treasure);
+    stroke: var(--color-ink);
+    stroke-width: 1;
+  }
+}
+
 .video {
   width: 100%;
   max-width: 20rem;
-  max-height: 40vh;
+  max-height: 60vh;
   aspect-ratio: 9 / 16;
-  margin: 0 auto;
+  margin-top: var(--space-6);
+  border: 3px solid var(--color-gold);
   border-radius: var(--radius-paper);
   background: var(--color-ink);
   box-shadow: var(--shadow-paper);
   object-fit: contain;
 }
 
-/*
- * Le message : la grande annonce, la seule chose vraiment audacieuse de l'écran. Grand, chaleureux,
- * très lisible (pas d'italique) — le reste (coffre, bouton) reste discret pour ne pas lui faire
- * concurrence.
- */
-.message {
-  max-width: 24rem;
-  padding: var(--space-5) var(--space-6);
-  border: 3px solid var(--color-gold);
-  border-radius: var(--radius-paper);
-  background: var(--color-parchment-light);
-  box-shadow: var(--shadow-paper);
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 5.5vw, 2.25rem);
-  line-height: 1.25;
-  color: var(--color-treasure-dark);
-}
-
 .restart {
-  margin-top: var(--space-2);
+  margin-top: var(--space-6);
 }
 
 @media (min-width: 700px) {
-  .chest {
-    width: 11rem;
-  }
-
-  .video {
-    max-width: 24rem;
-    max-height: 46vh;
+  .scene {
+    width: 22rem;
   }
 
   .message {
     max-width: 30rem;
-    font-size: clamp(2rem, 3.2vw, 2.5rem);
+    font-size: clamp(2.4rem, 3.4vw, 2.9rem);
+  }
+
+  .video {
+    max-width: 24rem;
+  }
+}
+
+/* Mouvements réduits : coffre directement ouvert, révélation sans effet. */
+@media (prefers-reduced-motion: reduce) {
+  .chest,
+  .lid-outer,
+  .lid-inner,
+  .glow,
+  .spill,
+  .sparkle,
+  .is-revealed .reveal > * {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }
