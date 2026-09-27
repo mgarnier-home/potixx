@@ -59,7 +59,12 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
-          path: playwright-report/
+          # Le rapport HTML (activé en CI dans playwright.config.ts) explique les échecs, et
+          # test-results/ contient les traces ('trace: on-first-retry') et captures des essais
+          # ayant échoué : les deux sont nécessaires pour déboguer un échec E2E depuis la CI.
+          path: |
+            playwright-report/
+            test-results/
           retention-days: 7
 
   docker:
