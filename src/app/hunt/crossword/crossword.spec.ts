@@ -417,6 +417,24 @@ describe('Crossword', () => {
       expect(activeClueNumber()).toBe('3');
     });
 
+    it('case partagée où aucun mot ne commence, horizontal verrouillé : choisit le vertical', () => {
+      createFixture();
+      lockWord(3, 'soeur');
+
+      tapCell(3, 5);
+
+      expect(activeClueNumber()).toBe('2');
+    });
+
+    it('case partagée : le mot qui commence sur la case l’emporte même s’il est verrouillé', () => {
+      createFixture();
+      lockWord(3, 'soeur');
+
+      tapCell(3, 1);
+
+      expect(activeClueNumber()).toBe('3');
+    });
+
     it('case partagée, aucun mot ne commence ni verrouillé : choisit le mot horizontal', () => {
       createFixture();
 
@@ -554,7 +572,7 @@ describe('Crossword', () => {
       expect(cell(7, 6).classList).toContain('active');
     });
 
-    it('effacement sur une case verrouillée : ne la vide pas, recule et vide la case précédente', () => {
+    it('effacement sur une case verrouillée : recule d’une case sans rien vider', () => {
       createFixture();
       lockWord(3, 'soeur');
 
@@ -565,8 +583,51 @@ describe('Crossword', () => {
       pressKey('Backspace');
 
       expect(letterAt(3, 1)).toBe('S');
-      expect(letterAt(2, 1)).toBe('');
+      expect(letterAt(2, 1)).toBe('U');
       expect(cell(2, 1).classList).toContain('active');
+    });
+
+    it('« SOEUR » avec le R final verrouillé : un effacement recule sans vider le U', () => {
+      createFixture();
+      lockWord(2, 'grandpere');
+
+      click('cw-clue-3');
+      type('soeur');
+      expect(cell(3, 5).classList).toContain('active');
+
+      pressKey('Backspace');
+
+      expect(letterAt(3, 5)).toBe('R');
+      expect(letterAt(3, 4)).toBe('U');
+      expect(cell(3, 4).classList).toContain('active');
+    });
+
+    it('effacement façon Android sur une case verrouillée : recule sans rien vider', () => {
+      createFixture();
+      lockWord(2, 'grandpere');
+
+      click('cw-clue-3');
+      type('soeur');
+
+      inputEvent('', { inputType: 'deleteContentBackward' });
+
+      expect(letterAt(3, 5)).toBe('R');
+      expect(letterAt(3, 4)).toBe('U');
+      expect(cell(3, 4).classList).toContain('active');
+    });
+
+    it('composition qui grandit puis raccourcit après une case verrouillée : vide O, garde S', () => {
+      createFixture();
+      lockWord(1, 'cousin');
+
+      click('cw-clue-3');
+      inputEvent(' s', { inputType: 'insertCompositionText', data: 's', isComposing: true });
+      inputEvent(' so', { inputType: 'insertCompositionText', data: 'so', isComposing: true });
+      inputEvent(' s', { inputType: 'insertCompositionText', data: 's', isComposing: true });
+
+      expect(letterAt(3, 1)).toBe('S');
+      expect(letterAt(3, 2)).toBe('');
+      expect(cell(3, 2).classList).toContain('active');
     });
 
     it('effacement sur une case vide après une case verrouillée : recule sur elle sans la vider', () => {

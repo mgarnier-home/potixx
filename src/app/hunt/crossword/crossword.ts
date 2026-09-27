@@ -422,8 +422,9 @@ export class Crossword {
   }
 
   /**
-   * Efface la case active si elle est modifiable et remplie ; sinon recule d'une case (en sautant
-   * le « - ») et la vide si elle est modifiable. Une case verrouillée n'est jamais vidée.
+   * Efface la case active si elle est modifiable et remplie. Sur une case verrouillée, recule
+   * seulement d'une case (en sautant le « - ») sans rien vider, symétrique de « taper
+   * par-dessus ». Sur une case vide, recule d'une case et la vide si elle est modifiable.
    */
   private erase(): void {
     const entry = this.activeEntry();
@@ -444,7 +445,7 @@ export class Crossword {
       .find((key) => !PREFILLED.has(key));
     if (previous !== undefined) {
       this.activeKey.set(previous);
-      if (this.isEditable(previous)) {
+      if (!this.lockedKeys().has(active) && this.isEditable(previous)) {
         this.writeLetter(previous, '');
       }
     }
@@ -496,6 +497,8 @@ export class Crossword {
       return first;
     }
 
+    // Départage seulement si un seul des deux mots commence ici (aucun cas de la grille actuelle
+    // n'a deux départs sur une même case, mais on retombe alors sur les règles suivantes).
     const startsHere = cell.entries.filter((number) => ENTRY_KEYS.get(number)?.[0] === cell.key);
     if (startsHere.length === 1) {
       return startsHere[0];
