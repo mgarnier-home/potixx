@@ -706,3 +706,93 @@ mot dans les 4 directions.
   `npm run lint && npm run format:check && npm test && npm run build && npm run e2e` → tout vert.
 - [ ] **Étape 4 : Point de contrôle final** — lister tous les fichiers du projet à commiter et
   rappeler au propriétaire de créer les secrets `DOCKERHUB_USERNAME` et `DOCKERHUB_TOKEN`.
+
+---
+
+## Retours de test du propriétaire (2026-09-27)
+
+Tâches ajoutées après les tests du propriétaire (notes de `site.md`, réponses aux questions du
+2026-09-27). La spec a été révisée en conséquence (§4.4 à §4.7). Elles passent avant les tâches 14
+et 15.
+
+### Tâche 16 : Mots mêlés dans les 8 directions
+
+**Fichiers :** modifier `src/app/hunt/core/word-search.ts` (+ spec), `e2e/helpers.ts`,
+éventuellement `src/app/hunt/word-search/word-search.ts` (aperçu de ligne au survol).
+
+**Interfaces :** `Direction` couvre les 8 directions (`right`, `left`, `down`, `up`,
+`down-right`, `down-left`, `up-right`, `up-left`). Signatures de `generateWordSearch` et
+`findWordAt` inchangées.
+
+- [ ] **Étape 1 : Tests** (sur 200 graines, liste réelle de `WORD_SEARCH`) : 10 mots placés ;
+  pas entre cases consécutives dans les 8 directions autorisées ; au moins 3 mots en diagonale ;
+  au moins 2 mots à l'envers (pas `left`, `up`, `up-left`, `up-right`, ou toute direction dont la
+  ligne ou la colonne décroît… définition retenue : un mot est « à l'envers » si sa direction a une
+  composante `left` ou `up`) ; aucun mot n'apparaît ailleurs qu'à sa position placée dans aucune
+  des 8 directions ; un mot palindrome (ex. `ELLE`) ajouté à la liste ne fait pas échouer la
+  génération ; déterminisme et régénération depuis la graine retournée conservés ;
+  `findWordAt` trouve un mot à l'envers dans les deux ordres de toucher.
+- [ ] **Étape 2 : Échec vu. Étape 3 : implémenter** (mêmes règles de graine dérivée et 50
+  tentatives ; une tentative est rejetée si les contraintes de diagonales/envers/doublons ne sont
+  pas satisfaites ; la détection de doublon exclut la position placée elle-même et sa lecture
+  inverse, pour qu'un palindrome passe). Mesurer sur 20 000 graines que la génération n'échoue
+  jamais et rapporter le nombre moyen de tentatives.
+- [ ] **Étape 4 :** `e2e/helpers.ts` cherche dans les 8 directions ; `npm test` et `npm run e2e`
+  verts ; vérification visuelle d'une grille (mots à l'envers et en diagonale visibles).
+
+### Tâche 17 : Mot de passe — rébus sur portée et champ ignoré des gestionnaires
+
+**Fichiers :** `src/app/hunt/password-riddle/*`, `src/app/hunt/hunt-content.ts` (type de l'indice
+rébus si nécessaire).
+
+- [ ] Rébus (spec §4.4) : SVG inline accessible (portée 5 lignes, clé de sol, ronde ou noire sur
+  le 1ᵉʳ interligne en partant du bas = Fa, puis « + 1000 »), sans le mot « Fa » ; lisible sur
+  390 px ; `role="img"` + texte alternatif de la spec.
+- [ ] Champ de réponse (spec §4.4) : `type="text"`, `autocomplete="off"`, `autocapitalize="none"`,
+  `spellcheck="false"`, `name`/`id` sans « password » (ex. `secret-word`), libellé « Le mot
+  secret », `data-bwignore`, `data-1p-ignore`, `data-lpignore="true"`. Le `data-testid`
+  `password-input` est conservé (contrat E2E).
+- [ ] Tests composant : le champ n'est pas de type password et porte les attributs d'exclusion ; le
+  rébus est un SVG avec un texte alternatif et ne contient pas le texte « Fa ».
+- [ ] Vérification visuelle du rébus en 390×844 et 1280×800.
+
+### Tâche 18 : Mots croisés — cases partagées, changement de sens, saisie sans décalage
+
+**Fichiers :** `src/app/hunt/crossword/*`, `src/app/hunt/hunt-content.ts` (définition 8),
+`e2e/hunt.spec.ts`.
+
+- [ ] Définition 8 : « Ta tante, comme l'appellent les petits ».
+- [ ] Règles de sélection de la spec §4.5 (définition → 1ʳᵉ case ; case partagée : mot actif
+  conservé, sinon mot qui commence sur la case, sinon mot non verrouillé, sinon horizontal ;
+  2ᵉ toucher bascule) + bouton « Changer de sens » dans la barre de définition, visible seulement
+  quand la case active est partagée.
+- [ ] Saisie sans décalage (spec §4.5) : le curseur ne saute plus les cases verrouillées ou
+  préremplies ; saisir sur une telle case ne la modifie pas mais avance d'une case. Revoir
+  l'effacement en cohérence (reculer sur une case verrouillée ne l'efface pas).
+- [ ] Tests composant : chaque règle de sélection ; bouton de changement de sens ; taper « SOEUR »
+  après avoir verrouillé COUSIN (case S partagée) remplit S-O-E-U-R à leur place ; taper
+  « GRANDPERE » depuis la définition 2 saute proprement le tiret (le « - » est tapé par-dessus
+  avec n'importe quelle lettre ; décision : la saisie d'une lettre sur « - » avance simplement).
+  Attention : pour GRAND-PERE, le joueur tape 9 lettres sans tiret ; le curseur doit donc sauter
+  automatiquement le « - » quand il y arrive par avance **et** ignorer une frappe sur « - » si le
+  joueur tape quand même un caractère pour le tiret. Décision retenue : sauter automatiquement les
+  cases « - » préremplies à l'avance (comme avant), mais ne plus sauter les cases verrouillées
+  (tapées par-dessus).
+- [ ] E2E : un scénario tape les mots entiers depuis leurs définitions (y compris après qu'un mot
+  croisant est rempli et verrouillé) et résout la grille ; `solveCrossword` peut revenir à cette
+  saisie naturelle.
+- [ ] Vérification visuelle (sélection d'une case partagée, bouton de sens, saisie d'un mot
+  croisant un mot verrouillé).
+
+### Tâche 19 : Trésor — coffre illustré
+
+**Fichiers :** `src/app/hunt/treasure/*` (éventuellement un SVG dans `assets/`).
+
+- [ ] Coffre au trésor en SVG dans le style de la carte (bois, ferrures dorées, cadenas ouvert,
+  pièces qui débordent, éclat doré), couvercle qui s'ouvre (≤ 2 s ; instantané si mouvements
+  réduits), puis apparition de la vidéo et du message **après** l'ouverture (spec §4.7).
+- [ ] Tests composant existants conservés (data-testid inchangés) ; ajouter un test que la
+  révélation est marquée visible après la fin de l'ouverture (`vi.useFakeTimers()` ou classe
+  d'état pilotée par `animationend`).
+- [ ] Vérification visuelle : pendant l'ouverture, révélation finale, en 390×844 et 1280×800 ;
+  comparer à la carte pour la cohérence de style.
