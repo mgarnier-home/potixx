@@ -71,7 +71,13 @@ export async function readWordSearchGrid(page: Page): Promise<string[][]> {
   const size = WORD_SEARCH.size;
   const grid: string[][] = Array.from({ length: size }, () => Array(size).fill(''));
 
-  const cells = await page.locator('[data-testid^="ws-cell-"]').evaluateAll((elements) =>
+  // `evaluateAll` prend un instantané immédiat du DOM sans attendre : sur une machine plus lente,
+  // l'écran des mots mêlés peut ne pas avoir fini de s'afficher, donnant une grille partielle ou
+  // vide. On attend d'abord que toutes les cases soient effectivement rendues.
+  const cellsLocator = page.locator('[data-testid^="ws-cell-"]');
+  await expect(cellsLocator).toHaveCount(size ** 2);
+
+  const cells = await cellsLocator.evaluateAll((elements) =>
     elements.map((element) => ({
       testId: element.getAttribute('data-testid') ?? '',
       letter: (element.textContent ?? '').trim(),
