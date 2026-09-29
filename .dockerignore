@@ -1,0 +1,19 @@
+# Fichiers inutiles à l'étape "build" de l'image Docker (voir spec §7 et Dockerfile).
+node_modules
+dist
+.angular
+.git
+.claude
+.vscode
+docs
+
+# Résultats et outillage de tests, jamais nécessaires pour `npm run build`.
+e2e
+test-results
+playwright-report
+
+# Fichiers de suivi du projet / documentation, non utilisés par le build.
+.superpowers
+site.md
+activity.png
+*.md

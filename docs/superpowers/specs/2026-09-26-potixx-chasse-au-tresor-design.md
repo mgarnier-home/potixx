@@ -1,7 +1,9 @@
 # Potixx — Chasse au trésor (v1) et configuration du LLM
 
 - Date : 2026-09-26
-- Statut : design validé, spec en relecture
+- Statut : design validé ; révisé le 2026-09-27 après les retours de test du propriétaire
+  (§4.4 rébus et champ de saisie, §4.5 définition 8 et sélection des cases partagées, §4.6 huit
+  directions, §4.7 coffre illustré)
 - Source du besoin : `site.md`, `activity.png`
 
 ## 1. Objectif
@@ -100,9 +102,17 @@ Les indices apparaissent un par un :
 1. Affiché dès le départ : une photo du couple (`assets/photo-us.jpg`, provisoire).
 2. Après le 1ᵉʳ échec : « L'équipage que l'on ne choisit pas toujours, mais que l'on garde toute sa
    vie. »
-3. Après le 2ᵉ échec : rébus « Fa » (note de musique, image ou symbole ♪) + « 1000 ».
+3. Après le 2ᵉ échec : rébus classique dessiné (SVG) : une portée avec une clé de sol et une note
+   placée sur le **Fa** (1ᵉʳ interligne en partant du bas), suivie de « + 1000 ». Le mot « Fa »
+   n'est pas écrit : c'est au joueur de lire la note. Texte alternatif : « Rébus : une note de
+   musique sur une portée, plus 1000 ».
 
 Après le 3ᵉ échec, le bouton « Passer l'énigme » apparaît.
+
+Le champ de réponse ne doit pas déclencher les gestionnaires de mots de passe (Bitwarden,
+1Password, LastPass, navigateur) : champ texte, sans le mot « password » dans son `name`, son `id`,
+son `autocomplete` ni son libellé (« Le mot secret »), `autocomplete="off"`, et les attributs
+d'exclusion `data-bwignore`, `data-1p-ignore`, `data-lpignore="true"`.
 
 ### 4.5 Énigme 3 — Les mots croisés
 
@@ -120,7 +130,7 @@ Coordonnées (ligne, colonne), origine en haut à gauche, à partir de 0 :
 | 5 | MARRAINE | vertical | (6, 2) | Elle veille sur toi depuis ton baptême |
 | 6 | GRAND-MERE | horizontal | (7, 0) | La maman de papa ou de maman |
 | 7 | FRERE | horizontal | (9, 1) | Garçon des mêmes parents que toi |
-| 8 | TATA | vertical | (10, 0) | La sœur de papa ou de maman, en plus tendre |
+| 8 | TATA | vertical | (10, 0) | Ta tante, comme l'appellent les petits |
 | 9 | AMIS | horizontal | (11, 0) | La famille que l'on choisit |
 
 Cases du mot caché **AGRANDIRA**, dans l'ordre d'illumination :
@@ -139,10 +149,20 @@ Cases du mot caché **AGRANDIRA**, dans l'ordre d'illumination :
 
 Interaction :
 
-- Toucher une case ou une définition sélectionne un mot ; toucher à nouveau une case partagée
-  bascule entre horizontal et vertical.
+- Toucher une définition sélectionne toujours ce mot, curseur sur sa **première** case.
+- Toucher une case d'un seul mot sélectionne ce mot. Toucher une case partagée par deux mots :
+  - si le mot actif contient déjà cette case, il reste sélectionné (on déplace juste le curseur) ;
+  - sinon, on choisit le mot qui **commence** sur cette case ; à défaut, le mot qui n'est pas encore
+    verrouillé ; à défaut, le mot horizontal ;
+  - toucher à nouveau la même case bascule vers l'autre mot.
+- Un bouton visible dans la barre de définition (« ↔ / ↕ Changer de sens ») bascule aussi vers
+  l'autre mot quand la case active est partagée, pour ceux qui ne devinent pas le double toucher.
 - La saisie passe par un champ caché qui ouvre le clavier du téléphone ; le curseur avance
   automatiquement et recule avec la touche d'effacement.
+- Taper le mot entier depuis sa première case remplit chaque lettre **à sa place** : une case
+  appartenant à un mot verrouillé n'est plus sautée, elle est « tapée par-dessus » (la lettre
+  saisie est ignorée pour cette case et le curseur avance d'une case). Seule la case préremplie
+  « - » est sautée automatiquement, puisque le joueur tape GRANDPERE sans tiret.
 - Bouton « Vérifier » : si la grille contient des erreurs, les mots faux passent en rouge et un
   échec est compté. Les mots justes sont verrouillés.
 - Grille juste (ou énigme passée) : les 9 cases s'illuminent une à une dans l'ordre ci-dessus, puis
@@ -155,8 +175,12 @@ PARENTS.
 
 - Grille de 10×10 : 62 lettres de mots pour 100 cases, cases d'environ 34 px sur un écran de
   360 px.
-- Directions : horizontale (gauche à droite), verticale (haut en bas), diagonales descendantes
-  (dans les deux sens horizontaux). Pas de mot écrit à l'envers.
+- Directions : les **8 directions** (horizontale, verticale et diagonales, dans les deux sens de
+  lecture, donc aussi à l'envers). Chaque grille contient au moins 3 mots en diagonale et au moins
+  2 mots écrits à l'envers. Les mots peuvent se croiser sur une lettre commune.
+- Aucun mot de la liste ne doit apparaître ailleurs qu'à sa position placée, dans aucune des 8
+  directions (sinon le joueur sélectionne une copie et se voit compter un échec). Un mot
+  palindrome ne doit pas faire échouer la génération.
 - Grille aléatoire par visiteur : une graine est tirée à la première ouverture et sauvegardée avec
   la progression, donc un rechargement redonne la même grille.
 - Le générateur doit placer les 10 mots. S'il échoue avec une graine, il réessaie avec une graine
@@ -168,7 +192,9 @@ PARENTS.
 
 ### 4.7 Le trésor
 
-- Animation d'ouverture d'un coffre.
+- Coffre au trésor illustré en SVG, dans le style de la carte (bois, ferrures, cadenas ouvert,
+  pièces d'or qui débordent), qui s'ouvre (≤ 2 s, instantané si « mouvements réduits »).
+- La vidéo et le message apparaissent **après** l'ouverture du coffre, sur fond parchemin.
 - Vidéo `assets/treasure.mp4` (provisoire), lue sans son par défaut, avec les contrôles natifs et
   `playsinline` pour iOS.
 - Message : « Notre famille s'agrandira en Avril 2027 ».

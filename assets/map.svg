@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" role="img" aria-label="Carte au trésor : une île sur un parchemin, traversée par un chemin en pointillés qui mène à une croix rouge">
+  <!--
+    Carte provisoire de la chasse (spec §4.1), remplaçable. Palette « tropical festif » : lagon,
+    sable doré, palmiers vert tropical, chemin corail. Format portrait 3:4 (600 × 800).
+    Les étapes sont posées par l'application sur le chemin, aux positions MAP.steps de
+    src/app/hunt/hunt-content.ts (en % de cette image) :
+      cadenas (175,150) · mot de passe (430,250) · mots croisés (170,400)
+      mots mêlés (420,540) · trésor (270,680, sous la croix).
+    Si le chemin bouge ici, mettre à jour ces pourcentages.
+  -->
+  <defs>
+    <!-- Grain du papier. -->
+    <filter id="paper-grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" result="noise" />
+      <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.3  0 0 0 0 0.12  0 0 0 0.16 0" />
+    </filter>
+    <!-- Bords déchirés et usés du parchemin. -->
+    <filter id="torn-edge" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="8" result="warp" />
+      <feDisplacementMap in="SourceGraphic" in2="warp" scale="14" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+    <!-- Côte irrégulière de l'île. -->
+    <filter id="rough-coast" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="2" result="warp" />
+      <feDisplacementMap in="SourceGraphic" in2="warp" scale="9" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+    <radialGradient id="parchment" cx="45%" cy="40%" r="75%">
+      <stop offset="0" stop-color="#fff6de" />
+      <stop offset="0.6" stop-color="#ffe8b8" />
+      <stop offset="0.9" stop-color="#f5c97f" />
+      <stop offset="1" stop-color="#e09a4a" />
+    </radialGradient>
+    <radialGradient id="sea" cx="50%" cy="50%" r="65%">
+      <stop offset="0.35" stop-color="#90e0ef" />
+      <stop offset="0.7" stop-color="#00b4d8" />
+      <stop offset="1" stop-color="#0096c7" />
+    </radialGradient>
+    <radialGradient id="land" cx="50%" cy="45%" r="60%">
+      <stop offset="0" stop-color="#fff0c2" />
+      <stop offset="0.7" stop-color="#ffdb8a" />
+      <stop offset="1" stop-color="#ffc86b" />
+    </radialGradient>
+    <symbol id="wave" viewBox="0 0 40 10">
+      <path d="M1 7 q5 -6 10 0 t10 0 t10 0" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="palm" viewBox="0 0 40 50">
+      <path d="M21 48 q-3 -18 1 -32" fill="none" stroke="#8b5a2b" stroke-width="3" stroke-linecap="round" />
+      <path d="M22 16 q-10 -8 -20 0 q10 -3 20 0 z M22 16 q10 -8 18 1 q-9 -4 -18 -1 z M22 16 q-4 -12 -14 -13 q9 4 14 13 z M22 16 q6 -12 15 -11 q-9 3 -15 11 z" fill="#38b000" stroke="#1f6b00" stroke-width="1" />
+    </symbol>
+    <symbol id="mountain" viewBox="0 0 60 40">
+      <path d="M2 38 L22 6 L32 20 L40 10 L58 38 Z" fill="#70c93a" stroke="#2f6b12" stroke-width="2" stroke-linejoin="round" />
+      <path d="M22 6 L26 22 M40 10 L43 24" fill="none" stroke="#2f6b12" stroke-width="1.5" />
+    </symbol>
+  </defs>
+
+  <!-- Fond du parchemin, bords brûlés. -->
+  <g filter="url(#torn-edge)">
+    <rect x="10" y="10" width="580" height="780" rx="14" fill="url(#parchment)" />
+    <rect x="10" y="10" width="580" height="780" rx="14" filter="url(#paper-grain)" />
+    <rect x="10" y="10" width="580" height="780" rx="14" fill="none" stroke="#e08a3c" stroke-width="10" stroke-opacity="0.35" />
+  </g>
+
+  <!-- Double cadre à l'encre. -->
+  <rect x="34" y="34" width="532" height="732" fill="none" stroke="#5a3e22" stroke-width="2.5" />
+  <rect x="42" y="42" width="516" height="716" fill="none" stroke="#5a3e22" stroke-width="1" />
+
+  <!-- Mer. -->
+  <rect x="42" y="42" width="516" height="716" fill="url(#sea)" />
+  <g opacity="0.85">
+    <use href="#wave" x="70" y="70" width="40" height="10" />
+    <use href="#wave" x="250" y="58" width="40" height="10" />
+    <use href="#wave" x="60" y="300" width="40" height="10" />
+    <use href="#wave" x="505" y="330" width="40" height="10" />
+    <use href="#wave" x="510" y="470" width="40" height="10" />
+    <use href="#wave" x="55" y="560" width="40" height="10" />
+    <use href="#wave" x="470" y="700" width="40" height="10" />
+    <use href="#wave" x="370" y="735" width="40" height="10" />
+    <use href="#wave" x="95" y="660" width="40" height="10" />
+  </g>
+
+  <!-- L'île. -->
+  <g filter="url(#rough-coast)">
+    <path d="M110 150 C 95 90, 230 70, 320 95 C 400 70, 505 125, 500 200 C 545 260, 525 330, 475 370 C 545 430, 525 560, 475 600 C 445 680, 385 745, 290 738 C 200 748, 145 700, 165 625 C 105 585, 85 500, 118 450 C 78 400, 88 320, 128 280 C 78 240, 80 190, 110 150 Z" fill="#ffe7a8" stroke="#caf0f8" stroke-width="22" stroke-opacity="0.85" />
+    <path d="M110 150 C 95 90, 230 70, 320 95 C 400 70, 505 125, 500 200 C 545 260, 525 330, 475 370 C 545 430, 525 560, 475 600 C 445 680, 385 745, 290 738 C 200 748, 145 700, 165 625 C 105 585, 85 500, 118 450 C 78 400, 88 320, 128 280 C 78 240, 80 190, 110 150 Z" fill="url(#land)" stroke="#5a3e22" stroke-width="2.5" />
+  </g>
+
+  <!-- Reliefs et végétation, à l'écart du chemin. -->
+  <use href="#mountain" x="235" y="215" width="70" height="46" />
+  <use href="#mountain" x="285" y="232" width="52" height="34" />
+  <use href="#palm" x="440" y="395" width="38" height="48" />
+  <use href="#palm" x="468" y="410" width="30" height="38" />
+  <use href="#palm" x="185" y="575" width="34" height="42" />
+  <use href="#palm" x="290" y="560" width="30" height="38" />
+  <use href="#palm" x="200" y="245" width="30" height="38" />
+  <!-- Petit lac. -->
+  <ellipse cx="300" cy="370" rx="34" ry="18" fill="#48cae4" stroke="#0077b6" stroke-width="1.5" />
+
+  <!-- Chemin en pointillés reliant les cinq étapes. -->
+  <path d="M175 150 C 260 140, 380 165, 430 250 C 470 320, 260 330, 170 400 C 110 450, 330 470, 420 540 C 480 590, 360 640, 270 680" fill="none" stroke="#ff5a5f" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="3 12" />
+
+  <!-- La croix du trésor. -->
+  <g stroke="#d62839" stroke-width="12" stroke-linecap="round">
+    <path d="M220 630 L320 730 M320 630 L220 730" />
+  </g>
+
+  <!-- Rose des vents. -->
+  <g transform="translate(500 105)">
+    <circle r="40" fill="#fff3d6" fill-opacity="0.85" stroke="#5a3e22" stroke-width="1.5" />
+    <circle r="31" fill="none" stroke="#5a3e22" stroke-width="0.8" />
+    <path d="M0 -44 L7 -7 L0 0 Z M0 44 L-7 7 L0 0 Z M44 0 L7 7 L0 0 Z M-44 0 L-7 -7 L0 0 Z" fill="#d62839" />
+    <path d="M0 -44 L-7 -7 L0 0 Z M0 44 L7 7 L0 0 Z M44 0 L7 -7 L0 0 Z M-44 0 L-7 7 L0 0 Z" fill="#ffc300" stroke="#5a3e22" stroke-width="0.8" />
+    <path d="M22 -22 L4 -4 L0 0 Z M-22 22 L-4 4 Z M22 22 L4 4 Z M-22 -22 L-4 -4 Z" fill="none" stroke="#5a3e22" stroke-width="1.5" />
+    <text y="-49" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#5a3e22">N</text>
+  </g>
+
+  <!-- Petit navire au large. -->
+  <g transform="translate(78 700)" stroke="#5a3e22" stroke-width="1.8" stroke-linejoin="round">
+    <path d="M0 22 L50 22 L42 34 L8 34 Z" fill="#8b5a2b" />
+    <path d="M3 26 L47 26" fill="none" stroke="#ffc300" stroke-width="2.5" />
+    <path d="M24 22 L24 -14" fill="none" />
+    <path d="M26 -12 L44 16 L26 16 Z" fill="#ffffff" />
+    <path d="M22 -8 L6 16 L22 16 Z" fill="#ffd3de" />
+    <path d="M24 -14 L34 -10 L24 -6" fill="#ff6b6b" />
+  </g>
+</svg>

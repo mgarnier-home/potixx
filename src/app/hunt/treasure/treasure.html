@@ -1,0 +1,385 @@
+<div class="treasure" [class.is-revealed]="revealed()" [style.--opening-duration]="openingDuration">
+  <!--
+    Le coffre, dessiné à l'encre comme la carte. Plusieurs calques superposés dans le même repère
+    (viewBox 320 × 280) : la lueur, l'intérieur du couvercle (qui se relève derrière le trésor), le
+    coffre et son trésor, puis le couvercle fermé (qui bascule et disparaît). Purement décoratif.
+  -->
+  <div class="scene" data-testid="treasure-chest" aria-hidden="true">
+    <!-- Lueur dorée et rayons, derrière tout le reste. -->
+    <svg class="layer glow" viewBox="0 0 320 280" focusable="false">
+      <defs>
+        <radialGradient id="tc-glow" cx="50%" cy="46%" r="50%">
+          <stop offset="0" stop-color="#fffbe6" />
+          <stop offset="0.3" stop-color="#ffe066" stop-opacity="0.95" />
+          <stop offset="0.65" stop-color="#ffb347" stop-opacity="0.55" />
+          <stop offset="1" stop-color="#ff8fab" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="tc-ray-fade" cx="160" cy="128" r="135" gradientUnits="userSpaceOnUse">
+          <stop offset="0.25" stop-color="#fff" />
+          <stop offset="1" stop-color="#fff" stop-opacity="0" />
+        </radialGradient>
+        <mask id="tc-ray-mask">
+          <rect width="320" height="280" fill="url(#tc-ray-fade)" />
+        </mask>
+      </defs>
+      <ellipse cx="160" cy="118" rx="158" ry="118" fill="url(#tc-glow)" />
+      <g class="rays" mask="url(#tc-ray-mask)">
+        <polygon points="160,128 12,102 19,77" />
+        <polygon points="160,128 54,75 62,63" />
+        <polygon points="160,128 45,32 64,13" />
+        <polygon points="160,128 95,30 107,22" />
+        <polygon points="160,128 109,-13 134,-20" />
+        <polygon points="160,128 153,10 167,10" />
+        <polygon points="160,128 186,-20 211,-13" />
+        <polygon points="160,128 213,22 225,30" />
+        <polygon points="160,128 256,13 275,32" />
+        <polygon points="160,128 258,63 266,75" />
+        <polygon points="160,128 301,77 308,102" />
+      </g>
+    </svg>
+
+    <div class="chest">
+      <!-- Intérieur du couvercle, doublé de velours framboise : il se relève derrière le trésor. -->
+      <div class="layer lid-inner">
+        <svg viewBox="0 0 320 280" focusable="false">
+          <defs>
+            <linearGradient id="tc-velvet" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#c9184a" />
+              <stop offset="1" stop-color="#ff6b6b" />
+            </linearGradient>
+            <pattern
+              id="tc-quilt"
+              width="22"
+              height="22"
+              patternUnits="userSpaceOnUse"
+              x="149"
+              y="41"
+            >
+              <path d="M0 0 L22 22 M22 0 L0 22" stroke="#8f0f33" stroke-width="1" opacity="0.5" />
+              <circle cx="11" cy="11" r="1.8" fill="#ffc300" />
+            </pattern>
+            <clipPath id="tc-lining">
+              <path d="M72 132 L72 76 C72 60 110 54 160 54 C210 54 248 60 248 76 L248 132 Z" />
+            </clipPath>
+          </defs>
+          <path
+            class="ink wood-dark"
+            d="M58 132 L58 72 C58 48 104 38 160 38 C216 38 262 48 262 72 L262 132 Z"
+          />
+          <path
+            class="ink"
+            fill="url(#tc-velvet)"
+            d="M72 132 L72 76 C72 60 110 54 160 54 C210 54 248 60 248 76 L248 132 Z"
+          />
+          <rect
+            x="72"
+            y="50"
+            width="176"
+            height="84"
+            fill="url(#tc-quilt)"
+            clip-path="url(#tc-lining)"
+          />
+          <path
+            class="ink gold"
+            d="M58 72 C58 48 104 38 160 38 C216 38 262 48 262 72 L262 80 C262 58 216 47 160 47 C104 47 58 58 58 80 Z"
+          />
+          <circle class="rivet" cx="82" cy="52" r="2.6" />
+          <circle class="rivet" cx="160" cy="42.5" r="2.6" />
+          <circle class="rivet" cx="238" cy="52" r="2.6" />
+        </svg>
+      </div>
+
+      <!-- Le coffre ouvert : son trésor qui déborde, les planches, les ferrures et le cadenas. -->
+      <svg class="layer body" viewBox="0 0 320 280" focusable="false">
+        <defs>
+          <linearGradient id="tc-wood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#c98a4b" />
+            <stop offset="1" stop-color="#8e5627" />
+          </linearGradient>
+          <linearGradient id="tc-gold" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffe98a" />
+            <stop offset="0.5" stop-color="#ffc300" />
+            <stop offset="1" stop-color="#d98e00" />
+          </linearGradient>
+          <radialGradient id="tc-heap" cx="50%" cy="20%" r="80%">
+            <stop offset="0" stop-color="#fff7cc" />
+            <stop offset="0.45" stop-color="#ffd23f" />
+            <stop offset="1" stop-color="#f0a000" />
+          </radialGradient>
+          <radialGradient id="tc-coin" cx="35%" cy="30%" r="75%">
+            <stop offset="0" stop-color="#fff7cc" />
+            <stop offset="0.6" stop-color="#ffc300" />
+            <stop offset="1" stop-color="#d98e00" />
+          </radialGradient>
+          <symbol id="tc-coin-flat" viewBox="-10 -5 20 10" overflow="visible">
+            <ellipse
+              cx="0"
+              cy="0"
+              rx="9"
+              ry="3.8"
+              fill="url(#tc-coin)"
+              stroke="#3a2715"
+              stroke-width="1.2"
+            />
+            <ellipse
+              cx="0"
+              cy="-0.2"
+              rx="5.5"
+              ry="2"
+              fill="none"
+              stroke="#c27c00"
+              stroke-width="0.8"
+            />
+          </symbol>
+        </defs>
+
+        <!-- Ombre au sol. -->
+        <ellipse cx="160" cy="252" rx="132" ry="10" class="shadow" />
+
+        <!-- Fond du coffre, puis le tas d'or qui dépasse du bord. -->
+        <path class="ink inside" d="M50 150 L62 130 L258 130 L270 150 Z" />
+        <path
+          class="ink"
+          fill="url(#tc-heap)"
+          d="M52 152 C66 130 98 114 126 110 C142 100 176 98 192 106 C222 112 252 128 268 152 Z"
+        />
+        <g class="heap-coins">
+          <use href="#tc-coin-flat" x="60" y="141" width="20" height="10" />
+          <use href="#tc-coin-flat" x="82" y="143" width="20" height="10" />
+          <use href="#tc-coin-flat" x="106" y="140" width="20" height="10" />
+          <use href="#tc-coin-flat" x="196" y="141" width="20" height="10" />
+          <use href="#tc-coin-flat" x="220" y="143" width="20" height="10" />
+          <use href="#tc-coin-flat" x="242" y="140" width="20" height="10" />
+          <use href="#tc-coin-flat" x="76" y="130" width="20" height="10" />
+          <use href="#tc-coin-flat" x="96" y="127" width="20" height="10" />
+          <use href="#tc-coin-flat" x="120" y="129" width="20" height="10" />
+          <use href="#tc-coin-flat" x="178" y="128" width="20" height="10" />
+          <use href="#tc-coin-flat" x="204" y="126" width="20" height="10" />
+          <use href="#tc-coin-flat" x="228" y="131" width="20" height="10" />
+          <use href="#tc-coin-flat" x="110" y="117" width="20" height="10" />
+          <use href="#tc-coin-flat" x="192" y="115" width="20" height="10" />
+          <use href="#tc-coin-flat" x="214" y="118" width="20" height="10" />
+          <use href="#tc-coin-flat" x="160" y="120" width="20" height="10" />
+          <use href="#tc-coin-flat" x="142" y="130" width="20" height="10" />
+          <use href="#tc-coin-flat" x="166" y="104" width="20" height="10" />
+        </g>
+        <!-- Pièces posées de chant. -->
+        <g class="ink">
+          <ellipse
+            cx="132"
+            cy="112"
+            rx="4"
+            ry="9"
+            fill="url(#tc-coin)"
+            transform="rotate(-18 132 112)"
+          />
+          <ellipse
+            cx="244"
+            cy="130"
+            rx="3.6"
+            ry="8"
+            fill="url(#tc-coin)"
+            transform="rotate(22 244 130)"
+          />
+        </g>
+
+        <!-- Un hochet parmi les pièces : le vrai trésor. -->
+        <g class="rattle" transform="translate(0 3) rotate(-24 150 104)">
+          <rect class="ink" x="146.5" y="102" width="7" height="30" rx="3.5" fill="#fff3d6" />
+          <circle class="ink" cx="150" cy="134" r="5" fill="#90e0ef" />
+          <circle class="ink" cx="150" cy="90" r="13" fill="#ffd3de" />
+          <path
+            d="M138 86 Q150 80 162 86 M137.5 94 Q150 100 162.5 94"
+            fill="none"
+            stroke="#ff6b6b"
+            stroke-width="3"
+            stroke-linecap="round"
+          />
+          <circle cx="146" cy="85" r="2.5" fill="#fff" opacity="0.8" />
+        </g>
+
+        <!-- Joyaux. -->
+        <g class="ink">
+          <path d="M188 104 L196 96 L206 96 L212 104 L200 116 Z" fill="#d62839" />
+          <path d="M188 104 L212 104 M196 96 L200 104 L206 96" fill="none" stroke-width="1" />
+          <path d="M226 118 L234 110 L242 118 L234 126 Z" fill="#00b4d8" />
+          <path d="M84 120 L90 113 L96 120 L90 127 Z" fill="#38b000" />
+        </g>
+
+        <!-- Face avant : trois planches de bois veiné. -->
+        <path
+          class="ink"
+          fill="url(#tc-wood)"
+          d="M48 150 L272 150 L272 242 Q272 248 266 248 L54 248 Q48 248 48 242 Z"
+        />
+        <g class="grain">
+          <path d="M78 162 C110 158 130 168 160 164 C190 160 210 170 242 164" />
+          <path d="M80 172 C112 176 150 168 176 174 C200 178 222 172 240 175" />
+          <path d="M76 194 C104 190 134 200 154 195" />
+          <path d="M186 192 C208 197 226 190 244 196" />
+          <path d="M78 206 C100 210 128 204 150 208 C180 213 214 204 242 209" />
+          <path d="M76 226 C98 222 130 232 160 226 C190 221 214 230 244 225" />
+          <path d="M84 238 C120 242 160 236 196 240 C216 242 230 238 242 240" />
+          <ellipse cx="214" cy="228" rx="5" ry="2.5" />
+          <ellipse cx="104" cy="196" rx="4" ry="2" />
+        </g>
+        <path class="seam" d="M48 182 H272 M48 215 H272" />
+
+        <!-- Ferrures dorées : rebord, coins, rivets. -->
+        <path class="ink gold" d="M46 148 H274 V157 H46 Z" />
+        <path class="ink gold" d="M48 157 H70 V248 H54 Q48 248 48 242 Z" />
+        <path class="ink gold" d="M250 157 H272 V242 Q272 248 266 248 H250 Z" />
+        <g>
+          <circle class="rivet" cx="59" cy="168" r="3" />
+          <circle class="rivet" cx="59" cy="200" r="3" />
+          <circle class="rivet" cx="59" cy="232" r="3" />
+          <circle class="rivet" cx="261" cy="168" r="3" />
+          <circle class="rivet" cx="261" cy="200" r="3" />
+          <circle class="rivet" cx="261" cy="232" r="3" />
+        </g>
+
+        <!-- Collier de perles qui pend par-dessus le bord. -->
+        <g class="pearls">
+          <circle cx="72" cy="146" r="3" />
+          <circle cx="75" cy="152" r="3" />
+          <circle cx="79" cy="158" r="3" />
+          <circle cx="84" cy="163" r="3" />
+          <circle cx="90" cy="166" r="3" />
+          <circle cx="97" cy="167" r="3" />
+          <circle cx="104" cy="165" r="3" />
+          <circle cx="110" cy="161" r="3" />
+          <circle cx="115" cy="156" r="3" />
+          <circle cx="119" cy="150" r="3" />
+          <circle cx="97" cy="175" r="4.5" class="pendant" />
+        </g>
+
+        <!-- Plaque de serrure et cadenas ouvert, suspendu à son anneau. -->
+        <path class="ink gold" d="M140 157 H180 V184 Q180 196 160 202 Q140 196 140 184 Z" />
+        <circle class="rivet" cx="146" cy="164" r="2.4" />
+        <circle class="rivet" cx="174" cy="164" r="2.4" />
+        <path d="M156 180 a4 4 0 1 1 8 0 l-1.5 9 h-5 z" fill="#3a2715" />
+        <g class="padlock" transform="rotate(14 160 162)">
+          <path
+            d="M152 186 V172 A10 10 0 0 1 172 172 V176"
+            fill="none"
+            stroke="#3a2715"
+            stroke-width="7"
+            stroke-linecap="round"
+          />
+          <path
+            d="M152 186 V172 A10 10 0 0 1 172 172 V176"
+            fill="none"
+            stroke="#9aa0a3"
+            stroke-width="3.6"
+            stroke-linecap="round"
+          />
+          <rect class="ink gold" x="143" y="184" width="26" height="24" rx="5" />
+          <path d="M153 193 a3 3 0 1 1 6 0 l-1 6 h-4 z" fill="#3a2715" />
+        </g>
+
+        <!-- Pièces tombées devant le coffre. -->
+        <g class="spill">
+          <use href="#tc-coin-flat" x="18" y="244" width="20" height="10" />
+          <use href="#tc-coin-flat" x="282" y="247" width="20" height="10" />
+          <use href="#tc-coin-flat" x="284" y="242" width="20" height="10" />
+          <use href="#tc-coin-flat" x="283" y="237" width="20" height="10" />
+          <g class="ink">
+            <circle cx="36" cy="238" r="9" fill="url(#tc-coin)" />
+            <path
+              d="M36 232 L37.6 236.6 L42 236.8 L38.5 239.6 L39.8 244 L36 241.4 L32.2 244 L33.5 239.6 L30 236.8 L34.4 236.6 Z"
+              fill="none"
+              stroke="#c27c00"
+              stroke-width="0.9"
+            />
+          </g>
+        </g>
+      </svg>
+
+      <!-- Couvercle fermé (bombé), qui bascule vers l'arrière en ouvrant le coffre. -->
+      <div class="layer lid-outer">
+        <svg viewBox="0 0 320 280" focusable="false">
+          <defs>
+            <clipPath id="tc-dome">
+              <path d="M44 157 L44 124 C44 92 96 78 160 78 C224 78 276 92 276 124 L276 157 Z" />
+            </clipPath>
+          </defs>
+          <path
+            class="ink"
+            fill="url(#tc-wood)"
+            d="M44 157 L44 124 C44 92 96 78 160 78 C224 78 276 92 276 124 L276 157 Z"
+          />
+          <g clip-path="url(#tc-dome)">
+            <path
+              class="seam"
+              d="M44 112 C60 96 104 88 160 88 C216 88 260 96 276 112 M44 132 C60 118 104 110 160 110 C216 110 260 118 276 132"
+            />
+            <g class="grain">
+              <path d="M80 100 C110 96 130 100 150 97" />
+              <path d="M180 98 C204 96 222 100 240 104" />
+              <path d="M84 124 C112 118 144 124 176 119 C200 116 222 122 240 124" />
+              <path d="M90 142 C120 138 150 145 180 140 C204 137 224 142 240 143" />
+            </g>
+            <rect class="ink gold" x="44" y="70" width="24" height="90" />
+            <rect class="ink gold" x="252" y="70" width="24" height="90" />
+          </g>
+          <path
+            class="ink"
+            fill="none"
+            d="M44 157 L44 124 C44 92 96 78 160 78 C224 78 276 92 276 124 L276 157 Z"
+          />
+          <path class="ink gold" d="M42 146 H278 V157 H42 Z" />
+          <!-- Moraillon : la patte qui descend sur la serrure. -->
+          <path class="ink gold" d="M150 86 H170 V156 Q170 164 160 166 Q150 164 150 156 Z" />
+          <rect x="156" y="150" width="8" height="10" rx="2" fill="#3a2715" />
+          <circle class="rivet" cx="56" cy="104" r="3" />
+          <circle class="rivet" cx="56" cy="128" r="3" />
+          <circle class="rivet" cx="264" cy="104" r="3" />
+          <circle class="rivet" cx="264" cy="128" r="3" />
+          <circle class="rivet" cx="160" cy="96" r="2.6" />
+          <circle class="rivet" cx="160" cy="130" r="2.6" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Éclats qui apparaissent une fois le coffre ouvert. -->
+    <svg class="layer sparkles" viewBox="0 0 320 280" focusable="false">
+      <path class="sparkle s1" d="M60 70 l3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3 z" />
+      <path
+        class="sparkle s2"
+        d="M258 58 l2.2 6.8 6.8 2.2 -6.8 2.2 -2.2 6.8 -2.2 -6.8 -6.8 -2.2 6.8 -2.2 z"
+      />
+      <path class="sparkle s3" d="M206 20 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2 z" />
+      <path
+        class="sparkle s4"
+        d="M108 30 l1.6 4.8 4.8 1.6 -4.8 1.6 -1.6 4.8 -1.6 -4.8 -4.8 -1.6 4.8 -1.6 z"
+      />
+    </svg>
+  </div>
+
+  <div class="reveal">
+    <p class="message" data-testid="treasure-message">{{ message }}</p>
+    <svg class="flourish" viewBox="0 0 200 20" aria-hidden="true" focusable="false">
+      <path
+        d="M8 10 C40 10 60 2 84 8 C92 10 96 14 100 10 C104 6 108 10 116 12 C140 18 160 10 192 10"
+      />
+      <path d="M100 4 l3 6 -3 6 -3 -6 z" class="flourish-gem" />
+    </svg>
+    <video
+      class="video"
+      data-testid="treasure-video"
+      [src]="videoSrc"
+      [poster]="posterSrc"
+      [muted]="true"
+      playsinline
+      controls
+    ></video>
+    <button
+      type="button"
+      class="button-secondary restart"
+      data-testid="restart"
+      (click)="onRestart()"
+    >
+      Recommencer
+    </button>
+  </div>
+</div>

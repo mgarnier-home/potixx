@@ -1,0 +1,44 @@
+<div class="padlock-riddle">
+  <div class="padlock" [class.solved]="isSolved()" aria-hidden="true">
+    <div class="shackle"></div>
+    <div class="body">
+      <div class="keyhole"></div>
+      <div class="dials">
+        @for (index of digitIndexes; track index) {
+          <span class="dial" [attr.data-testid]="'padlock-digit-' + index">{{
+            digitValue(index)
+          }}</span>
+        }
+      </div>
+    </div>
+  </div>
+
+  @if (!isSolved()) {
+    <form class="answer-form" (submit)="submit($event)">
+      <p class="question" data-testid="padlock-question" id="padlock-question">
+        {{ currentQuestion() }}
+      </p>
+      <div class="answer-row">
+        <input
+          class="answer-input"
+          data-testid="padlock-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          autocomplete="off"
+          aria-labelledby="padlock-question"
+          [value]="answer()"
+          (input)="onAnswerInput($any($event.target).value)"
+        />
+        <button type="submit" class="button-primary" data-testid="padlock-submit">Valider</button>
+      </div>
+      @if (errorMessage(); as message) {
+        <p class="error" data-testid="padlock-error" role="alert">{{ message }}</p>
+      }
+    </form>
+
+    <app-skip-button [visible]="skipVisible()" (skipped)="onSkip()" />
+  } @else {
+    <p class="solved-message">Le cadenas s'ouvre... 0-4-2-7, comme un certain mois d'avril !</p>
+  }
+</div>

@@ -1,0 +1,20 @@
+:host {
+  display: contents;
+}
+
+/* Discret mais bien visible : lien souligné sur fond transparent, grande cible tactile. */
+.skip {
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-4);
+  border: 2px dashed var(--color-ink-soft);
+  border-radius: var(--radius-control);
+  background: rgb(255 243 214 / 0.5);
+  font-size: var(--font-size-body);
+  font-style: italic;
+  color: var(--color-ink);
+
+  &:hover {
+    background: var(--color-parchment-light);
+    border-style: solid;
+  }
+}

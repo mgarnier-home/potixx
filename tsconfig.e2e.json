@@ -1,0 +1,8 @@
+/* Configuration TypeScript des tests E2E Playwright (vérification de types dans l'éditeur). */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["e2e/**/*.ts", "playwright.config.ts"]
+}

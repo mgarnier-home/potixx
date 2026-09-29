@@ -1,0 +1,384 @@
+:host {
+  display: block;
+}
+
+.treasure {
+  /* Durée totale de l'ouverture, fournie par le composant (CHEST_OPENING_MS). */
+  --opening-duration: 1800ms;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* La lueur et le couvercle en perspective peuvent dépasser : jamais de défilement horizontal. */
+  overflow-x: clip;
+}
+
+/*
+ * La scène du coffre : un seul moment orchestré. Le coffre tressaille, le couvercle bascule vers
+ * l'arrière, l'intérieur de velours se relève derrière l'or, la lueur monte, quelques pièces
+ * roulent au sol. Toutes les étapes sont en pourcentage de `--opening-duration`.
+ */
+.scene {
+  position: relative;
+  width: min(19rem, 100%);
+  aspect-ratio: 320 / 280;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+
+  > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+}
+
+.chest {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 88%;
+  animation: chest-shake var(--opening-duration) ease-in-out both;
+}
+
+/* Trait d'encre commun, comme sur la carte. */
+.ink {
+  stroke: var(--color-ink);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+}
+
+.gold {
+  fill: url(#tc-gold);
+}
+
+.wood-dark {
+  fill: #7a4520;
+}
+
+.inside {
+  fill: #2a1b0e;
+}
+
+.shadow {
+  fill: rgb(58 39 21 / 0.28);
+}
+
+.rivet {
+  fill: var(--color-gold-light);
+  stroke: var(--color-ink);
+  stroke-width: 1.2;
+}
+
+.grain {
+  fill: none;
+  stroke: #5e3a1b;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+.seam {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 1.6;
+}
+
+.pearls circle {
+  fill: #fbf6ea;
+  stroke: var(--color-ink);
+  stroke-width: 1;
+}
+
+.pearls .pendant {
+  fill: var(--color-baby-pink);
+}
+
+/* Couvercle fermé : il bascule autour de sa charnière (haut du dôme) puis disparaît. */
+.lid-outer {
+  transform-origin: 50% 36%;
+  animation: lid-outer-open var(--opening-duration) both;
+}
+
+/* Intérieur du couvercle : il se relève depuis le bord arrière du coffre. */
+.lid-inner {
+  transform-origin: 50% 47%;
+  animation: lid-inner-open var(--opening-duration) both;
+}
+
+.glow {
+  transform-origin: 50% 45%;
+  animation: glow-in var(--opening-duration) ease-out both;
+}
+
+.rays {
+  fill: var(--color-gold);
+  opacity: 0.5;
+}
+
+/* Un rayon sur deux en rose bébé : la touche festive de l'annonce. */
+.rays polygon:nth-child(even) {
+  fill: var(--color-baby-pink);
+}
+
+.spill {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: spill-in var(--opening-duration) ease-out both;
+}
+
+.sparkle {
+  fill: #fffbe6;
+  stroke: var(--color-coral);
+  stroke-width: 0.8;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: sparkle-pop var(--opening-duration) ease-out both;
+}
+
+.s2 {
+  animation-delay: 80ms;
+}
+
+.s3 {
+  animation-delay: 160ms;
+}
+
+.s4 {
+  animation-delay: 240ms;
+}
+
+@keyframes chest-shake {
+  0% {
+    transform: rotate(0deg);
+  }
+  5% {
+    transform: rotate(-2.2deg);
+  }
+  10% {
+    transform: rotate(2deg);
+  }
+  15% {
+    transform: rotate(-1.4deg);
+  }
+  20% {
+    transform: rotate(0.8deg);
+  }
+  25%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes lid-outer-open {
+  0%,
+  22% {
+    transform: perspective(700px) rotateX(0deg);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.6);
+  }
+  48% {
+    transform: perspective(700px) rotateX(88deg);
+    opacity: 1;
+  }
+  49%,
+  100% {
+    transform: perspective(700px) rotateX(90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes lid-inner-open {
+  0%,
+  47% {
+    transform: perspective(700px) rotateX(-88deg);
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.25);
+  }
+  48% {
+    transform: perspective(700px) rotateX(-86deg);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.25);
+  }
+  100% {
+    transform: perspective(700px) rotateX(-22deg);
+    opacity: 1;
+  }
+}
+
+@keyframes glow-in {
+  0%,
+  40% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+@keyframes spill-in {
+  0%,
+  55% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sparkle-pop {
+  0%,
+  70% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-30deg);
+  }
+  88% {
+    opacity: 1;
+    transform: scale(1.2) rotate(0deg);
+  }
+  100% {
+    opacity: 0.9;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/*
+ * La révélation : l'annonce d'abord (visible sans défiler sous le coffre), puis la vidéo. Invisible
+ * (et ignorée des lecteurs d'écran) tant que le coffre n'est pas ouvert, mais sa place est réservée
+ * pour que rien ne saute à l'apparition.
+ */
+.reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: var(--space-4);
+  visibility: hidden;
+
+  > * {
+    opacity: 0;
+  }
+}
+
+.is-revealed .reveal {
+  visibility: visible;
+
+  > * {
+    animation: reveal-in 700ms ease-out both;
+  }
+
+  > .flourish {
+    animation-delay: 120ms;
+  }
+
+  > .video {
+    animation-delay: 260ms;
+  }
+
+  > .restart {
+    animation-delay: 400ms;
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* L'annonce : la seule chose vraiment audacieuse de l'écran, grande et très lisible. */
+.message {
+  max-width: 22rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 8.4vw, 2.4rem);
+  line-height: 1.15;
+  color: var(--color-treasure-dark);
+  text-wrap: balance;
+}
+
+.flourish {
+  width: 11rem;
+  height: auto;
+  margin-top: var(--space-2);
+
+  path {
+    fill: none;
+    stroke: var(--color-gold-deep);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .flourish-gem {
+    fill: var(--color-coral);
+    stroke: var(--color-ink);
+    stroke-width: 1;
+  }
+}
+
+.video {
+  width: 100%;
+  max-width: 20rem;
+  max-height: 60vh;
+  aspect-ratio: 9 / 16;
+  margin-top: var(--space-6);
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-paper);
+  background: var(--color-sea-deep);
+  box-shadow: var(--shadow-paper);
+  object-fit: contain;
+}
+
+.restart {
+  margin-top: var(--space-6);
+}
+
+@media (min-width: 700px) {
+  .scene {
+    width: 22rem;
+  }
+
+  .message {
+    max-width: 30rem;
+    font-size: clamp(2.4rem, 3.4vw, 2.9rem);
+  }
+
+  .video {
+    max-width: 24rem;
+  }
+}
+
+/* Mouvements réduits : coffre directement ouvert, révélation sans effet. */
+@media (prefers-reduced-motion: reduce) {
+  .chest,
+  .lid-outer,
+  .lid-inner,
+  .glow,
+  .spill,
+  .sparkle,
+  .is-revealed .reveal > * {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

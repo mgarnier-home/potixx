@@ -1,0 +1,146 @@
+:host {
+  display: block;
+}
+
+.padlock-riddle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+/*
+ * Le cadenas : une anse (shackle) en U et un corps de laiton portant les 4 molettes gravées.
+ * Résolu, l'anse pivote et se soulève pour simuler l'ouverture ; la transition (et non une
+ * animation @keyframes) profite directement de la règle globale `prefers-reduced-motion` qui
+ * réduit `transition-duration` à quasi zéro dans `styles.scss`.
+ */
+.padlock {
+  position: relative;
+  width: 11rem;
+  height: 9.5rem;
+}
+
+.shackle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 6rem;
+  height: 5.5rem;
+  border: 1rem solid #8a9aa3;
+  border-bottom: none;
+  border-radius: 3rem 3rem 0 0;
+  background: transparent;
+  transform: translateX(-50%);
+  transform-origin: top left;
+  transition: transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3) var(--space-2) var(--space-2);
+  border-radius: var(--radius-control);
+  background: linear-gradient(
+    180deg,
+    var(--color-gold-pale),
+    var(--color-gold) 55%,
+    var(--color-gold-deep)
+  );
+  box-shadow: var(--shadow-seal);
+}
+
+.keyhole {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: var(--radius-round);
+  background: var(--color-ink);
+
+  &::after {
+    content: '';
+    display: block;
+    width: 0.32rem;
+    height: 0.6rem;
+    margin: 0 auto;
+    background: var(--color-ink);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    transform: translateY(0.1rem);
+  }
+}
+
+.dials {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dial {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.6rem;
+  border-radius: var(--radius-control);
+  background: var(--color-sea-deep);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.08),
+    inset 0 -3px 4px rgb(0 0 0 / 0.5);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-parchment-light);
+}
+
+/* Résolu : l'anse se soulève et pivote pour laisser croire à un cadenas déverrouillé. */
+.padlock.solved .shackle {
+  transform: translateX(-78%) rotate(-28deg);
+}
+
+.padlock.solved .dial {
+  color: var(--color-gold-light);
+}
+
+.answer-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 24rem;
+  text-align: center;
+}
+
+.question {
+  font-size: var(--font-size-lead);
+}
+
+.answer-row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.answer-input {
+  width: 4.5rem;
+  min-height: var(--touch-target);
+  border: 2px solid var(--color-ink-soft);
+  border-radius: var(--radius-control);
+  background: var(--color-parchment-light);
+  text-align: center;
+  font-size: var(--font-size-title);
+}
+
+.error {
+  color: var(--color-treasure-dark);
+  font-weight: 700;
+}
+
+.solved-message {
+  max-width: 24rem;
+  text-align: center;
+  font-size: var(--font-size-lead);
+  font-style: italic;
+  color: var(--color-ink-soft);
+}

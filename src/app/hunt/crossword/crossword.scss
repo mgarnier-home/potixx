@@ -1,0 +1,425 @@
+:host {
+  display: block;
+  /* Les requêtes de conteneur choisissent la mise en page selon la largeur réelle du panneau. */
+  container-type: inline-size;
+}
+
+/*
+ * Mise en page : sur téléphone, tout s'empile (grille, bouton, définitions) et une barre collée
+ * en bas rappelle la définition du mot en cours au-dessus du clavier. Quand la place le permet,
+ * les définitions passent à droite de la grille et la barre s'étend sous les deux colonnes.
+ */
+.crossword {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.board-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+/*
+ * La grille reprend `activity.png` : un plateau sombre (l'eau profonde du lagon au lieu du noir) où
+ * seules les cases blanches existent. Les cases noires ne sont pas rendues : le fond du plateau
+ * les remplace. 1 px d'écart entre cases dessine le quadrillage, comme sur l'original.
+ * Largeur : 10 colonnes de ≈ 34 px dans 358 px sur téléphone, plus grandes sur ordinateur.
+ */
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 1px;
+  width: 100%;
+  max-width: 24rem;
+  padding: 4px;
+  border-radius: var(--radius-paper);
+  background:
+    radial-gradient(ellipse at 30% 20%, rgb(0 180 216 / 0.3), transparent 60%),
+    var(--color-sea-deep);
+  box-shadow: var(--shadow-paper);
+}
+
+.cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  border-radius: 1px;
+  background: var(--color-parchment-light);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1;
+  /* Marge quand une définition ramène la case en haut de l'écran. */
+  scroll-margin-top: var(--space-4);
+  transition: background-color 150ms ease;
+
+  &:focus-visible {
+    z-index: 2;
+    outline-offset: 0;
+  }
+}
+
+/* Numéro du mot dans le coin de sa première case, comme sur la grille d'origine. */
+.number {
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-ink-soft);
+}
+
+.letter {
+  /* Léger décalage vers le bas pour ne pas toucher le numéro. */
+  padding-top: 0.15em;
+}
+
+/* Tiret pré-rempli de GRAND-MÈRE / GRAND-PÈRE : gravé dans le plateau, non modifiable. */
+.cell.prefilled {
+  background: var(--color-parchment);
+  color: var(--color-ink-soft);
+  cursor: default;
+}
+
+/* Mot sélectionné : bande lagon clair ; la case active, or soleil, porte en plus un cadre d'encre. */
+.cell.in-entry {
+  background: var(--color-sea-light);
+}
+
+/* Mot vérifié juste : verrouillé, teinté de vert (même dans le mot
+   sélectionné : ces cases sont sautées par le curseur). */
+.cell.locked {
+  background: var(--color-success-pale);
+  color: var(--color-success-dark);
+}
+
+.cell.wrong {
+  background: var(--color-baby-pink-pale);
+  color: var(--color-treasure-dark);
+  box-shadow: inset 0 0 0 2px var(--color-treasure);
+}
+
+.cell.active {
+  z-index: 1;
+  background: var(--color-gold);
+  box-shadow: inset 0 0 0 3px var(--color-ink);
+}
+
+/*
+ * Une fois la grille résolue, les cases ordinaires s'effacent pour que les lettres du mot caché
+ * ressortent quand elles s'illuminent une à une.
+ */
+.solved .cell.locked:not(.lit) {
+  background: var(--color-parchment-light);
+  color: var(--color-ink-soft);
+}
+
+.cell.lit {
+  z-index: 1;
+  background: radial-gradient(circle, var(--color-gold-pale), var(--color-gold) 60%, #ff9e00);
+  color: var(--color-ink);
+  box-shadow:
+    0 0 14px 3px rgb(255 195 0 / 0.8),
+    0 0 0 2px var(--color-baby-pink);
+  animation: lit-stamp 450ms ease-out both;
+}
+
+@keyframes lit-stamp {
+  from {
+    transform: scale(1.35);
+    box-shadow: 0 0 22px 8px rgb(255 143 171 / 0.95);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.actions,
+.reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.feedback {
+  max-width: 22rem;
+  color: var(--color-treasure-dark);
+  font-weight: 700;
+}
+
+/* Le mot caché s'inscrit lettre par lettre sur des plaquettes, au rythme des cases illuminées. */
+.hidden-word {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.hidden-letter {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.6rem;
+  border: 2px solid var(--color-gold-deep);
+  border-radius: var(--radius-control);
+  background: rgb(255 243 214 / 0.6);
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--color-ink);
+
+  &.shown {
+    border-color: var(--color-ink);
+    background: var(--color-gold);
+    box-shadow: var(--shadow-seal);
+    animation: lit-stamp 450ms ease-out both;
+  }
+}
+
+.solved-message {
+  font-size: var(--font-size-lead);
+  font-style: italic;
+  color: var(--color-ink-soft);
+}
+
+/* Définitions. */
+.clues {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.clue-group-title {
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-title);
+}
+
+.clue-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.clue {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid transparent;
+  border-radius: var(--radius-control);
+  background: transparent;
+  text-align: left;
+  line-height: 1.35;
+
+  /* Le survol ne doit pas masquer la définition active (lagon clair). */
+  &:hover:not(:disabled, .active) {
+    background: rgb(0 180 216 / 0.12);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &.active {
+    border-color: var(--color-sea-mid);
+    background: var(--color-sea-light);
+  }
+
+  &.wrong {
+    border-color: var(--color-treasure);
+  }
+
+  &.locked .clue-text {
+    color: var(--color-success-dark);
+  }
+}
+
+/* Numéro de définition dans un petit sceau, repris en corail (faux) ou vert (juste), chiffre à
+   l'encre sur ces fonds vifs (≥ 5:1). */
+.clue-number {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-round);
+  background: var(--color-ink-soft);
+  color: var(--color-parchment-light);
+  font-weight: 700;
+  font-size: var(--font-size-small);
+
+  .wrong & {
+    background: var(--color-coral);
+    color: var(--color-ink);
+  }
+
+  .locked & {
+    background: var(--color-success);
+    color: var(--color-ink);
+  }
+}
+
+.clue-text {
+  padding-top: 0.1rem;
+}
+
+/*
+ * Barre de définition collée en bas de l'écran pendant la saisie. `--cw-keyboard-offset` (hauteur
+ * du clavier virtuel mesurée par `visualViewport`) la garde juste au-dessus du clavier, y compris
+ * sur iOS où le clavier recouvre la page sans la redimensionner.
+ */
+.bar {
+  position: sticky;
+  bottom: var(--cw-keyboard-offset, 0px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 3.75rem;
+  margin: 0 calc(-1 * var(--space-4));
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-sea-deep);
+  color: var(--color-parchment-light);
+  box-shadow: 0 -8px 20px -10px rgb(1 24 36 / 0.7);
+}
+
+.bar-clue,
+.bar-hint {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  line-height: 1.3;
+}
+
+.bar-hint {
+  font-style: italic;
+  color: var(--color-parchment-dark);
+}
+
+.bar-number {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-round);
+  background: var(--color-gold);
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.bar-orientation {
+  flex: none;
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+/*
+ * « Changer de sens » : proposé seulement sur une case partagée par deux mots, pour ceux qui ne
+ * devinent pas le double toucher. Contour doré sur le bleu profond de la barre, flèche du sens d'arrivée.
+ */
+.bar-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 2.5rem;
+  margin-left: auto;
+  padding: var(--space-1) var(--space-3);
+  border: 2px solid var(--color-gold-light);
+  border-radius: var(--radius-round);
+  background: transparent;
+  color: var(--color-parchment-light);
+  font-family: var(--font-body);
+  font-size: var(--font-size-small);
+  font-weight: 700;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover,
+  &:active {
+    background: rgb(255 195 0 / 0.18);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-gold-light);
+    outline-offset: 2px;
+  }
+}
+
+.bar-toggle-icon {
+  color: var(--color-gold-light);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/*
+ * Champ caché qui reçoit la saisie : invisible mais focalisable (sinon le clavier du téléphone
+ * ne s'ouvre pas). 16 px évite le zoom automatique d'iOS au focus.
+ */
+.hidden-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  font-size: 16px;
+  caret-color: transparent;
+  pointer-events: none;
+}
+
+/* Assez de place : définitions à droite de la grille, barre de définition sur toute la largeur. */
+@container (min-width: 36rem) {
+  .crossword {
+    display: grid;
+    grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .cell {
+    font-size: 1.45rem;
+  }
+
+  .number {
+    font-size: 0.7rem;
+  }
+
+  .clues {
+    gap: var(--space-4);
+  }
+
+  .clue {
+    min-height: 2.5rem;
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--font-size-small);
+  }
+
+  /* La barre reste visible (sous la grille et les définitions) pour le bouton « Changer de sens ». */
+  .bar {
+    grid-column: 1 / -1;
+    margin: 0;
+    border-radius: var(--radius-control);
+  }
+}

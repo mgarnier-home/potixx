@@ -23,11 +23,16 @@ export const PADLOCK_RIDDLES: readonly { question: string; answer: string }[] = 
   { question: 'Je corresponds au nombre de jours dans une semaine', answer: '7' },
 ];
 
-/** Un indice de l'énigme du mot de passe, affiché progressivement (spec §4.4). */
+/**
+ * Un indice de l'énigme du mot de passe, affiché progressivement (spec §4.4). L'indice « rébus »
+ * est dessiné (portée + clé de sol + note) par le composant à partir de `note` (ex. `'F4'`, voir
+ * `core/music-staff.ts`) ; `suffix` est le texte affiché à côté (ex. « + 1000 ») et `alt` le texte
+ * alternatif du rébus complet.
+ */
 export type PasswordClue =
   | { kind: 'image'; src: string; alt: string }
   | { kind: 'text'; text: string }
-  | { kind: 'rebus'; parts: string[] };
+  | { kind: 'rebus'; note: string; suffix: string; alt: string };
 
 /** Énigme du mot de passe : réponse et indices affichés un par un (spec §4.4). */
 export const PASSWORD: { answer: string; clues: readonly PasswordClue[] } = {
@@ -38,7 +43,12 @@ export const PASSWORD: { answer: string; clues: readonly PasswordClue[] } = {
       kind: 'text',
       text: "L'équipage que l'on ne choisit pas toujours, mais que l'on garde toute sa vie.",
     },
-    { kind: 'rebus', parts: ['♪ Fa', '+', '1000'] },
+    {
+      kind: 'rebus',
+      note: 'F4',
+      suffix: '+ 1000',
+      alt: 'Rébus : une note de musique sur une portée, plus 1000',
+    },
   ],
 };
 
@@ -105,7 +115,7 @@ export const CROSSWORD: CrosswordDefinition = {
       answer: 'TATA',
       orientation: 'down',
       start: { row: 10, col: 0 },
-      clue: 'La sœur de papa ou de maman, en plus tendre',
+      clue: "Ta tante, comme l'appellent les petits",
     },
     {
       number: 9,
@@ -155,8 +165,10 @@ export const TREASURE: { videoSrc: string; posterSrc: string; message: string } 
 };
 
 /**
- * Carte de la chasse (spec §4.1) : positions en pourcentage de l'image, provisoires, ajustées
- * en tâche 7.
+ * Carte de la chasse (spec §4.1) : positions du centre de chaque étape, en pourcentage de
+ * l'image (0 = bord gauche/haut, 100 = bord droit/bas). Elles suivent le chemin dessiné dans
+ * `assets/map.svg` (600 × 800) ; le trésor est posé sur la croix rouge. Si l'image change, ces
+ * positions doivent être ajustées.
  */
 export const MAP: {
   imageSrc: string;
@@ -164,10 +176,10 @@ export const MAP: {
 } = {
   imageSrc: '/assets/map.svg',
   steps: {
-    padlock: { x: 20, y: 12, label: 'Le cadenas' },
-    password: { x: 75, y: 28, label: 'Le mot de passe' },
-    crossword: { x: 22, y: 48, label: 'Les mots croisés' },
-    wordSearch: { x: 72, y: 68, label: 'Les mots mêlés' },
-    treasure: { x: 50, y: 88, label: 'Le trésor' },
+    padlock: { x: 29.2, y: 18.75, label: 'Le cadenas' },
+    password: { x: 71.7, y: 31.25, label: 'Le mot de passe' },
+    crossword: { x: 28.3, y: 50, label: 'Les mots croisés' },
+    wordSearch: { x: 70, y: 67.5, label: 'Les mots mêlés' },
+    treasure: { x: 45, y: 85, label: 'Le trésor' },
   },
 };

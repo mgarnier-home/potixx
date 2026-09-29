@@ -41,3 +41,15 @@ Page d'accueil
 
 Prévoir petit fomrulaire pour les mises à jour du bébé
 Prévoir 2eme onglet pour la liste de naissance (ou redirection vers un truc déja fait)
+
+trucs à revoir
+
+bitwardcen s'ouvre sur le champ password de l'énigme 2
+revoir le rebus
+
+énigme 3 : probleme  quand on sélectionne une case qui est dans 2 mots
+8 en plus tendre un peu bizarre
+
+énigme 4 : je veux avoir des mots en diagonale, qu'ils puissent se croiser, et qu'ils puissent etre dans toutes les directions
+
+le trésor est moche

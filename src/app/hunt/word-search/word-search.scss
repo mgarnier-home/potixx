@@ -1,0 +1,192 @@
+:host {
+  display: block;
+  /* Les requêtes de conteneur choisissent la mise en page selon la largeur réelle du panneau. */
+  container-type: inline-size;
+}
+
+.word-search {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.puzzle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+/*
+ * Plateau sombre comme les mots croisés (tâche 10) : le lagon profond plutôt qu'un blanc cru.
+ * 10 colonnes de ≈ 34 px dans 358 px sur téléphone (mêmes proportions que la grille de mots
+ * croisés), plus grandes sur ordinateur.
+ */
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 1px;
+  width: 100%;
+  max-width: 24rem;
+  padding: 4px;
+  border-radius: var(--radius-paper);
+  background:
+    radial-gradient(ellipse at 30% 20%, rgb(0 180 216 / 0.3), transparent 60%),
+    var(--color-sea-deep);
+  box-shadow: var(--shadow-paper);
+}
+
+.cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  border-radius: 1px;
+  background: var(--color-parchment-light);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: background-color 150ms ease;
+}
+
+/*
+ * Case d'ancrage (1ᵉʳ toucher) : la seule case sombre de la grille (lagon profond, lettre
+ * parchemin, 12,6:1), cerclée d'or, donc distincte des dix teintes claires des mots trouvés.
+ */
+.cell.anchor {
+  z-index: 1;
+  background: var(--color-sea-deep);
+  color: var(--color-parchment-light);
+  box-shadow:
+    inset 0 0 0 3px var(--color-gold),
+    0 0 0 2px var(--color-parchment-light);
+}
+
+/* Aperçu au survol (ordinateur uniquement) d'une ligne droite depuis l'ancre. */
+.cell.preview:not(.anchor) {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 2px var(--color-sea-mid);
+}
+
+/* Mot trouvé : surligné dans la couleur du mot (une par mot, cf. `WORD_COLORS`), sans dépendre de
+   la seule couleur puisque le mot est aussi rayé dans la liste. */
+.cell.found {
+  background: var(--ws-word-color, var(--color-gold-light));
+}
+
+/* Sélection invalide : bref flash rouge + tremblement, instantané avec les animations réduites
+   (règle globale de `styles.scss` qui ramène toute durée d'animation à 0,01 ms). */
+.cell.failed {
+  animation: cell-shake 350ms ease-in-out;
+}
+
+@keyframes cell-shake {
+  0%,
+  100% {
+    background: var(--color-parchment-light);
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    background: var(--color-baby-pink-pale);
+    transform: translateX(-3px);
+  }
+  40%,
+  80% {
+    background: var(--color-baby-pink-pale);
+    transform: translateX(3px);
+  }
+}
+
+/* Liste des mots à trouver, en plaquettes façon étiquettes de carte au trésor. */
+.word-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 24rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.word-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding: var(--space-1) var(--space-3);
+  border: 2px solid var(--color-ink-soft);
+  border-radius: var(--radius-control);
+  background: var(--color-parchment-light);
+  font-family: var(--font-display);
+  font-size: var(--font-size-lead);
+  letter-spacing: 0.02em;
+  color: var(--color-ink);
+  transition: background-color 150ms ease;
+}
+
+.word-chip.found {
+  border-color: var(--color-ink);
+  background: var(--ws-word-color, var(--color-gold-light));
+  color: var(--color-ink);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  animation: reveal-in 400ms ease-out both;
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.solved-message {
+  max-width: 24rem;
+  font-size: var(--font-size-lead);
+  font-style: italic;
+  color: var(--color-ink-soft);
+}
+
+/* Assez de place : la grille et la liste des mots passent côte à côte. */
+@container (min-width: 36rem) {
+  .puzzle {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .board {
+    flex: none;
+  }
+
+  .cell {
+    font-size: 1.3rem;
+  }
+
+  .word-list {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    max-width: 16rem;
+  }
+}

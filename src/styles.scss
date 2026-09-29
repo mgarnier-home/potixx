@@ -1,1 +1,204 @@
-/* You can add global styles to this file, and also import other style files */
+/*
+ * Styles globaux et jetons de design de la chasse au trésor.
+ * Direction : vieille carte de pirate sur parchemin, chaleureuse et familiale, lisible par tous.
+ * Les écrans des énigmes (tâches 8 à 12) réutilisent ces variables plutôt que des valeurs en dur.
+ */
+
+/* Les polices Google (IM Fell English, Alegreya Sans) sont chargées dans `src/index.html`. */
+
+:root {
+  /*
+   * Couleurs « tropical festif » : parchemin clair et chaud, lagon, végétation vive, corail et
+   * rouge profond, touche de rose bébé, or soleil. L'encre reste sombre pour la lisibilité.
+   * Les variantes « deep » / « dark » servent aux textes et contours (contraste AA sur parchemin).
+   */
+  --color-parchment: #ffe8b8;
+  --color-parchment-light: #fff3d6;
+  --color-parchment-dark: #f0c987;
+  --color-ink: #3a2715;
+  --color-ink-soft: #6b4f32;
+  --color-sea: #00b4d8;
+  --color-sea-light: #90e0ef;
+  --color-sea-pale: #c9f1f8;
+  /* Eau profonde : fond de page et plateaux de jeu (texte parchemin dessus : 12,6:1). */
+  --color-sea-deep: #023047;
+  --color-sea-mid: #03658c;
+  --color-jungle: #38b000;
+  --color-coral: #ff6b6b;
+  --color-coral-light: #ff8585;
+  --color-treasure: #d62839;
+  /* Rouge profond pour le texte sur parchemin (5,5:1). */
+  --color-treasure-dark: #b3202f;
+  --color-baby-pink: #ff8fab;
+  --color-baby-pink-pale: #ffd3de;
+  --color-gold: #ffc300;
+  --color-gold-light: #ffd95a;
+  --color-gold-pale: #fff0b3;
+  /* Or foncé pour les contours sur parchemin (≥ 3:1). */
+  --color-gold-deep: #9a6f00;
+  --color-locked: #978b78;
+  --color-success: #2bb24c;
+  --color-success-pale: #c8f0b0;
+  /* Vert foncé pour le texte des mots validés (5,3:1 sur parchemin). */
+  --color-success-dark: #1a6e30;
+  --color-focus: #005f8f;
+
+  /* Typographie : titres façon carte ancienne, texte courant très lisible. */
+  --font-display: 'IM Fell English', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Alegreya Sans', 'Trebuchet MS', system-ui, sans-serif;
+  --font-size-small: 1rem;
+  --font-size-body: 1.125rem;
+  --font-size-lead: 1.3rem;
+  --font-size-title: 1.75rem;
+  --font-size-display: 2.25rem;
+  --line-height-body: 1.5;
+
+  /* Espacements (échelle de 4 px). */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  /* Rayons : les boutons ressemblent à des sceaux, les panneaux à du papier à peine arrondi. */
+  --radius-paper: 6px;
+  --radius-control: 10px;
+  --radius-round: 999px;
+
+  /* Ombres chaudes (encre), jamais grises. */
+  --shadow-paper: 0 1px 0 rgb(58 39 21 / 0.08), 0 10px 30px -12px rgb(58 39 21 / 0.45);
+  --shadow-seal: 0 2px 0 rgb(58 39 21 / 0.35), 0 6px 14px -4px rgb(58 39 21 / 0.55);
+  --shadow-inset: inset 0 0 60px rgb(240 140 60 / 0.22);
+
+  /* Taille minimale d'une cible tactile (spec : ≥ 32 px, on vise plus confortable). */
+  --touch-target: 48px;
+
+  /* Largeur de lecture des écrans d'énigme. */
+  --content-width: 40rem;
+
+  /* Fond commun : parchemin ensoleillé, avec une touche de rose et d'or dans les coins. */
+  --texture-parchment:
+    radial-gradient(ellipse at 20% 15%, rgb(255 252 240 / 0.8), transparent 55%),
+    radial-gradient(ellipse at 90% 85%, rgb(255 143 171 / 0.16), transparent 55%),
+    radial-gradient(ellipse at 5% 95%, rgb(255 195 0 / 0.14), transparent 50%);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--color-ink);
+  /* Le lagon profond autour de la carte, avec un reflet de soleil en haut. */
+  background-color: var(--color-sea-deep);
+  background-image:
+    radial-gradient(ellipse at 50% -10%, rgb(255 195 0 / 0.16), transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgb(0 180 216 / 0.25), transparent 60%),
+    linear-gradient(180deg, var(--color-sea-mid), var(--color-sea-deep) 70%);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--color-ink);
+}
+
+p {
+  margin: 0;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* Bouton principal (valider une réponse…) : corail, texte encre (5,1:1), grande cible tactile. */
+.button-primary,
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-control);
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease;
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.button-primary {
+  border: 2px solid var(--color-ink);
+  background: var(--color-coral);
+  color: var(--color-ink);
+  box-shadow: 0 3px 0 var(--color-ink);
+
+  &:hover {
+    background: var(--color-coral-light);
+  }
+}
+
+.button-secondary {
+  border: 2px solid var(--color-sea-mid);
+  background: transparent;
+  color: var(--color-ink);
+
+  &:hover {
+    background: rgb(0 180 216 / 0.14);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
