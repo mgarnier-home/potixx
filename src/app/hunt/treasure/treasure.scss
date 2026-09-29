@@ -59,7 +59,7 @@
 }
 
 .wood-dark {
-  fill: #6e4220;
+  fill: #7a4520;
 }
 
 .inside {
@@ -97,7 +97,7 @@
 }
 
 .pearls .pendant {
-  fill: var(--color-treasure);
+  fill: var(--color-baby-pink);
 }
 
 /* Couvercle fermé : il bascule autour de sa charnière (haut du dôme) puis disparaît. */
@@ -118,8 +118,13 @@
 }
 
 .rays {
-  fill: #e9bd55;
-  opacity: 0.4;
+  fill: var(--color-gold);
+  opacity: 0.5;
+}
+
+/* Un rayon sur deux en rose bébé : la touche festive de l'annonce. */
+.rays polygon:nth-child(even) {
+  fill: var(--color-baby-pink);
 }
 
 .spill {
@@ -129,8 +134,8 @@
 }
 
 .sparkle {
-  fill: #fff4cf;
-  stroke: var(--color-gold);
+  fill: #fffbe6;
+  stroke: var(--color-coral);
   stroke-width: 0.8;
   transform-box: fill-box;
   transform-origin: 50% 50%;
@@ -320,13 +325,13 @@
 
   path {
     fill: none;
-    stroke: var(--color-gold);
+    stroke: var(--color-gold-deep);
     stroke-width: 2;
     stroke-linecap: round;
   }
 
   .flourish-gem {
-    fill: var(--color-treasure);
+    fill: var(--color-coral);
     stroke: var(--color-ink);
     stroke-width: 1;
   }
@@ -340,7 +345,7 @@
   margin-top: var(--space-6);
   border: 3px solid var(--color-gold);
   border-radius: var(--radius-paper);
-  background: var(--color-ink);
+  background: var(--color-sea-deep);
   box-shadow: var(--shadow-paper);
   object-fit: contain;
 }

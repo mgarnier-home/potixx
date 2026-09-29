@@ -8,7 +8,7 @@
   aspect-ratio: 3 / 4;
   width: 100%;
   border-radius: var(--radius-paper);
-  filter: drop-shadow(0 18px 24px rgb(20 12 4 / 0.55));
+  filter: drop-shadow(0 18px 24px rgb(1 24 36 / 0.55));
 }
 
 .map-image {
@@ -52,8 +52,14 @@
   font-family: var(--font-display);
   font-size: 1.6rem;
   line-height: 1;
-  color: var(--color-parchment-light);
-  background: radial-gradient(circle at 35% 30%, #c4473f, var(--color-treasure) 55%, #6d1c17);
+  color: var(--color-ink);
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--color-baby-pink-pale),
+    var(--color-baby-pink) 30%,
+    var(--color-coral) 60%,
+    var(--color-treasure)
+  );
   box-shadow: var(--shadow-seal);
   transition: transform 150ms ease;
 }
@@ -79,16 +85,23 @@
   white-space: nowrap;
   color: var(--color-ink);
   background: var(--color-parchment-light);
-  box-shadow: 0 1px 3px rgb(58 39 21 / 0.3);
+  box-shadow: 0 1px 3px rgb(2 48 71 / 0.3);
 }
 
-/* En cours : le sceau rouge « respire » pour inviter au toucher. */
+/* En cours : le sceau corail et rose « respire » dans un halo pour inviter au toucher. */
 .current {
+  .seal {
+    box-shadow:
+      var(--shadow-seal),
+      0 0 0 4px rgb(255 143 171 / 0.55),
+      0 0 22px 6px rgb(255 195 0 / 0.55);
+  }
+
   .seal::after {
     content: '';
     position: absolute;
     inset: -9px;
-    border: 3px solid var(--color-gold-light);
+    border: 3px solid var(--color-baby-pink);
     border-radius: inherit;
     animation: beckon 1.8s ease-out infinite;
   }
@@ -99,13 +112,22 @@
 
   .caption {
     font-weight: 700;
+    box-shadow:
+      0 0 0 2px var(--color-baby-pink),
+      0 1px 3px rgb(2 48 71 / 0.3);
   }
 }
 
-/* Résolue : sceau vert olive coché. */
+/* Résolue : sceau vert franc coché, coche à l'encre (5,1:1 sur le vert). */
 .solved {
   .seal {
-    background: radial-gradient(circle at 35% 30%, #7aa05f, var(--color-success) 55%, #2f4f22);
+    color: var(--color-ink);
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-success-pale),
+      var(--color-success) 50%,
+      var(--color-success-dark)
+    );
   }
 
   &:hover .seal {
@@ -118,15 +140,15 @@
   cursor: default;
 
   .seal {
-    background: radial-gradient(circle at 35% 30%, #b3a894, var(--color-locked) 60%, #6f6555);
-    border-color: rgb(243 230 196 / 0.7);
-    color: rgb(243 230 196 / 0.85);
+    background: radial-gradient(circle at 35% 30%, #b8b0a2, var(--color-locked) 60%, #6f6555);
+    border-color: rgb(255 243 214 / 0.7);
+    color: rgb(255 243 214 / 0.9);
     box-shadow: 0 2px 0 rgb(58 39 21 / 0.25);
   }
 
   .caption {
     color: var(--color-ink-soft);
-    background: #e9dcb8;
+    background: #ede3cf;
     box-shadow: none;
   }
 }
@@ -136,7 +158,12 @@
   --seal-size: 3.75rem;
 
   &.locked .seal {
-    background: radial-gradient(circle at 35% 30%, #c6a15a, var(--color-gold) 60%, #7d5a1a);
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-gold-pale),
+      var(--color-gold) 55%,
+      var(--color-gold-deep)
+    );
     color: var(--color-treasure-dark);
   }
 }

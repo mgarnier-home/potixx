@@ -7,21 +7,41 @@
 /* Les polices Google (IM Fell English, Alegreya Sans) sont chargées dans `src/index.html`. */
 
 :root {
-  /* Couleurs : parchemin, encre sépia, mer, rouge du trésor, laiton. */
-  --color-parchment: #e8d3a2;
-  --color-parchment-light: #f3e6c4;
-  --color-parchment-dark: #c9a96b;
+  /*
+   * Couleurs « tropical festif » : parchemin clair et chaud, lagon, végétation vive, corail et
+   * rouge profond, touche de rose bébé, or soleil. L'encre reste sombre pour la lisibilité.
+   * Les variantes « deep » / « dark » servent aux textes et contours (contraste AA sur parchemin).
+   */
+  --color-parchment: #ffe8b8;
+  --color-parchment-light: #fff3d6;
+  --color-parchment-dark: #f0c987;
   --color-ink: #3a2715;
   --color-ink-soft: #6b4f32;
-  --color-sea: #3e7c78;
-  --color-sea-light: #9cc3b6;
-  --color-treasure: #a3302a;
-  --color-treasure-dark: #7a211c;
-  --color-gold: #b8862b;
-  --color-gold-light: #e2b85a;
+  --color-sea: #00b4d8;
+  --color-sea-light: #90e0ef;
+  --color-sea-pale: #c9f1f8;
+  /* Eau profonde : fond de page et plateaux de jeu (texte parchemin dessus : 12,6:1). */
+  --color-sea-deep: #023047;
+  --color-sea-mid: #03658c;
+  --color-jungle: #38b000;
+  --color-coral: #ff6b6b;
+  --color-coral-light: #ff8585;
+  --color-treasure: #d62839;
+  /* Rouge profond pour le texte sur parchemin (5,5:1). */
+  --color-treasure-dark: #b3202f;
+  --color-baby-pink: #ff8fab;
+  --color-baby-pink-pale: #ffd3de;
+  --color-gold: #ffc300;
+  --color-gold-light: #ffd95a;
+  --color-gold-pale: #fff0b3;
+  /* Or foncé pour les contours sur parchemin (≥ 3:1). */
+  --color-gold-deep: #9a6f00;
   --color-locked: #978b78;
-  --color-success: #4d7a3a;
-  --color-focus: #1f5f8b;
+  --color-success: #2bb24c;
+  --color-success-pale: #c8f0b0;
+  /* Vert foncé pour le texte des mots validés (5,3:1 sur parchemin). */
+  --color-success-dark: #1a6e30;
+  --color-focus: #005f8f;
 
   /* Typographie : titres façon carte ancienne, texte courant très lisible. */
   --font-display: 'IM Fell English', 'Iowan Old Style', Georgia, serif;
@@ -50,7 +70,7 @@
   /* Ombres chaudes (encre), jamais grises. */
   --shadow-paper: 0 1px 0 rgb(58 39 21 / 0.08), 0 10px 30px -12px rgb(58 39 21 / 0.45);
   --shadow-seal: 0 2px 0 rgb(58 39 21 / 0.35), 0 6px 14px -4px rgb(58 39 21 / 0.55);
-  --shadow-inset: inset 0 0 60px rgb(122 80 30 / 0.28);
+  --shadow-inset: inset 0 0 60px rgb(240 140 60 / 0.22);
 
   /* Taille minimale d'une cible tactile (spec : ≥ 32 px, on vise plus confortable). */
   --touch-target: 48px;
@@ -58,11 +78,11 @@
   /* Largeur de lecture des écrans d'énigme. */
   --content-width: 40rem;
 
-  /* Fond commun : parchemin légèrement taché. */
+  /* Fond commun : parchemin ensoleillé, avec une touche de rose et d'or dans les coins. */
   --texture-parchment:
-    radial-gradient(ellipse at 20% 15%, rgb(255 248 225 / 0.7), transparent 55%),
-    radial-gradient(ellipse at 85% 80%, rgb(160 110 50 / 0.18), transparent 60%),
-    radial-gradient(circle at 60% 40%, rgb(160 110 50 / 0.08), transparent 40%);
+    radial-gradient(ellipse at 20% 15%, rgb(255 252 240 / 0.8), transparent 55%),
+    radial-gradient(ellipse at 90% 85%, rgb(255 143 171 / 0.16), transparent 55%),
+    radial-gradient(ellipse at 5% 95%, rgb(255 195 0 / 0.14), transparent 50%);
 }
 
 *,
@@ -83,10 +103,12 @@ body {
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
   color: var(--color-ink);
-  background-color: #5b3f24;
+  /* Le lagon profond autour de la carte, avec un reflet de soleil en haut. */
+  background-color: var(--color-sea-deep);
   background-image:
-    radial-gradient(ellipse at 50% 0%, rgb(255 220 150 / 0.18), transparent 60%),
-    linear-gradient(180deg, #6a4a2b, #4a321c);
+    radial-gradient(ellipse at 50% -10%, rgb(255 195 0 / 0.16), transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgb(0 180 216 / 0.25), transparent 60%),
+    linear-gradient(180deg, var(--color-sea-mid), var(--color-sea-deep) 70%);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -128,7 +150,7 @@ button {
   outline-offset: 3px;
 }
 
-/* Bouton principal (valider une réponse…) : laiton, texte encre, grande cible tactile. */
+/* Bouton principal (valider une réponse…) : corail, texte encre (5,1:1), grande cible tactile. */
 .button-primary,
 .button-secondary {
   display: inline-flex;
@@ -152,22 +174,22 @@ button {
 
 .button-primary {
   border: 2px solid var(--color-ink);
-  background: var(--color-gold-light);
+  background: var(--color-coral);
   color: var(--color-ink);
   box-shadow: 0 3px 0 var(--color-ink);
 
   &:hover {
-    background: #eac673;
+    background: var(--color-coral-light);
   }
 }
 
 .button-secondary {
-  border: 2px solid var(--color-ink-soft);
+  border: 2px solid var(--color-sea-mid);
   background: transparent;
   color: var(--color-ink);
 
   &:hover {
-    background: rgb(58 39 21 / 0.07);
+    background: rgb(0 180 216 / 0.14);
   }
 }
 

@@ -14,22 +14,23 @@ import { SkipButton } from '../shared/skip-button/skip-button';
 
 /**
  * Une couleur par mot, réutilisée pour la case et pour la puce de la liste (spec §4.6 : les mots
- * trouvés restent surlignés). Des teintes claires (proches du parchemin) pour que le texte encre
- * reste lisible dessus sans variante de couleur de texte par mot. Ordre stable, indexé sur
- * `WORD_SEARCH.words` : la couleur d'un mot ne change jamais, quel que soit l'ordre où il est
- * trouvé.
+ * trouvés restent surlignés). Dix teintes vives et nettement distinctes entre elles et du parchemin
+ * des cases non trouvées ; toutes gardent le texte encre (#3a2715) lisible à ≥ 5,5:1, sans variante
+ * de couleur de texte par mot. L'ancre de sélection, elle, est sombre (voir `word-search.scss`).
+ * Ordre stable, indexé sur `WORD_SEARCH.words` : la couleur d'un mot ne change jamais, quel que
+ * soit l'ordre où il est trouvé.
  */
 const WORD_COLORS: readonly string[] = [
-  '#f1d993', // or
-  '#cfe3da', // sauge
-  '#f4c9bd', // corail
-  '#d3dfbd', // mousse
-  '#c9d9e8', // marine
-  '#ddc7e8', // améthyste
-  '#f2cfa8', // cuivre
-  '#e8c3d3', // bourgogne
-  '#d9c46b', // moutarde (plus soutenue que l'or pour rester distincte)
-  '#c7d3c9', // ardoise
+  '#ffd23f', // jaune soleil
+  '#48cae4', // lagon
+  '#ff7b7b', // corail
+  '#4cc764', // vert tropical
+  '#7aa7ff', // bleu
+  '#b98cff', // violet
+  '#ff9f45', // orange
+  '#ff8fd0', // rose
+  '#c6f432', // lime
+  '#2ee6c8', // turquoise
 ];
 
 const WORD_COLOR_BY_WORD = new Map<string, string>(

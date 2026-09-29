@@ -9,9 +9,10 @@
     <svg class="layer glow" viewBox="0 0 320 280" focusable="false">
       <defs>
         <radialGradient id="tc-glow" cx="50%" cy="46%" r="50%">
-          <stop offset="0" stop-color="#fff6d6" />
-          <stop offset="0.35" stop-color="#f6d98a" stop-opacity="0.85" />
-          <stop offset="1" stop-color="#e2b85a" stop-opacity="0" />
+          <stop offset="0" stop-color="#fffbe6" />
+          <stop offset="0.3" stop-color="#ffe066" stop-opacity="0.95" />
+          <stop offset="0.65" stop-color="#ffb347" stop-opacity="0.55" />
+          <stop offset="1" stop-color="#ff8fab" stop-opacity="0" />
         </radialGradient>
         <radialGradient id="tc-ray-fade" cx="160" cy="128" r="135" gradientUnits="userSpaceOnUse">
           <stop offset="0.25" stop-color="#fff" />
@@ -38,13 +39,13 @@
     </svg>
 
     <div class="chest">
-      <!-- Intérieur du couvercle, doublé de velours rouge : il se relève derrière le trésor. -->
+      <!-- Intérieur du couvercle, doublé de velours framboise : il se relève derrière le trésor. -->
       <div class="layer lid-inner">
         <svg viewBox="0 0 320 280" focusable="false">
           <defs>
             <linearGradient id="tc-velvet" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#7a211c" />
-              <stop offset="1" stop-color="#a3302a" />
+              <stop offset="0" stop-color="#c9184a" />
+              <stop offset="1" stop-color="#ff6b6b" />
             </linearGradient>
             <pattern
               id="tc-quilt"
@@ -54,8 +55,8 @@
               x="149"
               y="41"
             >
-              <path d="M0 0 L22 22 M22 0 L0 22" stroke="#4f1310" stroke-width="1" opacity="0.55" />
-              <circle cx="11" cy="11" r="1.8" fill="#e2b85a" />
+              <path d="M0 0 L22 22 M22 0 L0 22" stroke="#8f0f33" stroke-width="1" opacity="0.5" />
+              <circle cx="11" cy="11" r="1.8" fill="#ffc300" />
             </pattern>
             <clipPath id="tc-lining">
               <path d="M72 132 L72 76 C72 60 110 54 160 54 C210 54 248 60 248 76 L248 132 Z" />
@@ -92,23 +93,23 @@
       <svg class="layer body" viewBox="0 0 320 280" focusable="false">
         <defs>
           <linearGradient id="tc-wood" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#b27b43" />
-            <stop offset="1" stop-color="#875328" />
+            <stop offset="0" stop-color="#c98a4b" />
+            <stop offset="1" stop-color="#8e5627" />
           </linearGradient>
           <linearGradient id="tc-gold" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#f1cf73" />
-            <stop offset="0.55" stop-color="#d4a13e" />
-            <stop offset="1" stop-color="#a8792a" />
+            <stop offset="0" stop-color="#ffe98a" />
+            <stop offset="0.5" stop-color="#ffc300" />
+            <stop offset="1" stop-color="#d98e00" />
           </linearGradient>
           <radialGradient id="tc-heap" cx="50%" cy="20%" r="80%">
-            <stop offset="0" stop-color="#fff0b8" />
-            <stop offset="0.45" stop-color="#eec35f" />
-            <stop offset="1" stop-color="#c08f33" />
+            <stop offset="0" stop-color="#fff7cc" />
+            <stop offset="0.45" stop-color="#ffd23f" />
+            <stop offset="1" stop-color="#f0a000" />
           </radialGradient>
           <radialGradient id="tc-coin" cx="35%" cy="30%" r="75%">
-            <stop offset="0" stop-color="#fff2c2" />
-            <stop offset="0.6" stop-color="#e8bd57" />
-            <stop offset="1" stop-color="#b8862b" />
+            <stop offset="0" stop-color="#fff7cc" />
+            <stop offset="0.6" stop-color="#ffc300" />
+            <stop offset="1" stop-color="#d98e00" />
           </radialGradient>
           <symbol id="tc-coin-flat" viewBox="-10 -5 20 10" overflow="visible">
             <ellipse
@@ -126,7 +127,7 @@
               rx="5.5"
               ry="2"
               fill="none"
-              stroke="#a8792a"
+              stroke="#c27c00"
               stroke-width="0.8"
             />
           </symbol>
@@ -184,13 +185,13 @@
 
         <!-- Un hochet parmi les pièces : le vrai trésor. -->
         <g class="rattle" transform="translate(0 3) rotate(-24 150 104)">
-          <rect class="ink" x="146.5" y="102" width="7" height="30" rx="3.5" fill="#f3e6c4" />
-          <circle class="ink" cx="150" cy="134" r="5" fill="#9cc3b6" />
-          <circle class="ink" cx="150" cy="90" r="13" fill="#f3e6c4" />
+          <rect class="ink" x="146.5" y="102" width="7" height="30" rx="3.5" fill="#fff3d6" />
+          <circle class="ink" cx="150" cy="134" r="5" fill="#90e0ef" />
+          <circle class="ink" cx="150" cy="90" r="13" fill="#ffd3de" />
           <path
             d="M138 86 Q150 80 162 86 M137.5 94 Q150 100 162.5 94"
             fill="none"
-            stroke="#a3302a"
+            stroke="#ff6b6b"
             stroke-width="3"
             stroke-linecap="round"
           />
@@ -199,10 +200,10 @@
 
         <!-- Joyaux. -->
         <g class="ink">
-          <path d="M188 104 L196 96 L206 96 L212 104 L200 116 Z" fill="#a3302a" />
+          <path d="M188 104 L196 96 L206 96 L212 104 L200 116 Z" fill="#d62839" />
           <path d="M188 104 L212 104 M196 96 L200 104 L206 96" fill="none" stroke-width="1" />
-          <path d="M226 118 L234 110 L242 118 L234 126 Z" fill="#3e7c78" />
-          <path d="M84 120 L90 113 L96 120 L90 127 Z" fill="#3e7c78" />
+          <path d="M226 118 L234 110 L242 118 L234 126 Z" fill="#00b4d8" />
+          <path d="M84 120 L90 113 L96 120 L90 127 Z" fill="#38b000" />
         </g>
 
         <!-- Face avant : trois planches de bois veiné. -->
@@ -287,7 +288,7 @@
             <path
               d="M36 232 L37.6 236.6 L42 236.8 L38.5 239.6 L39.8 244 L36 241.4 L32.2 244 L33.5 239.6 L30 236.8 L34.4 236.6 Z"
               fill="none"
-              stroke="#a8792a"
+              stroke="#c27c00"
               stroke-width="0.9"
             />
           </g>
