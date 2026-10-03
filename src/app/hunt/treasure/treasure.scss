@@ -312,6 +312,7 @@
 .message {
   max-width: 22rem;
   font-family: var(--font-display);
+  font-weight: var(--font-weight-display);
   font-size: clamp(1.9rem, 8.4vw, 2.4rem);
   line-height: 1.15;
   color: var(--color-treasure-dark);

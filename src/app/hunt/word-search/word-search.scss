@@ -50,6 +50,7 @@
   background: var(--color-parchment-light);
   color: var(--color-ink);
   font-family: var(--font-display);
+  font-weight: var(--font-weight-display);
   font-size: 1.15rem;
   line-height: 1;
   transition: background-color 150ms ease;
@@ -126,6 +127,7 @@
   border-radius: var(--radius-control);
   background: var(--color-parchment-light);
   font-family: var(--font-display);
+  font-weight: var(--font-weight-display);
   font-size: var(--font-size-lead);
   letter-spacing: 0.02em;
   color: var(--color-ink);
@@ -163,7 +165,6 @@
 .solved-message {
   max-width: 24rem;
   font-size: var(--font-size-lead);
-  font-style: italic;
   color: var(--color-ink-soft);
 }
 

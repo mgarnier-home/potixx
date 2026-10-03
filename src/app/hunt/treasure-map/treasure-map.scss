@@ -50,6 +50,7 @@
   border-radius: var(--radius-round);
   border: 3px solid var(--color-parchment-light);
   font-family: var(--font-display);
+  font-weight: var(--font-weight-display);
   font-size: 1.6rem;
   line-height: 1;
   color: var(--color-ink);
@@ -79,6 +80,7 @@
   padding: 0 var(--space-2);
   border-radius: var(--radius-control);
   font-family: var(--font-display);
+  font-weight: var(--font-weight-display);
   font-size: 1.05rem;
   line-height: 1.25;
   text-align: center;
@@ -111,7 +113,7 @@
   }
 
   .caption {
-    font-weight: 700;
+    font-weight: var(--font-weight-strong);
     box-shadow:
       0 0 0 2px var(--color-baby-pink),
       0 1px 3px rgb(2 48 71 / 0.3);

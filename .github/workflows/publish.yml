@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Numéro de version à publier (ex. 1.2.0)'
+        description: "Numéro de version à publier (ex. 1.2.0)"
         required: true
         type: string
 

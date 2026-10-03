@@ -4,7 +4,7 @@
  * Les écrans des énigmes (tâches 8 à 12) réutilisent ces variables plutôt que des valeurs en dur.
  */
 
-/* Les polices Google (IM Fell English, Alegreya Sans) sont chargées dans `src/index.html`. */
+/* La police Google (Fredoka) est chargée dans `src/index.html`. */
 
 :root {
   /*
@@ -43,9 +43,15 @@
   --color-success-dark: #1a6e30;
   --color-focus: #005f8f;
 
-  /* Typographie : titres façon carte ancienne, texte courant très lisible. */
-  --font-display: 'IM Fell English', 'Iowan Old Style', Georgia, serif;
-  --font-body: 'Alegreya Sans', 'Trebuchet MS', system-ui, sans-serif;
+  /*
+   * Typographie : une seule famille toute en rondeurs (Fredoka), les titres se distinguent par
+   * leur graisse, volontairement légère (pas de gras : 500 au plus). Fredoka n'a pas d'italique :
+   * ne pas utiliser `font-style: italic`.
+   */
+  --font-display: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+  --font-body: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+  --font-weight-display: 500;
+  --font-weight-strong: 500;
   --font-size-small: 1rem;
   --font-size-body: 1.125rem;
   --font-size-lead: 1.3rem;
@@ -117,7 +123,7 @@ h2,
 h3 {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: var(--font-weight-display);
   line-height: 1.15;
   color: var(--color-ink);
 }
@@ -161,7 +167,7 @@ button {
   padding: var(--space-2) var(--space-5);
   border-radius: var(--radius-control);
   font-size: var(--font-size-body);
-  font-weight: 700;
+  font-weight: var(--font-weight-strong);
   text-decoration: none;
   transition:
     transform 120ms ease,
