@@ -99,27 +99,7 @@
   <path d="M175 150 C 260 140, 380 165, 430 250 C 470 320, 260 330, 170 400 C 110 450, 330 470, 420 540 C 480 590, 360 640, 270 680" fill="none" stroke="#ff5a5f" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="3 12" />
 
   <!-- La croix du trésor. -->
-  <g stroke="#d62839" stroke-width="12" stroke-linecap="round">
-    <path d="M220 630 L320 730 M320 630 L220 730" />
-  </g>
-
-  <!-- Rose des vents. -->
-  <g transform="translate(500 105)">
-    <circle r="40" fill="#fff3d6" fill-opacity="0.85" stroke="#5a3e22" stroke-width="1.5" />
-    <circle r="31" fill="none" stroke="#5a3e22" stroke-width="0.8" />
-    <path d="M0 -44 L7 -7 L0 0 Z M0 44 L-7 7 L0 0 Z M44 0 L7 7 L0 0 Z M-44 0 L-7 -7 L0 0 Z" fill="#d62839" />
-    <path d="M0 -44 L-7 -7 L0 0 Z M0 44 L7 7 L0 0 Z M44 0 L7 -7 L0 0 Z M-44 0 L-7 7 L0 0 Z" fill="#ffc300" stroke="#5a3e22" stroke-width="0.8" />
-    <path d="M22 -22 L4 -4 L0 0 Z M-22 22 L-4 4 Z M22 22 L4 4 Z M-22 -22 L-4 -4 Z" fill="none" stroke="#5a3e22" stroke-width="1.5" />
-    <text y="-49" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#5a3e22">N</text>
-  </g>
-
-  <!-- Petit navire au large. -->
-  <g transform="translate(78 700)" stroke="#5a3e22" stroke-width="1.8" stroke-linejoin="round">
-    <path d="M0 22 L50 22 L42 34 L8 34 Z" fill="#8b5a2b" />
-    <path d="M3 26 L47 26" fill="none" stroke="#ffc300" stroke-width="2.5" />
-    <path d="M24 22 L24 -14" fill="none" />
-    <path d="M26 -12 L44 16 L26 16 Z" fill="#ffffff" />
-    <path d="M22 -8 L6 16 L22 16 Z" fill="#ffd3de" />
-    <path d="M24 -14 L34 -10 L24 -6" fill="#ff6b6b" />
+  <g stroke="#d62839" stroke-width="8" stroke-linecap="round">
+    <path d="M234 644 L306 716 M306 644 L234 716" />
   </g>
 </svg>
