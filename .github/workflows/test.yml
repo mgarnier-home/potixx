@@ -1,0 +1,62 @@
+name: Tests
+
+# Lancé à chaque commit poussé, quelle que soit la branche. La publication de l'image Docker
+# est un workflow séparé, déclenché à la main (publish.yml).
+on:
+  push:
+    branches:
+      - '**'
+
+# Annule une exécution en cours du workflow sur la même branche dès qu'un nouveau push arrive,
+# pour ne pas gaspiller de minutes CI sur du code déjà obsolète.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v7
+
+      - name: Installation de Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .tool-versions
+          cache: npm
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Vérification du formatage
+        run: npm run format:check
+
+      - name: Tests unitaires
+        run: npm test
+
+      - name: Installation des navigateurs Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Tests E2E
+        run: npm run e2e
+
+      - name: Archivage du rapport Playwright en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          # Le rapport HTML (activé en CI dans playwright.config.ts) explique les échecs, et
+          # test-results/ contient les traces ('trace: on-first-retry') et captures des essais
+          # ayant échoué : les deux sont nécessaires pour déboguer un échec E2E depuis la CI.
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

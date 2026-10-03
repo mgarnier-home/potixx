@@ -87,7 +87,14 @@ Annonce le résultat réel des commandes, pas celui attendu.
 
 ## Déploiement
 
-La CI (`.github/workflows/docker.yml`) teste puis publie `docker.io/mgarnier11/potixx`
-(amd64) sur push vers `main` et sur tag `v*`. Secrets requis côté GitHub : `DOCKERHUB_USERNAME`,
-`DOCKERHUB_TOKEN`. Le conteneur écoute sur 8080 ; le HTTPS est géré par le reverse proxy du
-propriétaire.
+Deux workflows GitHub Actions :
+
+- `.github/workflows/test.yml` : à chaque commit poussé (toutes branches), lance lint, formatage,
+  tests unitaires et tests E2E. Ne publie rien.
+- `.github/workflows/publish.yml` : lancé à la main (onglet Actions → « Publication » → _Run
+  workflow_, ou `gh workflow run publish.yml -f version=1.2.0`) avec un numéro de version `X.Y.Z`.
+  Construit et publie `docker.io/mgarnier11/potixx:<version>` (amd64), plus `latest` si le
+  lancement se fait depuis la branche par défaut. Il ne relance pas les tests.
+
+Secrets requis côté GitHub : `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`. Le conteneur écoute sur
+8080 ; le HTTPS est géré par le reverse proxy du propriétaire.
