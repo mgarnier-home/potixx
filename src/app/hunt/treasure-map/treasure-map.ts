@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
-import { MAP, STEP_ORDER } from '../hunt-content';
-import type { StepId } from '../hunt-content';
-import { HuntProgressService } from '../hunt-progress.service';
+import { ChangeDetectionStrategy, Component, computed, inject, output } from "@angular/core";
+import { MAP, STEP_ORDER } from "../hunt-content";
+import type { StepId } from "../hunt-content";
+import { HuntProgressService } from "../hunt-progress.service";
 
 /** État d'affichage d'une étape sur la carte (spec §4.1). */
-export type StepStatus = 'locked' | 'current' | 'solved';
+export type StepStatus = "locked" | "current" | "solved";
 
 /** Une étape telle que la carte l'affiche. */
 interface MapStep {
@@ -23,9 +23,9 @@ interface MapStep {
  * rien.
  */
 @Component({
-  selector: 'app-treasure-map',
-  templateUrl: './treasure-map.html',
-  styleUrl: './treasure-map.scss',
+  selector: "app-treasure-map",
+  templateUrl: "./treasure-map.html",
+  styleUrl: "./treasure-map.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreasureMap {
@@ -41,15 +41,15 @@ export class TreasureMap {
     return STEP_ORDER.map((id, index) => ({
       id,
       label: MAP.steps[id].label,
-      number: id === 'treasure' ? null : index + 1,
+      number: id === "treasure" ? null : index + 1,
       x: MAP.steps[id].x,
       y: MAP.steps[id].y,
-      status: index < currentIndex ? 'solved' : index === currentIndex ? 'current' : 'locked',
+      status: index < currentIndex ? "solved" : index === currentIndex ? "current" : "locked",
     }));
   });
 
   protected select(step: MapStep): void {
-    if (step.status !== 'locked') {
+    if (step.status !== "locked") {
       this.stepSelected.emit(step.id);
     }
   }

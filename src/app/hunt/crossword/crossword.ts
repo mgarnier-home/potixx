@@ -8,15 +8,15 @@ import {
   output,
   signal,
   viewChild,
-} from '@angular/core';
-import type { Cell } from '../core/cell';
-import { cellKey } from '../core/cell';
-import type { CrosswordEntry, Orientation } from '../core/crossword';
-import { entryCells, prefilledCells } from '../core/crossword';
-import { normalizeAnswer } from '../core/normalize-answer';
-import { CROSSWORD } from '../hunt-content';
-import { HuntProgressService } from '../hunt-progress.service';
-import { SkipButton } from '../shared/skip-button/skip-button';
+} from "@angular/core";
+import type { Cell } from "../core/cell";
+import { cellKey } from "../core/cell";
+import type { CrosswordEntry, Orientation } from "../core/crossword";
+import { entryCells, prefilledCells } from "../core/crossword";
+import { normalizeAnswer } from "../core/normalize-answer";
+import { CROSSWORD } from "../hunt-content";
+import { HuntProgressService } from "../hunt-progress.service";
+import { SkipButton } from "../shared/skip-button/skip-button";
 
 /** Intervalle entre l'illumination de deux cases du mot caché (spec : ≈ 250 ms). */
 const LIGHT_INTERVAL_MS = 250;
@@ -26,7 +26,7 @@ const LIGHT_INTERVAL_MS = 250;
  * (Android surtout), la touche d'effacement sur un champ vide n'émet souvent aucun événement
  * exploitable : garder un caractère à effacer garantit un événement `input` à chaque appui.
  */
-const SENTINEL = ' ';
+const SENTINEL = " ";
 
 /** Une seule lettre A-Z, après normalisation. */
 const SINGLE_LETTER = /^[A-Z]$/;
@@ -34,9 +34,9 @@ const SINGLE_LETTER = /^[A-Z]$/;
 /** Vrai si le visiteur a demandé de réduire les animations (faux si l'API est indisponible). */
 function prefersReducedMotion(): boolean {
   return (
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
 }
 
@@ -99,20 +99,20 @@ const HIGHLIGHT_KEYS = CROSSWORD.highlight.map(cellKey);
  * bouton ni émission (spec §4.2 : une énigme résolue reste consultable).
  */
 @Component({
-  selector: 'app-crossword',
+  selector: "app-crossword",
   imports: [SkipButton],
-  templateUrl: './crossword.html',
-  styleUrl: './crossword.scss',
+  templateUrl: "./crossword.html",
+  styleUrl: "./crossword.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Crossword {
   private readonly progress = inject(HuntProgressService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
-  private readonly hiddenInput = viewChild<ElementRef<HTMLInputElement>>('hiddenInput');
+  private readonly hiddenInput = viewChild<ElementRef<HTMLInputElement>>("hiddenInput");
   private readonly timers: ReturnType<typeof setTimeout>[] = [];
   /** Texte de la composition en cours (clavier prédictif) déjà écrit dans la grille. */
-  private composedText = '';
+  private composedText = "";
   /** Vrai juste après un keydown Backspace/Delete, pour ignorer un input delete* en doublon. */
   private eraseHandledByKeydown = false;
 
@@ -124,11 +124,11 @@ export class Crossword {
 
   protected readonly cells = GRID_CELLS;
   protected readonly sentinel = SENTINEL;
-  protected readonly hiddenWord = CROSSWORD.hiddenWord.split('');
+  protected readonly hiddenWord = CROSSWORD.hiddenWord.split("");
   /** Définitions en deux groupes, comme sur la grille d'origine. */
   protected readonly clueGroups = [
-    { title: 'Horizontal', entries: CROSSWORD.entries.filter((e) => e.orientation === 'across') },
-    { title: 'Vertical', entries: CROSSWORD.entries.filter((e) => e.orientation === 'down') },
+    { title: "Horizontal", entries: CROSSWORD.entries.filter((e) => e.orientation === "across") },
+    { title: "Vertical", entries: CROSSWORD.entries.filter((e) => e.orientation === "down") },
   ];
 
   protected readonly activeEntry = signal<number | null>(null);
@@ -142,7 +142,7 @@ export class Crossword {
 
   private readonly crossword = computed(() => this.progress.progress().crossword);
   protected readonly isSolved = computed(() => this.crossword().solved);
-  protected readonly skipVisible = computed(() => this.progress.canSkip('crossword'));
+  protected readonly skipVisible = computed(() => this.progress.canSkip("crossword"));
 
   private readonly lockedEntries = computed(() => new Set(this.crossword().locked));
   private readonly lockedKeys = computed(() => this.keysOf(this.lockedEntries()));
@@ -193,7 +193,7 @@ export class Crossword {
   }
 
   protected letterOf(key: string): string {
-    return PREFILLED.get(key) ?? this.crossword().letters[key] ?? '';
+    return PREFILLED.get(key) ?? this.crossword().letters[key] ?? "";
   }
 
   protected isActive(key: string): boolean {
@@ -225,12 +225,12 @@ export class Crossword {
   }
 
   protected orientationLabel(orientation: Orientation): string {
-    return orientation === 'across' ? 'Horizontal' : 'Vertical';
+    return orientation === "across" ? "Horizontal" : "Vertical";
   }
 
   protected cellLabel(cell: GridCell): string {
     const letter = this.letterOf(cell.key);
-    return `Ligne ${cell.row + 1}, colonne ${cell.col + 1} : ${letter === '' ? 'vide' : letter}`;
+    return `Ligne ${cell.row + 1}, colonne ${cell.col + 1} : ${letter === "" ? "vide" : letter}`;
   }
 
   /**
@@ -294,16 +294,16 @@ export class Crossword {
   protected onInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const value = input.value;
-    const inputType = (event as Partial<InputEvent>).inputType ?? '';
+    const inputType = (event as Partial<InputEvent>).inputType ?? "";
     const composing =
-      (event as Partial<InputEvent>).isComposing === true || inputType === 'insertCompositionText';
+      (event as Partial<InputEvent>).isComposing === true || inputType === "insertCompositionText";
 
-    if (composing && value !== '') {
+    if (composing && value !== "") {
       this.consumeComposition(value.startsWith(SENTINEL) ? value.slice(SENTINEL.length) : value);
       return;
     }
 
-    if (value === '' || inputType.startsWith('delete')) {
+    if (value === "" || inputType.startsWith("delete")) {
       // Un clavier peut envoyer un vrai keydown Backspace ET un input delete* malgré
       // preventDefault : l'effacement déjà fait par le keydown ne doit pas être répété.
       if (!this.eraseHandledByKeydown) {
@@ -328,27 +328,27 @@ export class Crossword {
   /** Touches physiques (ordinateur) : effacement et flèches. Les lettres passent par `input`. */
   protected onKeydown(event: KeyboardEvent): void {
     switch (event.key) {
-      case 'Backspace':
-      case 'Delete':
+      case "Backspace":
+      case "Delete":
         event.preventDefault();
         this.erase();
         // Garde contre un input delete* envoyé en plus dans la foulée (voir `onInput`).
         this.eraseHandledByKeydown = true;
         setTimeout(() => (this.eraseHandledByKeydown = false));
         break;
-      case 'ArrowLeft':
+      case "ArrowLeft":
         event.preventDefault();
         this.move(0, -1);
         break;
-      case 'ArrowRight':
+      case "ArrowRight":
         event.preventDefault();
         this.move(0, 1);
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         event.preventDefault();
         this.move(-1, 0);
         break;
-      case 'ArrowDown':
+      case "ArrowDown":
         event.preventDefault();
         this.move(1, 0);
         break;
@@ -370,7 +370,7 @@ export class Crossword {
   }
 
   protected onSkip(): void {
-    this.progress.skip('crossword');
+    this.progress.skip("crossword");
     this.wrongEntries.set(new Set());
     this.startReveal();
   }
@@ -433,8 +433,8 @@ export class Crossword {
       return;
     }
 
-    if (this.isEditable(active) && this.letterOf(active) !== '') {
-      this.writeLetter(active, '');
+    if (this.isEditable(active) && this.letterOf(active) !== "") {
+      this.writeLetter(active, "");
       return;
     }
 
@@ -446,7 +446,7 @@ export class Crossword {
     if (previous !== undefined) {
       this.activeKey.set(previous);
       if (!this.lockedKeys().has(active) && this.isEditable(previous)) {
-        this.writeLetter(previous, '');
+        this.writeLetter(previous, "");
       }
     }
   }
@@ -482,7 +482,7 @@ export class Crossword {
       return;
     }
 
-    const orientation: Orientation = colStep !== 0 ? 'across' : 'down';
+    const orientation: Orientation = colStep !== 0 ? "across" : "down";
     const entry =
       next.entries.find((number) => ENTRIES.get(number)?.orientation === orientation) ??
       next.entries[0];
@@ -507,7 +507,7 @@ export class Crossword {
     if (unlocked.length === 1) {
       return unlocked[0];
     }
-    return cell.entries.find((number) => ENTRIES.get(number)?.orientation === 'across') ?? first;
+    return cell.entries.find((number) => ENTRIES.get(number)?.orientation === "across") ?? first;
   }
 
   private isEditable(key: string): boolean {
@@ -544,15 +544,15 @@ export class Crossword {
    * au-dessus du clavier) ; ne bouge rien si elle est déjà visible (ordinateur).
    */
   private scrollCellIntoView(key: string | null): void {
-    const cell = GRID_CELLS_BY_KEY.get(key ?? '');
+    const cell = GRID_CELLS_BY_KEY.get(key ?? "");
     const element =
       cell === undefined
         ? null
         : this.host.nativeElement.querySelector(`[data-testid="cw-cell-${cell.row}-${cell.col}"]`);
-    if (element instanceof HTMLElement && typeof element.scrollIntoView === 'function') {
+    if (element instanceof HTMLElement && typeof element.scrollIntoView === "function") {
       element.scrollIntoView({
-        block: 'nearest',
-        behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+        block: "nearest",
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
       });
     }
   }
@@ -568,7 +568,7 @@ export class Crossword {
 
   /** Remet la sentinelle seule dans le champ ; toute composition en cours est oubliée. */
   private resetInput(input: HTMLInputElement): void {
-    this.composedText = '';
+    this.composedText = "";
     input.value = SENTINEL;
     try {
       input.setSelectionRange(SENTINEL.length, SENTINEL.length);
@@ -583,7 +583,7 @@ export class Crossword {
    * serait cachée dessous.
    */
   private trackVirtualKeyboard(): void {
-    const viewport = typeof window === 'undefined' ? null : window.visualViewport;
+    const viewport = typeof window === "undefined" ? null : window.visualViewport;
     if (viewport === null || viewport === undefined) {
       return;
     }
@@ -592,11 +592,11 @@ export class Crossword {
       const offset = window.innerHeight - viewport.height - viewport.offsetTop;
       this.keyboardOffset.set(Math.max(0, Math.round(offset)));
     };
-    viewport.addEventListener('resize', update);
-    viewport.addEventListener('scroll', update);
+    viewport.addEventListener("resize", update);
+    viewport.addEventListener("scroll", update);
     this.destroyRef.onDestroy(() => {
-      viewport.removeEventListener('resize', update);
-      viewport.removeEventListener('scroll', update);
+      viewport.removeEventListener("resize", update);
+      viewport.removeEventListener("scroll", update);
     });
   }
 }

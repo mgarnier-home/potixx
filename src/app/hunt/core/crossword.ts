@@ -1,8 +1,8 @@
-import type { Cell } from './cell';
-import { cellKey } from './cell';
+import type { Cell } from "./cell";
+import { cellKey } from "./cell";
 
 /** Sens d'une entrée dans la grille de mots croisés. */
-export type Orientation = 'across' | 'down';
+export type Orientation = "across" | "down";
 
 /** Une entrée (un mot) de la grille de mots croisés. */
 export interface CrosswordEntry {
@@ -30,8 +30,8 @@ export interface CrosswordCheck {
 
 /** Renvoie les cases occupées par une entrée, dans l'ordre des lettres de sa réponse. */
 export function entryCells(entry: CrosswordEntry): Cell[] {
-  const rowStep = entry.orientation === 'down' ? 1 : 0;
-  const colStep = entry.orientation === 'across' ? 1 : 0;
+  const rowStep = entry.orientation === "down" ? 1 : 0;
+  const colStep = entry.orientation === "across" ? 1 : 0;
 
   return Array.from({ length: entry.answer.length }, (_, index) => ({
     row: entry.start.row + rowStep * index,
@@ -70,7 +70,7 @@ export function prefilledCells(def: CrosswordDefinition): Map<string, string> {
   const prefilled = new Map<string, string>();
 
   solution.forEach((letter, key) => {
-    if (letter === '-') {
+    if (letter === "-") {
       prefilled.set(key, letter);
     }
   });
@@ -94,11 +94,11 @@ export function checkCrossword(
     const isWrong = cells.some((cell) => {
       const key = cellKey(cell);
       const expected = solution.get(key);
-      if (expected === '-') {
+      if (expected === "-") {
         return false;
       }
       const actual = letters[key];
-      return actual === undefined || actual === '' || actual !== expected;
+      return actual === undefined || actual === "" || actual !== expected;
     });
 
     if (isWrong) {

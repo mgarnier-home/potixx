@@ -1,20 +1,20 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Crossword } from './hunt/crossword/crossword';
-import { MAP } from './hunt/hunt-content';
-import type { StepId } from './hunt/hunt-content';
-import { PadlockRiddle } from './hunt/padlock-riddle/padlock-riddle';
-import { PasswordRiddle } from './hunt/password-riddle/password-riddle';
-import { RiddlePanel } from './hunt/shared/riddle-panel/riddle-panel';
-import { Treasure } from './hunt/treasure/treasure';
-import { TreasureMap } from './hunt/treasure-map/treasure-map';
-import { WordSearch } from './hunt/word-search/word-search';
+import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
+import { Crossword } from "./hunt/crossword/crossword";
+import { MAP } from "./hunt/hunt-content";
+import type { StepId } from "./hunt/hunt-content";
+import { PadlockRiddle } from "./hunt/padlock-riddle/padlock-riddle";
+import { PasswordRiddle } from "./hunt/password-riddle/password-riddle";
+import { RiddlePanel } from "./hunt/shared/riddle-panel/riddle-panel";
+import { Treasure } from "./hunt/treasure/treasure";
+import { TreasureMap } from "./hunt/treasure-map/treasure-map";
+import { WordSearch } from "./hunt/word-search/word-search";
 
 /**
  * Coquille de l'application : la carte au trésor, ou l'écran de l'étape ouverte dans un
  * `RiddlePanel`. Chaque composant d'énigme émet `solved`, ce qui ramène à la carte.
  */
 @Component({
-  selector: 'app-root',
+  selector: "app-root",
   imports: [
     RiddlePanel,
     TreasureMap,
@@ -24,8 +24,8 @@ import { WordSearch } from './hunt/word-search/word-search';
     WordSearch,
     Treasure,
   ],
-  templateUrl: './app.html',
-  styleUrl: './app.scss',
+  templateUrl: "./app.html",
+  styleUrl: "./app.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {

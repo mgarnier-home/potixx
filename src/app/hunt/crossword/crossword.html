@@ -39,7 +39,7 @@
         >
           @for (letter of hiddenWord; track $index) {
             <span class="hidden-letter" [class.shown]="$index < litCount()">{{
-              $index < litCount() ? letter : ''
+              $index < litCount() ? letter : ""
             }}</span>
           }
         </p>
@@ -120,7 +120,7 @@
             (click)="toggleDirection()"
           >
             <span class="bar-toggle-icon" aria-hidden="true">{{
-              other.orientation === 'across' ? '↔' : '↕'
+              other.orientation === "across" ? "↔" : "↕"
             }}</span>
             <span class="bar-toggle-text">Changer de sens</span>
           </button>

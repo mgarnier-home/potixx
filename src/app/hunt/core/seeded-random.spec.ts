@@ -1,19 +1,19 @@
-import { createSeededRandom, randomSeed } from './seeded-random';
+import { createSeededRandom, randomSeed } from "./seeded-random";
 
-describe('createSeededRandom', () => {
-  it('donne la même suite pour la même graine', () => {
+describe("createSeededRandom", () => {
+  it("donne la même suite pour la même graine", () => {
     const a = createSeededRandom(42);
     const b = createSeededRandom(42);
     expect([a(), a(), a()]).toEqual([b(), b(), b()]);
   });
 
-  it('donne des suites différentes pour des graines différentes', () => {
+  it("donne des suites différentes pour des graines différentes", () => {
     const a = createSeededRandom(1);
     const b = createSeededRandom(2);
     expect([a(), a(), a()]).not.toEqual([b(), b(), b()]);
   });
 
-  it('produit des valeurs dans [0, 1)', () => {
+  it("produit des valeurs dans [0, 1)", () => {
     const random = createSeededRandom(1);
     for (let i = 0; i < 1000; i++) {
       const value = random();
@@ -23,8 +23,8 @@ describe('createSeededRandom', () => {
   });
 });
 
-describe('randomSeed', () => {
-  it('renvoie un entier 32 bits non signé', () => {
+describe("randomSeed", () => {
+  it("renvoie un entier 32 bits non signé", () => {
     const seed = randomSeed();
     expect(Number.isInteger(seed)).toBe(true);
     expect(seed).toBeGreaterThanOrEqual(0);

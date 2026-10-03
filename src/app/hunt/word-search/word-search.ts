@@ -5,12 +5,12 @@ import {
   inject,
   output,
   signal,
-} from '@angular/core';
-import type { Cell } from '../core/cell';
-import { cellKey } from '../core/cell';
-import { WORD_SEARCH } from '../hunt-content';
-import { HuntProgressService } from '../hunt-progress.service';
-import { SkipButton } from '../shared/skip-button/skip-button';
+} from "@angular/core";
+import type { Cell } from "../core/cell";
+import { cellKey } from "../core/cell";
+import { WORD_SEARCH } from "../hunt-content";
+import { HuntProgressService } from "../hunt-progress.service";
+import { SkipButton } from "../shared/skip-button/skip-button";
 
 /**
  * Une couleur par mot, réutilisée pour la case et pour la puce de la liste (spec §4.6 : les mots
@@ -21,16 +21,16 @@ import { SkipButton } from '../shared/skip-button/skip-button';
  * soit l'ordre où il est trouvé.
  */
 const WORD_COLORS: readonly string[] = [
-  '#ffd23f', // jaune soleil
-  '#48cae4', // lagon
-  '#ff7b7b', // corail
-  '#4cc764', // vert tropical
-  '#7aa7ff', // bleu
-  '#b98cff', // violet
-  '#ff9f45', // orange
-  '#ff8fd0', // rose
-  '#c6f432', // lime
-  '#2ee6c8', // turquoise
+  "#ffd23f", // jaune soleil
+  "#48cae4", // lagon
+  "#ff7b7b", // corail
+  "#4cc764", // vert tropical
+  "#7aa7ff", // bleu
+  "#b98cff", // violet
+  "#ff9f45", // orange
+  "#ff8fd0", // rose
+  "#c6f432", // lime
+  "#2ee6c8", // turquoise
 ];
 
 const WORD_COLOR_BY_WORD = new Map<string, string>(
@@ -80,10 +80,10 @@ function straightLine(from: Cell, to: Cell): Cell[] | null {
  * tout est affiché d'emblée, sans bouton ni émission (spec §4.2).
  */
 @Component({
-  selector: 'app-word-search',
+  selector: "app-word-search",
   imports: [SkipButton],
-  templateUrl: './word-search.html',
-  styleUrl: './word-search.scss',
+  templateUrl: "./word-search.html",
+  styleUrl: "./word-search.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WordSearch {
@@ -125,7 +125,7 @@ export class WordSearch {
 
   private readonly wordSearch = computed(() => this.progress.progress().wordSearch);
   protected readonly isSolved = computed(() => this.wordSearch().solved);
-  protected readonly skipVisible = computed(() => this.progress.canSkip('wordSearch'));
+  protected readonly skipVisible = computed(() => this.progress.canSkip("wordSearch"));
   protected readonly continueVisible = computed(() => !this.alreadySolvedOnOpen && this.isSolved());
   private readonly foundWords = computed(() => new Set(this.wordSearch().found));
 
@@ -221,7 +221,7 @@ export class WordSearch {
   }
 
   protected onSkip(): void {
-    this.progress.skip('wordSearch');
+    this.progress.skip("wordSearch");
   }
 
   protected continue(): void {

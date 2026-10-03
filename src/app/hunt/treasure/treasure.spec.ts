@@ -1,10 +1,10 @@
-import { TestBed } from '@angular/core/testing';
-import type { ComponentFixture } from '@angular/core/testing';
-import { TREASURE } from '../hunt-content';
-import { HuntProgressService, PROGRESS_STORAGE, SEED_FACTORY } from '../hunt-progress.service';
-import { CHEST_OPENING_MS, Treasure } from './treasure';
+import { TestBed } from "@angular/core/testing";
+import type { ComponentFixture } from "@angular/core/testing";
+import { TREASURE } from "../hunt-content";
+import { HuntProgressService, PROGRESS_STORAGE, SEED_FACTORY } from "../hunt-progress.service";
+import { CHEST_OPENING_MS, Treasure } from "./treasure";
 
-describe('Treasure', () => {
+describe("Treasure", () => {
   let fixture: ComponentFixture<Treasure>;
   let restartedCount: number;
 
@@ -18,7 +18,7 @@ describe('Treasure', () => {
 
   /** Vrai si l'écran a marqué la révélation (vidéo + message) comme visible. */
   function isRevealed(): boolean {
-    return el().querySelector('.treasure')?.classList.contains('is-revealed') ?? false;
+    return el().querySelector(".treasure")?.classList.contains("is-revealed") ?? false;
   }
 
   function createComponent(): void {
@@ -44,7 +44,7 @@ describe('Treasure', () => {
     vi.restoreAllMocks();
   });
 
-  describe('ouverture du coffre puis révélation', () => {
+  describe("ouverture du coffre puis révélation", () => {
     beforeEach(() => {
       vi.useFakeTimers();
     });
@@ -67,59 +67,59 @@ describe('Treasure', () => {
       expect(isRevealed()).toBe(true);
     });
 
-    it('mouvements réduits : la révélation est immédiate', () => {
+    it("mouvements réduits : la révélation est immédiate", () => {
       vi.stubGlobal(
-        'matchMedia',
-        vi.fn((query: string) => ({ matches: query.includes('reduce'), media: query })),
+        "matchMedia",
+        vi.fn((query: string) => ({ matches: query.includes("reduce"), media: query })),
       );
       createComponent();
       expect(isRevealed()).toBe(true);
     });
   });
 
-  describe('contenu et « Recommencer »', () => {
+  describe("contenu et « Recommencer »", () => {
     beforeEach(() => {
       createComponent();
     });
 
-    it('affiche le coffre au trésor', () => {
-      expect(testid('treasure-chest')).not.toBeNull();
+    it("affiche le coffre au trésor", () => {
+      expect(testid("treasure-chest")).not.toBeNull();
     });
 
-    it('affiche le message exact du trésor', () => {
-      expect(testid('treasure-message')?.textContent?.trim()).toBe(TREASURE.message);
+    it("affiche le message exact du trésor", () => {
+      expect(testid("treasure-message")?.textContent?.trim()).toBe(TREASURE.message);
     });
 
-    it('affiche la vidéo sans son, adaptée à iOS, avec contrôles et affiche', () => {
-      const video = testid('treasure-video') as HTMLVideoElement;
+    it("affiche la vidéo sans son, adaptée à iOS, avec contrôles et affiche", () => {
+      const video = testid("treasure-video") as HTMLVideoElement;
       expect(video).not.toBeNull();
       // La propriété `muted`, pas seulement l'attribut : un attribut statique ne coupe le son
       // qu'à la création, `defaultMuted` restant vrai mais `video.muted` pouvant valoir faux.
       expect(video.muted).toBe(true);
-      expect(video.hasAttribute('playsinline')).toBe(true);
-      expect(video.hasAttribute('controls')).toBe(true);
+      expect(video.hasAttribute("playsinline")).toBe(true);
+      expect(video.hasAttribute("controls")).toBe(true);
       expect(video.src).toContain(TREASURE.videoSrc);
       expect(video.poster).toContain(TREASURE.posterSrc);
     });
 
     it("« Recommencer » annulé (confirm → false) : ne réinitialise rien et n'émet rien", () => {
       const service = TestBed.inject(HuntProgressService);
-      const restartSpy = vi.spyOn(service, 'restart');
-      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
+      const restartSpy = vi.spyOn(service, "restart");
+      const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
 
-      (testid('restart') as HTMLButtonElement).click();
+      (testid("restart") as HTMLButtonElement).click();
 
-      expect(confirmSpy).toHaveBeenCalledWith('Recommencer la chasse depuis le début ?');
+      expect(confirmSpy).toHaveBeenCalledWith("Recommencer la chasse depuis le début ?");
       expect(restartSpy).not.toHaveBeenCalled();
       expect(restartedCount).toBe(0);
     });
 
-    it('« Recommencer » confirmé (confirm → true) : réinitialise la progression et émet `restarted`', () => {
+    it("« Recommencer » confirmé (confirm → true) : réinitialise la progression et émet `restarted`", () => {
       const service = TestBed.inject(HuntProgressService);
-      const restartSpy = vi.spyOn(service, 'restart');
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const restartSpy = vi.spyOn(service, "restart");
+      vi.spyOn(window, "confirm").mockReturnValue(true);
 
-      (testid('restart') as HTMLButtonElement).click();
+      (testid("restart") as HTMLButtonElement).click();
 
       expect(restartSpy).toHaveBeenCalledTimes(1);
       expect(restartedCount).toBe(1);

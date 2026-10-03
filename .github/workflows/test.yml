@@ -5,7 +5,7 @@ name: Tests
 on:
   push:
     branches:
-      - '**'
+      - "**"
 
 # Annule une exécution en cours du workflow sur la même branche dès qu'un nouveau push arrive,
 # pour ne pas gaspiller de minutes CI sur du code déjà obsolète.

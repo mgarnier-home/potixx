@@ -5,9 +5,9 @@ import {
   inject,
   output,
   signal,
-} from '@angular/core';
-import { TREASURE } from '../hunt-content';
-import { HuntProgressService } from '../hunt-progress.service';
+} from "@angular/core";
+import { TREASURE } from "../hunt-content";
+import { HuntProgressService } from "../hunt-progress.service";
 
 /**
  * Durée de l'ouverture du coffre (ms), avant la révélation de la vidéo et du message. Transmise
@@ -18,9 +18,9 @@ export const CHEST_OPENING_MS = 1800;
 /** Vrai si le visiteur a demandé de réduire les animations (faux si l'API est indisponible). */
 function prefersReducedMotion(): boolean {
   return (
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
 }
 
@@ -31,9 +31,9 @@ function prefersReducedMotion(): boolean {
  * avant d'effacer la progression et de revenir à la carte (géré par `App` via `restarted`).
  */
 @Component({
-  selector: 'app-treasure',
-  templateUrl: './treasure.html',
-  styleUrl: './treasure.scss',
+  selector: "app-treasure",
+  templateUrl: "./treasure.html",
+  styleUrl: "./treasure.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Treasure {
@@ -60,7 +60,7 @@ export class Treasure {
   }
 
   protected onRestart(): void {
-    if (!window.confirm('Recommencer la chasse depuis le début ?')) {
+    if (!window.confirm("Recommencer la chasse depuis le début ?")) {
       return;
     }
 

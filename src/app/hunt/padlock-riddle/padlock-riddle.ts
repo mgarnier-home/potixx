@@ -6,10 +6,10 @@ import {
   inject,
   output,
   signal,
-} from '@angular/core';
-import { PADLOCK_RIDDLES } from '../hunt-content';
-import { HuntProgressService } from '../hunt-progress.service';
-import { SkipButton } from '../shared/skip-button/skip-button';
+} from "@angular/core";
+import { PADLOCK_RIDDLES } from "../hunt-content";
+import { HuntProgressService } from "../hunt-progress.service";
+import { SkipButton } from "../shared/skip-button/skip-button";
 
 /** Durée de l'animation d'ouverture du cadenas (spec : ≤ 1,5 s). */
 const OPENING_ANIMATION_MS = 1400;
@@ -20,9 +20,9 @@ const DIGIT_INDEXES = [0, 1, 2, 3] as const;
 /** Vrai si le visiteur a demandé de réduire les animations (faux si l'API est indisponible). */
 function prefersReducedMotion(): boolean {
   return (
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
 }
 
@@ -33,10 +33,10 @@ function prefersReducedMotion(): boolean {
  * le cadenas ouvert 0-4-2-7 sans rien émettre (spec §4.2 : une énigme résolue reste consultable).
  */
 @Component({
-  selector: 'app-padlock-riddle',
+  selector: "app-padlock-riddle",
   imports: [SkipButton],
-  templateUrl: './padlock-riddle.html',
-  styleUrl: './padlock-riddle.scss',
+  templateUrl: "./padlock-riddle.html",
+  styleUrl: "./padlock-riddle.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PadlockRiddle {
@@ -53,7 +53,7 @@ export class PadlockRiddle {
   private readonly alreadySolvedOnOpen = this.progress.progress().padlock.solved;
 
   protected readonly digitIndexes = DIGIT_INDEXES;
-  protected readonly answer = signal('');
+  protected readonly answer = signal("");
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly opening = signal(false);
 
@@ -63,7 +63,7 @@ export class PadlockRiddle {
     const state = this.padlock();
     return state.solved ? null : PADLOCK_RIDDLES[state.digitIndex].question;
   });
-  protected readonly skipVisible = computed(() => this.progress.canSkip('padlock'));
+  protected readonly skipVisible = computed(() => this.progress.canSkip("padlock"));
 
   constructor() {
     this.destroyRef.onDestroy(() => clearTimeout(this.openingTimer));
@@ -72,7 +72,7 @@ export class PadlockRiddle {
   /** Chiffre affiché sur une molette : révélé si déjà trouvé (ou cadenas résolu), sinon « ? ». */
   protected digitValue(index: number): string {
     const state = this.padlock();
-    return state.solved || index < state.digitIndex ? PADLOCK_RIDDLES[index].answer : '?';
+    return state.solved || index < state.digitIndex ? PADLOCK_RIDDLES[index].answer : "?";
   }
 
   protected onAnswerInput(value: string): void {
@@ -82,12 +82,12 @@ export class PadlockRiddle {
   protected submit(event: Event): void {
     event.preventDefault();
     const value = this.answer();
-    if (value === '') {
+    if (value === "") {
       return;
     }
 
     const correct = this.progress.answerPadlockDigit(value);
-    this.answer.set('');
+    this.answer.set("");
 
     if (correct) {
       this.errorMessage.set(null);
@@ -98,7 +98,7 @@ export class PadlockRiddle {
   }
 
   protected onSkip(): void {
-    this.progress.skip('padlock');
+    this.progress.skip("padlock");
     this.errorMessage.set(null);
     this.maybeStartOpening();
   }

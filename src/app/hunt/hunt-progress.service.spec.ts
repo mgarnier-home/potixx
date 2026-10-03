@@ -1,14 +1,14 @@
-import { TestBed } from '@angular/core/testing';
-import type { Cell } from './core/cell';
-import { cellKey } from './core/cell';
-import { buildSolution, entryCells } from './core/crossword';
-import { CROSSWORD, PADLOCK_RIDDLES, WORD_SEARCH } from './hunt-content';
+import { TestBed } from "@angular/core/testing";
+import type { Cell } from "./core/cell";
+import { cellKey } from "./core/cell";
+import { buildSolution, entryCells } from "./core/crossword";
+import { CROSSWORD, PADLOCK_RIDDLES, WORD_SEARCH } from "./hunt-content";
 import {
   HuntProgressService,
   PROGRESS_STORAGE,
   SEED_FACTORY,
   STORAGE_KEY,
-} from './hunt-progress.service';
+} from "./hunt-progress.service";
 
 /** Faux `Storage` en mémoire, pour ne pas dépendre du `localStorage` du navigateur de test. */
 class FakeStorage implements Storage {
@@ -42,7 +42,7 @@ class FakeStorage implements Storage {
 /** Faux `Storage` dont l'écriture échoue toujours (ex. navigation privée pleine). */
 class ThrowingStorage extends FakeStorage {
   override setItem(): void {
-    throw new Error('Stockage indisponible.');
+    throw new Error("Stockage indisponible.");
   }
 }
 
@@ -61,56 +61,56 @@ function setup(options: { seed?: () => number; storage?: Storage | null } = {}):
   return { service: TestBed.inject(HuntProgressService), storage };
 }
 
-describe('HuntProgressService', () => {
-  it('starts at padlock', () => {
+describe("HuntProgressService", () => {
+  it("starts at padlock", () => {
     const { service } = setup();
 
-    expect(service.currentStep()).toBe('padlock');
-    expect(service.isUnlocked('padlock')).toBe(true);
-    expect(service.isUnlocked('password')).toBe(false);
-    expect(service.isUnlocked('crossword')).toBe(false);
-    expect(service.isUnlocked('wordSearch')).toBe(false);
-    expect(service.isUnlocked('treasure')).toBe(false);
+    expect(service.currentStep()).toBe("padlock");
+    expect(service.isUnlocked("padlock")).toBe(true);
+    expect(service.isUnlocked("password")).toBe(false);
+    expect(service.isUnlocked("crossword")).toBe(false);
+    expect(service.isUnlocked("wordSearch")).toBe(false);
+    expect(service.isUnlocked("treasure")).toBe(false);
   });
 
-  it('padlock: 4 bonnes réponses résolvent le cadenas et débloquent le mot de passe', () => {
+  it("padlock: 4 bonnes réponses résolvent le cadenas et débloquent le mot de passe", () => {
     const { service } = setup();
 
-    expect(service.answerPadlockDigit('0')).toBe(true);
-    expect(service.answerPadlockDigit(' 4')).toBe(true);
-    expect(service.answerPadlockDigit('2')).toBe(true);
-    expect(service.answerPadlockDigit('7')).toBe(true);
+    expect(service.answerPadlockDigit("0")).toBe(true);
+    expect(service.answerPadlockDigit(" 4")).toBe(true);
+    expect(service.answerPadlockDigit("2")).toBe(true);
+    expect(service.answerPadlockDigit("7")).toBe(true);
 
     expect(service.progress().padlock.solved).toBe(true);
-    expect(service.currentStep()).toBe('password');
+    expect(service.currentStep()).toBe("password");
 
     // Une fois résolu, on n'accepte plus de nouvelle réponse.
-    expect(service.answerPadlockDigit('0')).toBe(false);
+    expect(service.answerPadlockDigit("0")).toBe(false);
   });
 
-  it('padlock: le bouton passer apparaît après 3 échecs, puis skip avance au chiffre suivant', () => {
+  it("padlock: le bouton passer apparaît après 3 échecs, puis skip avance au chiffre suivant", () => {
     const { service } = setup();
 
-    service.answerPadlockDigit('9');
-    service.answerPadlockDigit('9');
-    expect(service.canSkip('padlock')).toBe(false);
+    service.answerPadlockDigit("9");
+    service.answerPadlockDigit("9");
+    expect(service.canSkip("padlock")).toBe(false);
 
-    service.answerPadlockDigit('9');
-    expect(service.canSkip('padlock')).toBe(true);
+    service.answerPadlockDigit("9");
+    expect(service.canSkip("padlock")).toBe(true);
 
-    service.skip('padlock');
+    service.skip("padlock");
     expect(service.progress().padlock.digitIndex).toBe(1);
     expect(service.progress().padlock.failures).toBe(0);
   });
 
-  it('padlock: skip ne fait rien si canSkip est faux (2 échecs seulement)', () => {
+  it("padlock: skip ne fait rien si canSkip est faux (2 échecs seulement)", () => {
     const { service } = setup();
 
-    service.answerPadlockDigit('9');
-    service.answerPadlockDigit('9');
-    expect(service.canSkip('padlock')).toBe(false);
+    service.answerPadlockDigit("9");
+    service.answerPadlockDigit("9");
+    expect(service.canSkip("padlock")).toBe(false);
 
-    service.skip('padlock');
+    service.skip("padlock");
 
     expect(service.progress().padlock.digitIndex).toBe(0);
   });
@@ -118,37 +118,37 @@ describe('HuntProgressService', () => {
   it('password: accepte "Famille"', () => {
     const { service } = setup();
 
-    expect(service.answerPassword('Famille')).toBe(true);
+    expect(service.answerPassword("Famille")).toBe(true);
     expect(service.progress().password.solved).toBe(true);
 
     // Une fois résolu, on n'accepte plus de nouvelle réponse.
-    expect(service.answerPassword('Famille')).toBe(false);
+    expect(service.answerPassword("Famille")).toBe(false);
   });
 
-  it('password: le bouton passer apparaît après 3 échecs', () => {
+  it("password: le bouton passer apparaît après 3 échecs", () => {
     const { service } = setup();
 
-    service.answerPassword('faux');
-    service.answerPassword('faux');
-    expect(service.canSkip('password')).toBe(false);
-    service.answerPassword('faux');
-    expect(service.canSkip('password')).toBe(true);
+    service.answerPassword("faux");
+    service.answerPassword("faux");
+    expect(service.canSkip("password")).toBe(false);
+    service.answerPassword("faux");
+    expect(service.canSkip("password")).toBe(true);
   });
 
-  it('password: canSkip redevient faux une fois résolu, même après 3 échecs', () => {
+  it("password: canSkip redevient faux une fois résolu, même après 3 échecs", () => {
     const { service } = setup();
 
-    service.answerPassword('faux');
-    service.answerPassword('faux');
-    service.answerPassword('faux');
-    expect(service.canSkip('password')).toBe(true);
+    service.answerPassword("faux");
+    service.answerPassword("faux");
+    service.answerPassword("faux");
+    expect(service.canSkip("password")).toBe(true);
 
-    service.answerPassword('Famille');
+    service.answerPassword("Famille");
     expect(service.progress().password.solved).toBe(true);
-    expect(service.canSkip('password')).toBe(false);
+    expect(service.canSkip("password")).toBe(false);
   });
 
-  it('crossword: les échecs comptent, les mots verrouillés sont protégés, solved global à la fin', () => {
+  it("crossword: les échecs comptent, les mots verrouillés sont protégés, solved global à la fin", () => {
     const { service } = setup();
 
     // Grille vide : échec.
@@ -157,8 +157,8 @@ describe('HuntProgressService', () => {
     expect(service.progress().crossword.failures).toBe(1);
 
     // La case pré-remplie ('-' de GRAND-MERE) ne peut jamais être modifiée.
-    service.setCrosswordLetter('7,5', 'X');
-    expect(service.progress().crossword.letters['7,5']).toBeUndefined();
+    service.setCrosswordLetter("7,5", "X");
+    expect(service.progress().crossword.letters["7,5"]).toBeUndefined();
 
     // Remplit correctement le mot 1 (COUSIN) puis vérifie : il se verrouille.
     const solution = buildSolution(CROSSWORD);
@@ -168,18 +168,18 @@ describe('HuntProgressService', () => {
     }
     entryCells(cousinEntry).forEach((cell) => {
       const key = cellKey(cell);
-      service.setCrosswordLetter(key, solution.get(key) ?? '');
+      service.setCrosswordLetter(key, solution.get(key) ?? "");
     });
     service.checkCrossword();
     expect(service.progress().crossword.locked).toContain(1);
 
     // Une case d'un mot verrouillé ne peut plus être modifiée.
-    service.setCrosswordLetter('0,1', 'X');
-    expect(service.progress().crossword.letters['0,1']).toBe(solution.get('0,1'));
+    service.setCrosswordLetter("0,1", "X");
+    expect(service.progress().crossword.letters["0,1"]).toBe(solution.get("0,1"));
 
     // Remplit tout le reste de la grille avec la solution : tout devient juste.
     solution.forEach((letter, key) => {
-      if (letter !== '-') {
+      if (letter !== "-") {
         service.setCrosswordLetter(key, letter);
       }
     });
@@ -188,60 +188,60 @@ describe('HuntProgressService', () => {
     expect(service.progress().crossword.solved).toBe(true);
   });
 
-  it('crossword: canSkip redevient faux une fois résolu, même après 3 échecs', () => {
+  it("crossword: canSkip redevient faux une fois résolu, même après 3 échecs", () => {
     const { service } = setup();
 
     service.checkCrossword();
     service.checkCrossword();
     service.checkCrossword();
-    expect(service.canSkip('crossword')).toBe(true);
+    expect(service.canSkip("crossword")).toBe(true);
 
     const solution = buildSolution(CROSSWORD);
     solution.forEach((letter, key) => {
-      if (letter !== '-') {
+      if (letter !== "-") {
         service.setCrosswordLetter(key, letter);
       }
     });
     service.checkCrossword();
 
     expect(service.progress().crossword.solved).toBe(true);
-    expect(service.canSkip('crossword')).toBe(false);
+    expect(service.canSkip("crossword")).toBe(false);
   });
 
-  it('setCrosswordLetter: normalise la lettre saisie (casse, accents) et rejette les saisies invalides', () => {
+  it("setCrosswordLetter: normalise la lettre saisie (casse, accents) et rejette les saisies invalides", () => {
     const { service } = setup();
-    const key = '0,1'; // première case de COUSIN, modifiable
+    const key = "0,1"; // première case de COUSIN, modifiable
 
-    service.setCrosswordLetter(key, 'c');
-    expect(service.progress().crossword.letters[key]).toBe('C');
+    service.setCrosswordLetter(key, "c");
+    expect(service.progress().crossword.letters[key]).toBe("C");
 
-    service.setCrosswordLetter(key, 'é');
-    expect(service.progress().crossword.letters[key]).toBe('E');
+    service.setCrosswordLetter(key, "é");
+    expect(service.progress().crossword.letters[key]).toBe("E");
 
     // Saisies invalides : ignorées, la case garde sa dernière valeur valide.
-    service.setCrosswordLetter(key, 'ab');
-    expect(service.progress().crossword.letters[key]).toBe('E');
+    service.setCrosswordLetter(key, "ab");
+    expect(service.progress().crossword.letters[key]).toBe("E");
 
-    service.setCrosswordLetter(key, '1');
-    expect(service.progress().crossword.letters[key]).toBe('E');
+    service.setCrosswordLetter(key, "1");
+    expect(service.progress().crossword.letters[key]).toBe("E");
 
-    service.setCrosswordLetter(key, ' ');
-    expect(service.progress().crossword.letters[key]).toBe('E');
+    service.setCrosswordLetter(key, " ");
+    expect(service.progress().crossword.letters[key]).toBe("E");
 
     // '' efface toujours la case.
-    service.setCrosswordLetter(key, '');
+    service.setCrosswordLetter(key, "");
     expect(service.progress().crossword.letters[key]).toBeUndefined();
   });
 
-  it('setCrosswordLetter: ignore une clé hors grille (case noire, absente de la solution)', () => {
+  it("setCrosswordLetter: ignore une clé hors grille (case noire, absente de la solution)", () => {
     const { service } = setup();
 
-    service.setCrosswordLetter('0,0', 'C');
+    service.setCrosswordLetter("0,0", "C");
 
-    expect(service.progress().crossword.letters['0,0']).toBeUndefined();
+    expect(service.progress().crossword.letters["0,0"]).toBeUndefined();
   });
 
-  it('wordSearch: sélectionner un mot placé le marque trouvé ; resélection = échec', () => {
+  it("wordSearch: sélectionner un mot placé le marque trouvé ; resélection = échec", () => {
     const { service } = setup();
 
     const grid = service.wordSearchGrid();
@@ -256,7 +256,7 @@ describe('HuntProgressService', () => {
     expect(service.progress().wordSearch.failures).toBe(1);
   });
 
-  it('wordSearch: une sélection qui ne correspond à aucun mot compte un échec', () => {
+  it("wordSearch: une sélection qui ne correspond à aucun mot compte un échec", () => {
     const { service } = setup();
 
     const invalidCell: Cell = { row: 0, col: 0 };
@@ -264,7 +264,7 @@ describe('HuntProgressService', () => {
     expect(service.progress().wordSearch.failures).toBe(1);
   });
 
-  it('wordSearch: solved quand les 10 mots sont trouvés', () => {
+  it("wordSearch: solved quand les 10 mots sont trouvés", () => {
     const { service } = setup();
 
     const grid = service.wordSearchGrid();
@@ -276,12 +276,12 @@ describe('HuntProgressService', () => {
     expect(service.progress().wordSearch.found.length).toBe(WORD_SEARCH.words.length);
   });
 
-  it('persists and restores : même progression et même grille après rechargement', () => {
+  it("persists and restores : même progression et même grille après rechargement", () => {
     const storage = new FakeStorage();
     const { service: firstService } = setup({ seed: () => 123, storage });
 
-    firstService.answerPadlockDigit('0');
-    firstService.setCrosswordLetter('0,1', 'C');
+    firstService.answerPadlockDigit("0");
+    firstService.setCrosswordLetter("0,1", "C");
     const grid = firstService.wordSearchGrid();
     const word = grid.words[0];
     firstService.selectWordSearch(word.cells[0], word.cells[word.cells.length - 1]);
@@ -298,8 +298,8 @@ describe('HuntProgressService', () => {
     expect(secondService.wordSearchGrid().letters).toEqual(gridLetters);
   });
 
-  it('ignores corrupted storage : aucune exception, état neuf à chaque fois', () => {
-    const corruptedValues = ['{oops', '{"version":0}', '{"version":1}'];
+  it("ignores corrupted storage : aucune exception, état neuf à chaque fois", () => {
+    const corruptedValues = ["{oops", '{"version":0}', '{"version":1}'];
 
     for (const raw of corruptedValues) {
       TestBed.resetTestingModule();
@@ -311,12 +311,12 @@ describe('HuntProgressService', () => {
         service = setup({ storage }).service;
       }).not.toThrow();
 
-      expect(service?.currentStep()).toBe('padlock');
+      expect(service?.currentStep()).toBe("padlock");
       expect(service?.progress().padlock.solved).toBe(false);
     }
   });
 
-  it('ignore une sauvegarde de forme imbriquée invalide : état neuf, aucune exception ensuite', () => {
+  it("ignore une sauvegarde de forme imbriquée invalide : état neuf, aucune exception ensuite", () => {
     const validPadlock = { digitIndex: 0, failures: 0, solved: false };
     const validPassword = { failures: 0, solved: false };
     const validCrossword = { letters: {}, locked: [], failures: 0, solved: false };
@@ -345,7 +345,7 @@ describe('HuntProgressService', () => {
         padlock: validPadlock,
         password: validPassword,
         crossword: validCrossword,
-        wordSearch: { seed: 1, found: 'oops', failures: 0, solved: false },
+        wordSearch: { seed: 1, found: "oops", failures: 0, solved: false },
       },
     ];
 
@@ -359,15 +359,15 @@ describe('HuntProgressService', () => {
         service = setup({ storage }).service;
       }).not.toThrow();
 
-      expect(service?.currentStep()).toBe('padlock');
+      expect(service?.currentStep()).toBe("padlock");
       expect(service?.progress().padlock.solved).toBe(false);
 
       // Une réponse ensuite ne doit lever aucune exception.
-      expect(() => service?.answerPadlockDigit('0')).not.toThrow();
+      expect(() => service?.answerPadlockDigit("0")).not.toThrow();
     }
   });
 
-  it('rejette une sauvegarde de cadenas incohérente (digitIndex au bout mais solved = false) : état neuf', () => {
+  it("rejette une sauvegarde de cadenas incohérente (digitIndex au bout mais solved = false) : état neuf", () => {
     const storage = new FakeStorage();
     storage.setItem(
       STORAGE_KEY,
@@ -383,39 +383,39 @@ describe('HuntProgressService', () => {
     const { service } = setup({ storage });
 
     expect(service.progress().padlock.digitIndex).toBe(0);
-    expect(() => service.answerPadlockDigit('0')).not.toThrow();
+    expect(() => service.answerPadlockDigit("0")).not.toThrow();
   });
 
-  it('works without storage : token null, aucune exception', () => {
+  it("works without storage : token null, aucune exception", () => {
     expect(() => {
       const { service } = setup({ storage: null });
-      service.answerPadlockDigit('0');
+      service.answerPadlockDigit("0");
       TestBed.tick();
     }).not.toThrow();
   });
 
-  it('works without storage : setItem qui lève, aucune exception', () => {
+  it("works without storage : setItem qui lève, aucune exception", () => {
     TestBed.resetTestingModule();
 
     expect(() => {
       const { service } = setup({ storage: new ThrowingStorage() });
-      service.answerPadlockDigit('0');
+      service.answerPadlockDigit("0");
       TestBed.tick();
     }).not.toThrow();
   });
 
-  it('restart : nouvel état, nouvelle graine', () => {
+  it("restart : nouvel état, nouvelle graine", () => {
     let nextSeed = 1000;
     const { service } = setup({ seed: () => nextSeed++ });
 
-    service.answerPadlockDigit('0');
+    service.answerPadlockDigit("0");
     const seedBefore = service.progress().wordSearch.seed;
 
     service.restart();
 
     expect(service.progress().padlock.solved).toBe(false);
     expect(service.progress().padlock.digitIndex).toBe(0);
-    expect(service.currentStep()).toBe('padlock');
+    expect(service.currentStep()).toBe("padlock");
     expect(service.progress().wordSearch.seed).not.toBe(seedBefore);
   });
 });

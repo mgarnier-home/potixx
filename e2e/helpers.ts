@@ -1,12 +1,12 @@
-import { expect, type Page } from '@playwright/test';
-import { entryCells } from '../src/app/hunt/core/crossword';
+import { expect, type Page } from "@playwright/test";
+import { entryCells } from "../src/app/hunt/core/crossword";
 import {
   CROSSWORD,
   MAX_FAILURES_BEFORE_SKIP,
   PADLOCK_RIDDLES,
   PASSWORD,
   WORD_SEARCH,
-} from '../src/app/hunt/hunt-content';
+} from "../src/app/hunt/hunt-content";
 
 /**
  * Fonctions partagées par les scénarios E2E (spec §6). Elles ne lisent jamais l'état interne de
@@ -24,17 +24,17 @@ interface CellPosition {
 /** Résout l'énigme du cadenas en répondant juste aux quatre chiffres, puis attend le retour à la carte. */
 export async function solvePadlock(page: Page): Promise<void> {
   for (const riddle of PADLOCK_RIDDLES) {
-    await page.getByTestId('padlock-input').fill(riddle.answer);
-    await page.getByTestId('padlock-submit').click();
+    await page.getByTestId("padlock-input").fill(riddle.answer);
+    await page.getByTestId("padlock-submit").click();
   }
-  await expect(page.getByTestId('back-to-map')).toBeHidden();
+  await expect(page.getByTestId("back-to-map")).toBeHidden();
 }
 
 /** Résout l'énigme du mot de passe, puis attend le retour à la carte. */
 export async function solvePassword(page: Page): Promise<void> {
-  await page.getByTestId('password-input').fill(PASSWORD.answer);
-  await page.getByTestId('password-submit').click();
-  await expect(page.getByTestId('back-to-map')).toBeHidden();
+  await page.getByTestId("password-input").fill(PASSWORD.answer);
+  await page.getByTestId("password-submit").click();
+  await expect(page.getByTestId("back-to-map")).toBeHidden();
 }
 
 /**
@@ -48,10 +48,10 @@ export async function solveCrossword(page: Page): Promise<void> {
     await typeCrosswordEntry(page, entry.number);
   }
 
-  await page.getByTestId('cw-check').click();
-  await expect(page.getByTestId('cw-continue')).toBeVisible();
-  await page.getByTestId('cw-continue').click();
-  await expect(page.getByTestId('back-to-map')).toBeHidden();
+  await page.getByTestId("cw-check").click();
+  await expect(page.getByTestId("cw-continue")).toBeVisible();
+  await page.getByTestId("cw-continue").click();
+  await expect(page.getByTestId("back-to-map")).toBeHidden();
 }
 
 /** Touche la définition `number` puis tape sa réponse entière, sans le tiret pré-rempli. */
@@ -61,7 +61,7 @@ export async function typeCrosswordEntry(page: Page, number: number): Promise<vo
     throw new Error(`Définition ${number} introuvable dans CROSSWORD.`);
   }
   await page.getByTestId(`cw-clue-${number}`).click();
-  await page.keyboard.type(entry.answer.replaceAll('-', ''));
+  await page.keyboard.type(entry.answer.replaceAll("-", ""));
 }
 
 /** Texte attendu d'une entrée, case par case (pour vérifier que les lettres sont à leur place). */
@@ -82,7 +82,7 @@ export function crosswordEntryCells(number: number): { testId: string; letter: s
  */
 export async function readWordSearchGrid(page: Page): Promise<string[][]> {
   const size = WORD_SEARCH.size;
-  const grid: string[][] = Array.from({ length: size }, () => Array(size).fill(''));
+  const grid: string[][] = Array.from({ length: size }, () => Array(size).fill(""));
 
   // `evaluateAll` prend un instantané immédiat du DOM sans attendre : sur une machine plus lente,
   // l'écran des mots mêlés peut ne pas avoir fini de s'afficher, donnant une grille partielle ou
@@ -92,8 +92,8 @@ export async function readWordSearchGrid(page: Page): Promise<string[][]> {
 
   const cells = await cellsLocator.evaluateAll((elements) =>
     elements.map((element) => ({
-      testId: element.getAttribute('data-testid') ?? '',
-      letter: (element.textContent ?? '').trim(),
+      testId: element.getAttribute("data-testid") ?? "",
+      letter: (element.textContent ?? "").trim(),
     })),
   );
 
@@ -174,25 +174,25 @@ export async function solveWordSearch(page: Page): Promise<void> {
     await expect(page.getByTestId(`ws-word-${word}`)).toHaveClass(/found/);
   }
 
-  await page.getByTestId('ws-continue').click();
-  await expect(page.getByTestId('back-to-map')).toBeHidden();
+  await page.getByTestId("ws-continue").click();
+  await expect(page.getByTestId("back-to-map")).toBeHidden();
 }
 
 /** Réponse fausse au cadenas : jamais l'une des quatre bonnes réponses (0, 4, 2 ou 7). */
 export async function failPadlockDigit(page: Page): Promise<void> {
-  await page.getByTestId('padlock-input').fill('9');
-  await page.getByTestId('padlock-submit').click();
+  await page.getByTestId("padlock-input").fill("9");
+  await page.getByTestId("padlock-submit").click();
 }
 
 /** Réponse fausse au mot de passe. */
 export async function failPassword(page: Page): Promise<void> {
-  await page.getByTestId('password-input').fill('mauvais mot de passe');
-  await page.getByTestId('password-submit').click();
+  await page.getByTestId("password-input").fill("mauvais mot de passe");
+  await page.getByTestId("password-submit").click();
 }
 
 /** « Vérifier » sur une grille vide (ou fausse) : compte comme un échec pour chaque mot. */
 export async function failCrossword(page: Page): Promise<void> {
-  await page.getByTestId('cw-check').click();
+  await page.getByTestId("cw-check").click();
 }
 
 /**
@@ -200,8 +200,8 @@ export async function failCrossword(page: Page): Promise<void> {
  * extrémités d'un mot de la liste (le plus court fait 4 lettres, donc au moins 3 cases d'écart).
  */
 export async function failWordSearchSelection(page: Page): Promise<void> {
-  await page.getByTestId('ws-cell-0-0').click();
-  await page.getByTestId('ws-cell-0-1').click();
+  await page.getByTestId("ws-cell-0-0").click();
+  await page.getByTestId("ws-cell-0-1").click();
 }
 
 /**
@@ -215,5 +215,5 @@ export async function skipRiddle(
   for (let attempt = 0; attempt < MAX_FAILURES_BEFORE_SKIP; attempt++) {
     await failAction(page);
   }
-  await page.getByTestId('skip').click();
+  await page.getByTestId("skip").click();
 }

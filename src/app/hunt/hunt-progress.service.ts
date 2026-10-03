@@ -6,20 +6,20 @@ import {
   effect,
   inject,
   signal,
-} from '@angular/core';
-import type { Cell } from './core/cell';
-import { cellKey } from './core/cell';
-import type { CrosswordCheck, CrosswordDefinition } from './core/crossword';
+} from "@angular/core";
+import type { Cell } from "./core/cell";
+import { cellKey } from "./core/cell";
+import type { CrosswordCheck, CrosswordDefinition } from "./core/crossword";
 import {
   buildSolution,
   checkCrossword as evaluateCrossword,
   entryCells,
   prefilledCells,
-} from './core/crossword';
-import { isCorrectAnswer, normalizeAnswer } from './core/normalize-answer';
-import { randomSeed } from './core/seeded-random';
-import type { WordSearchGrid } from './core/word-search';
-import { findWordAt, generateWordSearch } from './core/word-search';
+} from "./core/crossword";
+import { isCorrectAnswer, normalizeAnswer } from "./core/normalize-answer";
+import { randomSeed } from "./core/seeded-random";
+import type { WordSearchGrid } from "./core/word-search";
+import { findWordAt, generateWordSearch } from "./core/word-search";
 import {
   CROSSWORD,
   MAX_FAILURES_BEFORE_SKIP,
@@ -27,15 +27,15 @@ import {
   PASSWORD,
   STEP_ORDER,
   WORD_SEARCH,
-} from './hunt-content';
-import type { StepId } from './hunt-content';
+} from "./hunt-content";
+import type { StepId } from "./hunt-content";
 
 /**
  * Fabrique de graine pour le générateur de mots mêlés, injectable pour permettre des tests
  * déterministes (voir `hunt-progress.service.spec.ts`).
  */
-export const SEED_FACTORY = new InjectionToken<() => number>('SEED_FACTORY', {
-  providedIn: 'root',
+export const SEED_FACTORY = new InjectionToken<() => number>("SEED_FACTORY", {
+  providedIn: "root",
   factory: () => randomSeed,
 });
 
@@ -44,8 +44,8 @@ export const SEED_FACTORY = new InjectionToken<() => number>('SEED_FACTORY', {
  * (navigation privée, quota, environnement sans DOM, etc.) : le jeu doit alors fonctionner
  * normalement sans persistance (point de vigilance §1 du plan).
  */
-export const PROGRESS_STORAGE = new InjectionToken<Storage | null>('PROGRESS_STORAGE', {
-  providedIn: 'root',
+export const PROGRESS_STORAGE = new InjectionToken<Storage | null>("PROGRESS_STORAGE", {
+  providedIn: "root",
   factory: () => {
     try {
       return localStorage;
@@ -56,10 +56,10 @@ export const PROGRESS_STORAGE = new InjectionToken<Storage | null>('PROGRESS_STO
 });
 
 /** Clé de sauvegarde dans le stockage (spec : `potixx.progress.v1`). */
-export const STORAGE_KEY = 'potixx.progress.v1';
+export const STORAGE_KEY = "potixx.progress.v1";
 
 /** Les quatre mini-énigmes de la chasse (toutes les étapes sauf le trésor final). */
-export type RiddleId = Exclude<StepId, 'treasure'>;
+export type RiddleId = Exclude<StepId, "treasure">;
 
 /** État complet de la progression d'un visiteur, tel que persisté. */
 export interface HuntProgress {
@@ -100,81 +100,81 @@ const SINGLE_LETTER = /^[A-Z]$/;
 
 /** Vrai si `value` est un entier ≥ 0. */
 function isNonNegativeInteger(value: unknown): value is number {
-  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
 
 /** Vrai si `value` est un objet simple (non tableau) dont toutes les valeurs sont des chaînes. */
 function isStringRecord(value: unknown): value is Record<string, string> {
   return (
-    typeof value === 'object' &&
+    typeof value === "object" &&
     value !== null &&
     !Array.isArray(value) &&
-    Object.values(value).every((entry) => typeof entry === 'string')
+    Object.values(value).every((entry) => typeof entry === "string")
   );
 }
 
 /** Vrai si `value` est un tableau de nombres. */
 function isNumberArray(value: unknown): value is number[] {
-  return Array.isArray(value) && value.every((entry) => typeof entry === 'number');
+  return Array.isArray(value) && value.every((entry) => typeof entry === "number");
 }
 
 /** Vrai si `value` est un tableau de chaînes. */
 function isStringArray(value: unknown): value is string[] {
-  return Array.isArray(value) && value.every((entry) => typeof entry === 'string');
+  return Array.isArray(value) && value.every((entry) => typeof entry === "string");
 }
 
-function isValidPadlock(value: unknown): value is HuntProgress['padlock'] {
-  if (typeof value !== 'object' || value === null) {
+function isValidPadlock(value: unknown): value is HuntProgress["padlock"] {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
   const record = value as Record<string, unknown>;
   if (
-    !isNonNegativeInteger(record['digitIndex']) ||
-    record['digitIndex'] > PADLOCK_RIDDLES.length ||
-    !isNonNegativeInteger(record['failures']) ||
-    typeof record['solved'] !== 'boolean'
+    !isNonNegativeInteger(record["digitIndex"]) ||
+    record["digitIndex"] > PADLOCK_RIDDLES.length ||
+    !isNonNegativeInteger(record["failures"]) ||
+    typeof record["solved"] !== "boolean"
   ) {
     return false;
   }
   // digitIndex et solved doivent rester cohérents : non résolu implique un chiffre restant à
   // deviner, résolu implique que tous les chiffres ont été franchis (sinon `answerPadlockDigit`
   // indexerait PADLOCK_RIDDLES hors bornes).
-  return record['solved']
-    ? record['digitIndex'] === PADLOCK_RIDDLES.length
-    : record['digitIndex'] < PADLOCK_RIDDLES.length;
+  return record["solved"]
+    ? record["digitIndex"] === PADLOCK_RIDDLES.length
+    : record["digitIndex"] < PADLOCK_RIDDLES.length;
 }
 
-function isValidPassword(value: unknown): value is HuntProgress['password'] {
-  if (typeof value !== 'object' || value === null) {
+function isValidPassword(value: unknown): value is HuntProgress["password"] {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
   const record = value as Record<string, unknown>;
-  return isNonNegativeInteger(record['failures']) && typeof record['solved'] === 'boolean';
+  return isNonNegativeInteger(record["failures"]) && typeof record["solved"] === "boolean";
 }
 
-function isValidCrossword(value: unknown): value is HuntProgress['crossword'] {
-  if (typeof value !== 'object' || value === null) {
+function isValidCrossword(value: unknown): value is HuntProgress["crossword"] {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
   const record = value as Record<string, unknown>;
   return (
-    isStringRecord(record['letters']) &&
-    isNumberArray(record['locked']) &&
-    isNonNegativeInteger(record['failures']) &&
-    typeof record['solved'] === 'boolean'
+    isStringRecord(record["letters"]) &&
+    isNumberArray(record["locked"]) &&
+    isNonNegativeInteger(record["failures"]) &&
+    typeof record["solved"] === "boolean"
   );
 }
 
-function isValidWordSearch(value: unknown): value is HuntProgress['wordSearch'] {
-  if (typeof value !== 'object' || value === null) {
+function isValidWordSearch(value: unknown): value is HuntProgress["wordSearch"] {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
   const record = value as Record<string, unknown>;
   return (
-    isNonNegativeInteger(record['seed']) &&
-    isStringArray(record['found']) &&
-    isNonNegativeInteger(record['failures']) &&
-    typeof record['solved'] === 'boolean'
+    isNonNegativeInteger(record["seed"]) &&
+    isStringArray(record["found"]) &&
+    isNonNegativeInteger(record["failures"]) &&
+    typeof record["solved"] === "boolean"
   );
 }
 
@@ -184,18 +184,18 @@ function isValidWordSearch(value: unknown): value is HuntProgress['wordSearch'] 
  * sinon une sauvegarde corrompue produirait un TypeError persistant en cours de partie.
  */
 function isValidProgress(value: unknown): value is HuntProgress {
-  if (typeof value !== 'object' || value === null) {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
   const record = value as Record<string, unknown>;
-  if (record['version'] !== 1) {
+  if (record["version"] !== 1) {
     return false;
   }
   return (
-    isValidPadlock(record['padlock']) &&
-    isValidPassword(record['password']) &&
-    isValidCrossword(record['crossword']) &&
-    isValidWordSearch(record['wordSearch'])
+    isValidPadlock(record["padlock"]) &&
+    isValidPassword(record["password"]) &&
+    isValidCrossword(record["crossword"]) &&
+    isValidWordSearch(record["wordSearch"])
   );
 }
 
@@ -203,7 +203,7 @@ function isValidProgress(value: unknown): value is HuntProgress {
  * Service de progression de la chasse au trésor : détient tout l'état du jeu, le persiste dans
  * le stockage local et expose l'API consommée par les écrans (carte, 4 énigmes, trésor).
  */
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class HuntProgressService {
   private readonly storage = inject(PROGRESS_STORAGE);
   private readonly seedFactory = inject(SEED_FACTORY);
@@ -217,18 +217,18 @@ export class HuntProgressService {
   readonly currentStep: Signal<StepId> = computed(() => {
     const progress = this.state();
     if (!progress.padlock.solved) {
-      return 'padlock';
+      return "padlock";
     }
     if (!progress.password.solved) {
-      return 'password';
+      return "password";
     }
     if (!progress.crossword.solved) {
-      return 'crossword';
+      return "crossword";
     }
     if (!progress.wordSearch.solved) {
-      return 'wordSearch';
+      return "wordSearch";
     }
-    return 'treasure';
+    return "treasure";
   });
 
   /** Grille de mots mêlés, régénérée de façon déterministe depuis la graine sauvegardée. */
@@ -322,7 +322,7 @@ export class HuntProgressService {
       return;
     }
 
-    if (letter === '') {
+    if (letter === "") {
       this.state.update((progress) => {
         const letters = { ...progress.crossword.letters };
         delete letters[key];
@@ -410,16 +410,16 @@ export class HuntProgressService {
     }
 
     switch (riddle) {
-      case 'padlock':
+      case "padlock":
         this.state.update((progress) => ({ ...progress, padlock: this.advancePadlock(progress) }));
         break;
-      case 'password':
+      case "password":
         this.state.update((progress) => ({
           ...progress,
           password: { ...progress.password, solved: true },
         }));
         break;
-      case 'crossword':
+      case "crossword":
         this.state.update((progress) => ({
           ...progress,
           crossword: {
@@ -430,7 +430,7 @@ export class HuntProgressService {
           },
         }));
         break;
-      case 'wordSearch':
+      case "wordSearch":
         this.state.update((progress) => ({
           ...progress,
           wordSearch: { ...progress.wordSearch, found: [...WORD_SEARCH.words], solved: true },
@@ -445,7 +445,7 @@ export class HuntProgressService {
   }
 
   /** Avance le cadenas au chiffre suivant, échecs remis à zéro ; résolu après le dernier. */
-  private advancePadlock(progress: HuntProgress): HuntProgress['padlock'] {
+  private advancePadlock(progress: HuntProgress): HuntProgress["padlock"] {
     const digitIndex = progress.padlock.digitIndex + 1;
     return { digitIndex, failures: 0, solved: digitIndex >= PADLOCK_RIDDLES.length };
   }
@@ -455,7 +455,7 @@ export class HuntProgressService {
     const solution = buildSolution(CROSSWORD);
     const letters: Record<string, string> = {};
     solution.forEach((letter, key) => {
-      if (letter !== '-') {
+      if (letter !== "-") {
         letters[key] = letter;
       }
     });

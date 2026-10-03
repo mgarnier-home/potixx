@@ -1,19 +1,19 @@
 @if (openStep(); as step) {
   <app-riddle-panel [title]="stepLabel(step)" (closed)="backToMap()">
     @switch (step) {
-      @case ('padlock') {
+      @case ("padlock") {
         <app-padlock-riddle (solved)="backToMap()" />
       }
-      @case ('password') {
+      @case ("password") {
         <app-password-riddle (solved)="backToMap()" />
       }
-      @case ('crossword') {
+      @case ("crossword") {
         <app-crossword (solved)="backToMap()" />
       }
-      @case ('wordSearch') {
+      @case ("wordSearch") {
         <app-word-search (solved)="backToMap()" />
       }
-      @case ('treasure') {
+      @case ("treasure") {
         <app-treasure (restarted)="backToMap()" />
       }
     }

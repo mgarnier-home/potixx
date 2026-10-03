@@ -20,7 +20,7 @@ La chasse se débloque dans l'ordre. Pour aller directement à une énigme, inje
 dans `localStorage` avec `browser_evaluate`, puis recharge la page :
 
 ```js
-localStorage.setItem('potixx.progress.v1', JSON.stringify({/* HuntProgress voulu */}));
+localStorage.setItem("potixx.progress.v1", JSON.stringify({/* HuntProgress voulu */}));
 location.reload();
 ```
 

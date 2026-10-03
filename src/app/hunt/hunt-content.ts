@@ -1,15 +1,15 @@
-import type { CrosswordDefinition } from './core/crossword';
+import type { CrosswordDefinition } from "./core/crossword";
 
 /** Identifiant d'une étape de la chasse, dans l'ordre où elle doit être résolue. */
-export type StepId = 'padlock' | 'password' | 'crossword' | 'wordSearch' | 'treasure';
+export type StepId = "padlock" | "password" | "crossword" | "wordSearch" | "treasure";
 
 /** Ordre imposé des étapes (spec §4.1 : les étapes se débloquent strictement dans l'ordre). */
 export const STEP_ORDER: readonly StepId[] = [
-  'padlock',
-  'password',
-  'crossword',
-  'wordSearch',
-  'treasure',
+  "padlock",
+  "password",
+  "crossword",
+  "wordSearch",
+  "treasure",
 ];
 
 /** Seuil d'échecs à partir duquel le bouton « Passer l'énigme » apparaît (spec §4.2). */
@@ -17,10 +17,10 @@ export const MAX_FAILURES_BEFORE_SKIP = 3;
 
 /** Les quatre mini-énigmes du cadenas, dans leur ordre d'affichage (spec §4.3). */
 export const PADLOCK_RIDDLES: readonly { question: string; answer: string }[] = [
-  { question: 'Je représente le rien', answer: '0' },
-  { question: 'Je suis le nombre de saisons dans une année', answer: '4' },
-  { question: 'Je suis le seul chiffre pair et premier', answer: '2' },
-  { question: 'Je corresponds au nombre de jours dans une semaine', answer: '7' },
+  { question: "Je représente le rien", answer: "0" },
+  { question: "Je suis le nombre de saisons dans une année", answer: "4" },
+  { question: "Je suis le seul chiffre pair et premier", answer: "2" },
+  { question: "Je corresponds au nombre de jours dans une semaine", answer: "7" },
 ];
 
 /**
@@ -30,24 +30,24 @@ export const PADLOCK_RIDDLES: readonly { question: string; answer: string }[] = 
  * alternatif du rébus complet.
  */
 export type PasswordClue =
-  | { kind: 'image'; src: string; alt: string }
-  | { kind: 'text'; text: string }
-  | { kind: 'rebus'; note: string; suffix: string; alt: string };
+  | { kind: "image"; src: string; alt: string }
+  | { kind: "text"; text: string }
+  | { kind: "rebus"; note: string; suffix: string; alt: string };
 
 /** Énigme du mot de passe : réponse et indices affichés un par un (spec §4.4). */
 export const PASSWORD: { answer: string; clues: readonly PasswordClue[] } = {
-  answer: 'famille',
+  answer: "famille",
   clues: [
-    { kind: 'image', src: '/assets/photo-us.jpg', alt: 'Photo de nous' },
+    { kind: "image", src: "/assets/photo-us.jpg", alt: "Photo de nous" },
     {
-      kind: 'text',
+      kind: "text",
       text: "L'équipage que l'on ne choisit pas toujours, mais que l'on garde toute sa vie.",
     },
     {
-      kind: 'rebus',
-      note: 'F4',
-      suffix: '+ 1000',
-      alt: 'Rébus : une note de musique sur une portée, plus 1000',
+      kind: "rebus",
+      note: "F4",
+      suffix: "+ 1000",
+      alt: "Rébus : une note de musique sur une portée, plus 1000",
     },
   ],
 };
@@ -63,64 +63,64 @@ export const CROSSWORD: CrosswordDefinition = {
   entries: [
     {
       number: 1,
-      answer: 'COUSIN',
-      orientation: 'down',
+      answer: "COUSIN",
+      orientation: "down",
       start: { row: 0, col: 1 },
       clue: "L'enfant de ton oncle ou de ta tante",
     },
     {
       number: 2,
-      answer: 'GRAND-PERE',
-      orientation: 'down',
+      answer: "GRAND-PERE",
+      orientation: "down",
       start: { row: 2, col: 5 },
-      clue: 'Le papa de papa ou de maman',
+      clue: "Le papa de papa ou de maman",
     },
     {
       number: 3,
-      answer: 'SOEUR',
-      orientation: 'across',
+      answer: "SOEUR",
+      orientation: "across",
       start: { row: 3, col: 1 },
-      clue: 'Fille des mêmes parents que toi',
+      clue: "Fille des mêmes parents que toi",
     },
     {
       number: 4,
-      answer: 'ONCLE',
-      orientation: 'across',
+      answer: "ONCLE",
+      orientation: "across",
       start: { row: 5, col: 4 },
-      clue: 'Le frère de papa ou de maman',
+      clue: "Le frère de papa ou de maman",
     },
     {
       number: 5,
-      answer: 'MARRAINE',
-      orientation: 'down',
+      answer: "MARRAINE",
+      orientation: "down",
       start: { row: 6, col: 2 },
-      clue: 'Elle veille sur toi depuis ton baptême',
+      clue: "Elle veille sur toi depuis ton baptême",
     },
     {
       number: 6,
-      answer: 'GRAND-MERE',
-      orientation: 'across',
+      answer: "GRAND-MERE",
+      orientation: "across",
       start: { row: 7, col: 0 },
-      clue: 'La maman de papa ou de maman',
+      clue: "La maman de papa ou de maman",
     },
     {
       number: 7,
-      answer: 'FRERE',
-      orientation: 'across',
+      answer: "FRERE",
+      orientation: "across",
       start: { row: 9, col: 1 },
-      clue: 'Garçon des mêmes parents que toi',
+      clue: "Garçon des mêmes parents que toi",
     },
     {
       number: 8,
-      answer: 'TATA',
-      orientation: 'down',
+      answer: "TATA",
+      orientation: "down",
       start: { row: 10, col: 0 },
       clue: "Ta tante, comme l'appellent les petits",
     },
     {
       number: 9,
-      answer: 'AMIS',
-      orientation: 'across',
+      answer: "AMIS",
+      orientation: "across",
       start: { row: 11, col: 0 },
       clue: "La famille que l'on choisit",
     },
@@ -137,30 +137,30 @@ export const CROSSWORD: CrosswordDefinition = {
     { row: 3, col: 5 }, // R — SOEUR
     { row: 11, col: 0 }, // A — AMIS
   ],
-  hiddenWord: 'AGRANDIRA',
+  hiddenWord: "AGRANDIRA",
 };
 
 /** Mots à retrouver dans la grille de mots mêlés, sans accents (spec §4.6). */
 export const WORD_SEARCH: { size: number; words: readonly string[] } = {
   size: 10,
   words: [
-    'BEBE',
-    'FAMILLE',
-    'AMOUR',
-    'NAISSANCE',
-    'FOYER',
-    'JEUX',
-    'BIBERON',
-    'COUCHES',
-    'DOUDOUS',
-    'PARENTS',
+    "BEBE",
+    "FAMILLE",
+    "AMOUR",
+    "NAISSANCE",
+    "FOYER",
+    "JEUX",
+    "BIBERON",
+    "COUCHES",
+    "DOUDOUS",
+    "PARENTS",
   ],
 };
 
 /** Contenu de l'écran final du trésor (spec §4.7). */
 export const TREASURE: { videoSrc: string; posterSrc: string; message: string } = {
-  videoSrc: '/assets/treasure.mp4',
-  posterSrc: '/assets/treasure-poster.jpg',
+  videoSrc: "/assets/treasure.mp4",
+  posterSrc: "/assets/treasure-poster.jpg",
   message: "Notre famille s'agrandira en Avril 2027",
 };
 
@@ -174,12 +174,12 @@ export const MAP: {
   imageSrc: string;
   steps: Record<StepId, { x: number; y: number; label: string }>;
 } = {
-  imageSrc: '/assets/map.svg',
+  imageSrc: "/assets/map.svg",
   steps: {
-    padlock: { x: 29.2, y: 18.75, label: 'Le cadenas' },
-    password: { x: 71.7, y: 31.25, label: 'Le mot de passe' },
-    crossword: { x: 28.3, y: 50, label: 'Les mots croisés' },
-    wordSearch: { x: 70, y: 67.5, label: 'Les mots mêlés' },
-    treasure: { x: 45, y: 85, label: 'Le trésor' },
+    padlock: { x: 29.2, y: 18.75, label: "Le cadenas" },
+    password: { x: 71.7, y: 31.25, label: "Le mot de passe" },
+    crossword: { x: 28.3, y: 50, label: "Les mots croisés" },
+    wordSearch: { x: 70, y: 67.5, label: "Les mots mêlés" },
+    treasure: { x: 45, y: 85, label: "Le trésor" },
   },
 };

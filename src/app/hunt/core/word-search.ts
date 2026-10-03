@@ -1,9 +1,9 @@
-import type { Cell } from './cell';
-import { createSeededRandom } from './seeded-random';
+import type { Cell } from "./cell";
+import { createSeededRandom } from "./seeded-random";
 
 /** Direction de placement d'un mot dans la grille (pas entre deux cases consécutives). */
 export type Direction =
-  'right' | 'left' | 'down' | 'up' | 'down-right' | 'down-left' | 'up-right' | 'up-left';
+  "right" | "left" | "down" | "up" | "down-right" | "down-left" | "up-right" | "up-left";
 
 /** Mot placé dans la grille, avec ses cases dans l'ordre (première lettre en premier). */
 export interface PlacedWord {
@@ -19,7 +19,7 @@ export interface WordSearchGrid {
   words: PlacedWord[];
 }
 
-const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 const MAX_ATTEMPTS = 50;
 
@@ -33,10 +33,10 @@ const DIRECTION_STEPS: Record<Direction, { rowStep: number; colStep: number }> =
   left: { rowStep: 0, colStep: -1 },
   down: { rowStep: 1, colStep: 0 },
   up: { rowStep: -1, colStep: 0 },
-  'down-right': { rowStep: 1, colStep: 1 },
-  'up-left': { rowStep: -1, colStep: -1 },
-  'down-left': { rowStep: 1, colStep: -1 },
-  'up-right': { rowStep: -1, colStep: 1 },
+  "down-right": { rowStep: 1, colStep: 1 },
+  "up-left": { rowStep: -1, colStep: -1 },
+  "down-left": { rowStep: 1, colStep: -1 },
+  "up-right": { rowStep: -1, colStep: 1 },
 };
 
 // Mêmes pas que DIRECTION_STEPS, utilisés pour détecter après coup qu'un mot de la liste
@@ -86,7 +86,7 @@ export function generateWordSearch(
     return { size, seed: attemptSeed, letters, words: attempted.placedWords };
   }
 
-  throw new Error('Impossible de générer la grille de mots mêlés après 50 tentatives.');
+  throw new Error("Impossible de générer la grille de mots mêlés après 50 tentatives.");
 }
 
 /** Pas (deltaRow, deltaCol) réduit à -1/0/1 entre les deux premières cases d'un mot placé. */

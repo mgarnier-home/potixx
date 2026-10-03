@@ -1,23 +1,23 @@
-import type { Cell } from './cell';
+import type { Cell } from "./cell";
 import {
   findWordAt,
   generateWordSearch,
   type PlacedWord,
   type WordSearchGrid,
-} from './word-search';
+} from "./word-search";
 
 // Liste de mots de la spec §4.6 (thème naissance/bébé).
 const WORDS = [
-  'BEBE',
-  'FAMILLE',
-  'AMOUR',
-  'NAISSANCE',
-  'FOYER',
-  'JEUX',
-  'BIBERON',
-  'COUCHES',
-  'DOUDOUS',
-  'PARENTS',
+  "BEBE",
+  "FAMILLE",
+  "AMOUR",
+  "NAISSANCE",
+  "FOYER",
+  "JEUX",
+  "BIBERON",
+  "COUCHES",
+  "DOUDOUS",
+  "PARENTS",
 ] as const;
 
 const SIZE = 10;
@@ -26,18 +26,18 @@ const SEED_COUNT = 200;
 // Pas (deltaRow,deltaCol) autorisés entre deux cases consécutives d'un mot placé : les 8
 // directions (horizontale, verticale, diagonales, dans les deux sens de lecture).
 const ALLOWED_STEPS = new Set([
-  '0,1', // droite
-  '0,-1', // gauche
-  '1,0', // bas
-  '-1,0', // haut
-  '1,1', // bas-droite
-  '-1,-1', // haut-gauche
-  '1,-1', // bas-gauche
-  '-1,1', // haut-droite
+  "0,1", // droite
+  "0,-1", // gauche
+  "1,0", // bas
+  "-1,0", // haut
+  "1,1", // bas-droite
+  "-1,-1", // haut-gauche
+  "1,-1", // bas-gauche
+  "-1,1", // haut-droite
 ]);
 
 function wordFromCells(grid: WordSearchGrid, cells: Cell[]): string {
-  return cells.map((cell) => grid.letters[cell.row][cell.col]).join('');
+  return cells.map((cell) => grid.letters[cell.row][cell.col]).join("");
 }
 
 /** Pas (deltaRow, deltaCol) entre les deux premières cases d'un mot placé, réduit à -1/0/1. */
@@ -58,7 +58,7 @@ function isReversed(step: { rowStep: number; colStep: number }): boolean {
   return step.rowStep === -1 || step.colStep === -1;
 }
 
-describe('generateWordSearch', () => {
+describe("generateWordSearch", () => {
   it(`place les 10 mots pour ${SEED_COUNT} graines différentes`, () => {
     for (let seed = 1; seed <= SEED_COUNT; seed++) {
       const grid = generateWordSearch(WORDS, SIZE, seed);
@@ -89,7 +89,7 @@ describe('generateWordSearch', () => {
     }
   });
 
-  it('place au moins 3 mots en diagonale et au moins 2 mots à l’envers, sur chaque grille', () => {
+  it("place au moins 3 mots en diagonale et au moins 2 mots à l’envers, sur chaque grille", () => {
     for (let seed = 1; seed <= SEED_COUNT; seed++) {
       const grid = generateWordSearch(WORDS, SIZE, seed);
 
@@ -101,26 +101,26 @@ describe('generateWordSearch', () => {
     }
   });
 
-  it('est déterministe pour une même graine', () => {
+  it("est déterministe pour une même graine", () => {
     const a = generateWordSearch(WORDS, SIZE, 7);
     const b = generateWordSearch(WORDS, SIZE, 7);
     expect(a).toEqual(b);
   });
 
-  it('se régénère à l’identique à partir de la graine renvoyée', () => {
+  it("se régénère à l’identique à partir de la graine renvoyée", () => {
     const first = generateWordSearch(WORDS, SIZE, 123);
     const second = generateWordSearch(WORDS, SIZE, first.seed);
     expect(second.letters).toEqual(first.letters);
   });
 
-  it('un mot palindrome ajouté à la liste ne fait pas échouer la génération', () => {
-    const wordsWithPalindrome = [...WORDS, 'ELLE'];
+  it("un mot palindrome ajouté à la liste ne fait pas échouer la génération", () => {
+    const wordsWithPalindrome = [...WORDS, "ELLE"];
 
     for (let seed = 1; seed <= 50; seed++) {
       expect(() => generateWordSearch(wordsWithPalindrome, SIZE, seed)).not.toThrow();
 
       const grid = generateWordSearch(wordsWithPalindrome, SIZE, seed);
-      expect(grid.words.some((placed) => placed.word === 'ELLE')).toBe(true);
+      expect(grid.words.some((placed) => placed.word === "ELLE")).toBe(true);
     }
   });
 });
@@ -163,7 +163,7 @@ function distinctOccurrenceCellSets(letters: string[][], size: number, word: str
           const key = cells
             .map((cell) => `${cell.row},${cell.col}`)
             .sort()
-            .join('|');
+            .join("|");
           sets.add(key);
         }
       }
@@ -172,7 +172,7 @@ function distinctOccurrenceCellSets(letters: string[][], size: number, word: str
   return sets;
 }
 
-describe('generateWordSearch — pas de mot dupliqué visible', () => {
+describe("generateWordSearch — pas de mot dupliqué visible", () => {
   it(`chaque mot n'apparaît qu'à sa position placée, sur ${SEED_COUNT} graines, dans les 8 directions`, () => {
     for (let seed = 1; seed <= SEED_COUNT; seed++) {
       const grid = generateWordSearch(WORDS, SIZE, seed);
@@ -184,16 +184,16 @@ describe('generateWordSearch — pas de mot dupliqué visible', () => {
   });
 
   it("un mot palindrome n'apparaît qu'à sa position placée (les deux sens de lecture comptent pour un seul ensemble de cases)", () => {
-    const wordsWithPalindrome = [...WORDS, 'ELLE'];
+    const wordsWithPalindrome = [...WORDS, "ELLE"];
 
     for (let seed = 1; seed <= 50; seed++) {
       const grid = generateWordSearch(wordsWithPalindrome, SIZE, seed);
-      expect(distinctOccurrenceCellSets(grid.letters, SIZE, 'ELLE').size).toBe(1);
+      expect(distinctOccurrenceCellSets(grid.letters, SIZE, "ELLE").size).toBe(1);
     }
   });
 });
 
-describe('findWordAt', () => {
+describe("findWordAt", () => {
   let grid: WordSearchGrid;
   let target: PlacedWord;
 
@@ -202,7 +202,7 @@ describe('findWordAt', () => {
     target = grid.words[0];
   });
 
-  it('trouve un mot placé en touchant ses deux extrémités, dans les deux sens', () => {
+  it("trouve un mot placé en touchant ses deux extrémités, dans les deux sens", () => {
     const first = target.cells[0];
     const last = target.cells[target.cells.length - 1];
 
@@ -210,7 +210,7 @@ describe('findWordAt', () => {
     expect(findWordAt(grid, last, first)).toEqual(target);
   });
 
-  it('trouve un mot placé à l’envers dans les deux sens de toucher', () => {
+  it("trouve un mot placé à l’envers dans les deux sens de toucher", () => {
     // Cherche, dans un lot de grilles, un mot dont la direction est « à l'envers » (au moins 2
     // par grille, garanti ci-dessus) pour vérifier que findWordAt ne privilégie pas un sens.
     let reversedWord: PlacedWord | undefined;
@@ -230,12 +230,12 @@ describe('findWordAt', () => {
     expect(findWordAt(grid, last, first)).toEqual(reversedWord);
   });
 
-  it('renvoie null pour une sélection à une seule case', () => {
+  it("renvoie null pour une sélection à une seule case", () => {
     const cell = target.cells[0];
     expect(findWordAt(grid, cell, cell)).toBeNull();
   });
 
-  it('renvoie null pour deux cases dont aucun mot ne relie exactement les extrémités', () => {
+  it("renvoie null pour deux cases dont aucun mot ne relie exactement les extrémités", () => {
     // (0,0) → (1,2) : delta (1,2) n'est atteignable par aucune des 8 directions (elles exigent
     // |rowStep| === |colStep| ou l'un des deux nul), donc ce ne peuvent être les deux extrémités
     // d'un mot placé, quelle que soit la graine.
