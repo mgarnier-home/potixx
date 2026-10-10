@@ -9,8 +9,8 @@
 ## 1. Objectif
 
 Annoncer une grossesse à la famille et aux amis via un site au thème pirate. Le visiteur suit un
-chemin sur une carte au trésor, résout quatre énigmes, puis découvre le trésor : une vidéo de
-l'échographie et le message « Notre famille s'agrandira en Avril 2027 ».
+chemin sur une carte au trésor, résout quatre énigmes, puis découvre le trésor : le message
+« Notre famille s'agrandira en Avril 2027 » et une petite animation de bébé.
 
 Le lien est envoyé à tout le monde au même moment. Le public est de tous âges et joue
 principalement sur téléphone ; le site doit rester confortable sur ordinateur.
@@ -192,11 +192,16 @@ PARENTS.
 
 ### 4.7 Le trésor
 
-- Coffre au trésor illustré en SVG, dans le style de la carte (bois, ferrures, cadenas ouvert,
-  pièces d'or qui débordent), qui s'ouvre (≤ 2 s, instantané si « mouvements réduits »).
-- La vidéo et le message apparaissent **après** l'ouverture du coffre, sur fond parchemin.
-- Vidéo `assets/treasure.mp4` (provisoire), lue sans son par défaut, avec les contrôles natifs et
-  `playsinline` pour iOS.
+- Une scène est tirée au sort à chaque ouverture de l'écran (à parts égales) ; elle remplace la
+  vidéo de l'échographie prévue au départ :
+  - **le coffre** : coffre au trésor illustré en SVG, dans le style de la carte (bois, ferrures,
+    cadenas ouvert, pièces d'or qui débordent), qui s'ouvre ; un bébé pirate sort alors la tête
+    du tas d'or, fait coucou, puis se recache, en boucle ;
+  - **la mouette** : une mouette-cigogne arrive en vol au-dessus de la mer, le bébé dans un
+    baluchon suspendu à son bec ; elle remplace le coffre.
+- L'installation de la scène dure ≤ 2 s (instantanée, et image fixe, si « mouvements réduits »).
+  Animations en SVG/CSS, sans son, teintes neutres.
+- Le message apparaît **après** l'installation de la scène, sur fond parchemin.
 - Message : « Notre famille s'agrandira en Avril 2027 ».
 - Bouton « Recommencer » : demande une confirmation, efface la progression, revient à la carte.
 
@@ -213,7 +218,7 @@ PARENTS.
 ## 5. Organisation du code
 
 ```
-assets/                      images, vidéo, carte (servis sous /assets)
+assets/                      images, carte (servis sous /assets)
 src/
   index.html                 meta robots noindex
   app/

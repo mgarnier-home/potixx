@@ -2,7 +2,7 @@ import { TestBed } from "@angular/core/testing";
 import type { ComponentFixture } from "@angular/core/testing";
 import { TREASURE } from "../hunt-content";
 import { HuntProgressService, PROGRESS_STORAGE, SEED_FACTORY } from "../hunt-progress.service";
-import { CHEST_OPENING_MS, Treasure } from "./treasure";
+import { CHEST_OPENING_MS, TREASURE_RANDOM, Treasure } from "./treasure";
 
 describe("Treasure", () => {
   let fixture: ComponentFixture<Treasure>;
@@ -16,12 +16,16 @@ describe("Treasure", () => {
     return el().querySelector(`[data-testid="${id}"]`);
   }
 
-  /** Vrai si l'écran a marqué la révélation (vidéo + message) comme visible. */
+  /** Vrai si l'écran a marqué la révélation (message + animation) comme visible. */
   function isRevealed(): boolean {
     return el().querySelector(".treasure")?.classList.contains("is-revealed") ?? false;
   }
 
-  function createComponent(): void {
+  /** `random` remplace le tirage qui choisit l'animation du bébé (0 → coffre, 0,99 → mouette). */
+  function createComponent(random?: () => number): void {
+    if (random) {
+      TestBed.overrideProvider(TREASURE_RANDOM, { useValue: random });
+    }
     fixture = TestBed.createComponent(Treasure);
     restartedCount = 0;
     fixture.componentInstance.restarted.subscribe(() => restartedCount++);
@@ -54,7 +58,7 @@ describe("Treasure", () => {
       expect(CHEST_OPENING_MS).toBeLessThanOrEqual(2000);
     });
 
-    it("la vidéo et le message ne sont révélés qu'une fois le coffre ouvert", async () => {
+    it("le message et l'animation ne sont révélés qu'une fois le coffre ouvert", async () => {
       createComponent();
       expect(isRevealed()).toBe(false);
 
@@ -77,29 +81,64 @@ describe("Treasure", () => {
     });
   });
 
+  describe("scène tirée au sort à chaque ouverture", () => {
+    /** Attribut `data-animation` de l'écran : la scène retenue par le tirage. */
+    function drawnAnimation(): string | null {
+      return el().querySelector(".treasure")?.getAttribute("data-animation") ?? null;
+    }
+
+    it("tirage bas : le coffre, d'où sort le bébé, sans la mouette", () => {
+      createComponent(() => 0);
+      expect(drawnAnimation()).toBe("chest");
+      expect(testid("treasure-chest")).not.toBeNull();
+      expect(testid("treasure-chest")?.querySelector('[data-testid="chest-baby"]')).not.toBeNull();
+      expect(testid("treasure-gull")).toBeNull();
+      expect(el().querySelector("app-baby-gull")).toBeNull();
+    });
+
+    it("tirage haut : la mouette et son baluchon, sans le coffre", () => {
+      createComponent(() => 0.99);
+      expect(drawnAnimation()).toBe("gull");
+      expect(testid("treasure-gull")?.querySelector("app-baby-gull")).not.toBeNull();
+      expect(testid("treasure-chest")).toBeNull();
+      expect(testid("chest-baby")).toBeNull();
+    });
+
+    it("la mouette porte une description pour les lecteurs d'écran", () => {
+      createComponent(() => 0.99);
+      expect(el().querySelector("app-baby-gull svg")?.getAttribute("aria-label")).toBeTruthy();
+    });
+
+    it("sous la scène, il ne reste que le message et « Recommencer »", () => {
+      for (const random of [() => 0, () => 0.99]) {
+        TestBed.resetTestingModule();
+        TestBed.configureTestingModule({
+          imports: [Treasure],
+          providers: [
+            { provide: PROGRESS_STORAGE, useValue: null },
+            { provide: SEED_FACTORY, useValue: () => 42 },
+          ],
+        });
+        createComponent(random);
+        const reveal = el().querySelector(".reveal");
+        expect(reveal?.querySelector('[data-testid="treasure-message"]')).not.toBeNull();
+        expect(reveal?.querySelector('[data-testid="restart"]')).not.toBeNull();
+        expect(reveal?.querySelector("app-baby-gull, video, .animation")).toBeNull();
+      }
+    });
+  });
+
   describe("contenu et « Recommencer »", () => {
     beforeEach(() => {
       createComponent();
-    });
-
-    it("affiche le coffre au trésor", () => {
-      expect(testid("treasure-chest")).not.toBeNull();
     });
 
     it("affiche le message exact du trésor", () => {
       expect(testid("treasure-message")?.textContent?.trim()).toBe(TREASURE.message);
     });
 
-    it("affiche la vidéo sans son, adaptée à iOS, avec contrôles et affiche", () => {
-      const video = testid("treasure-video") as HTMLVideoElement;
-      expect(video).not.toBeNull();
-      // La propriété `muted`, pas seulement l'attribut : un attribut statique ne coupe le son
-      // qu'à la création, `defaultMuted` restant vrai mais `video.muted` pouvant valoir faux.
-      expect(video.muted).toBe(true);
-      expect(video.hasAttribute("playsinline")).toBe(true);
-      expect(video.hasAttribute("controls")).toBe(true);
-      expect(video.src).toContain(TREASURE.videoSrc);
-      expect(video.poster).toContain(TREASURE.posterSrc);
+    it("n'affiche plus de vidéo", () => {
+      expect(el().querySelector("video")).toBeNull();
     });
 
     it("« Recommencer » annulé (confirm → false) : ne réinitialise rien et n'émet rien", () => {

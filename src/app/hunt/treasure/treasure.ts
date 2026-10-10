@@ -2,18 +2,30 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  InjectionToken,
   inject,
   output,
   signal,
 } from "@angular/core";
+import { pickTreasureAnimation } from "../core/treasure-animation";
 import { TREASURE } from "../hunt-content";
 import { HuntProgressService } from "../hunt-progress.service";
+import { BabyGull } from "./baby-gull/baby-gull";
 
 /**
- * Durée de l'ouverture du coffre (ms), avant la révélation de la vidéo et du message. Transmise
+ * Durée de l'ouverture du coffre ou de l'arrivée de la mouette (ms), avant la révélation du message. Transmise
  * aux styles (`--opening-duration`) : les étapes de l'animation sont en pourcentage de cette durée.
  */
 export const CHEST_OPENING_MS = 1800;
+
+/**
+ * Source de hasard pour le choix de la scène (coffre ou mouette), injectable pour permettre des tests
+ * déterministes (voir `treasure.spec.ts`).
+ */
+export const TREASURE_RANDOM = new InjectionToken<() => number>("TREASURE_RANDOM", {
+  providedIn: "root",
+  factory: () => Math.random,
+});
 
 /** Vrai si le visiteur a demandé de réduire les animations (faux si l'API est indisponible). */
 function prefersReducedMotion(): boolean {
@@ -25,13 +37,15 @@ function prefersReducedMotion(): boolean {
 }
 
 /**
- * Écran final : le trésor (spec §4.7). Le coffre s'ouvre à chaque ouverture de l'écran (c'est la
- * récompense), puis, une fois le couvercle ouvert, la vidéo et le message de l'annonce
- * apparaissent (tout de suite si « mouvements réduits »). « Recommencer » demande une confirmation
- * avant d'effacer la progression et de revenir à la carte (géré par `App` via `restarted`).
+ * Écran final : le trésor (spec §4.7). Une scène est tirée au sort à chaque ouverture de l'écran :
+ * soit le coffre s'ouvre et le bébé pirate en sort, soit la mouette-cigogne arrive avec le bébé
+ * dans son baluchon. Le message de l'annonce apparaît ensuite (tout de suite si « mouvements
+ * réduits »). « Recommencer » demande une confirmation avant d'effacer la progression et de
+ * revenir à la carte (géré par `App` via `restarted`).
  */
 @Component({
   selector: "app-treasure",
+  imports: [BabyGull],
   templateUrl: "./treasure.html",
   styleUrl: "./treasure.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,12 +56,11 @@ export class Treasure {
   /** Émis après confirmation, une fois la progression réinitialisée. */
   readonly restarted = output<void>();
 
-  protected readonly videoSrc = TREASURE.videoSrc;
-  protected readonly posterSrc = TREASURE.posterSrc;
   protected readonly message = TREASURE.message;
+  protected readonly animation = pickTreasureAnimation(inject(TREASURE_RANDOM));
   protected readonly openingDuration = `${CHEST_OPENING_MS}ms`;
 
-  /** Vrai une fois le coffre ouvert : la vidéo, le message et « Recommencer » sont montrés. */
+  /** Vrai une fois la scène installée : le message et « Recommencer » sont montrés. */
   protected readonly revealed = signal(prefersReducedMotion());
 
   constructor() {

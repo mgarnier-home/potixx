@@ -138,7 +138,10 @@ test("treasure: shows the reveal and restart sends back to a fresh map", async (
   await expect(page.getByTestId("treasure-message")).toHaveText(
     "Notre famille s'agrandira en Avril 2027",
   );
-  await expect(page.getByTestId("treasure-video")).toBeVisible();
+  // La scène est tirée au sort : le coffre (avec le bébé) ou la mouette.
+  await expect(
+    page.getByTestId("treasure-chest").or(page.getByTestId("treasure-gull")),
+  ).toBeVisible();
 
   page.once("dialog", (dialog) => dialog.dismiss());
   await page.getByTestId("restart").click();

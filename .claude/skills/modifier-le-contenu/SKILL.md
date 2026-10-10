@@ -1,22 +1,22 @@
 ---
 name: modifier-le-contenu
-description: Modifie le contenu de la chasse au trésor Potixx (textes des énigmes, réponses, indices, définitions et grille des mots croisés, mots mêlés, message du trésor, positions sur la carte) ou remplace les images et la vidéo. À utiliser pour toute demande de changement de texte ou de média, sans toucher aux composants.
+description: Modifie le contenu de la chasse au trésor Potixx (textes des énigmes, réponses, indices, définitions et grille des mots croisés, mots mêlés, message du trésor, positions sur la carte) ou remplace les images. À utiliser pour toute demande de changement de texte ou de média, sans toucher aux composants.
 ---
 
 # Modifier le contenu
 
 ## Où se trouve quoi
 
-| À modifier                                               | Emplacement                                                                  |
-| -------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Énoncés et réponses du cadenas                           | `PADLOCK_RIDDLES` dans `src/app/hunt/hunt-content.ts`                        |
-| Réponse et indices du mot de passe                       | `PASSWORD`                                                                   |
-| Grille, définitions, cases de AGRANDIRA                  | `CROSSWORD`                                                                  |
-| Liste des mots mêlés, taille de grille                   | `WORD_SEARCH`                                                                |
-| Vidéo, image d'attente, message final                    | `TREASURE`                                                                   |
-| Image de la carte, position des étapes (en % de l'image) | `MAP`                                                                        |
-| Seuil d'échecs avant « Passer l'énigme »                 | `MAX_FAILURES_BEFORE_SKIP`                                                   |
-| Fichiers médias                                          | `assets/` : `map.svg`, `photo-us.jpg`, `treasure.mp4`, `treasure-poster.jpg` |
+| À modifier                                               | Emplacement                                           |
+| -------------------------------------------------------- | ----------------------------------------------------- |
+| Énoncés et réponses du cadenas                           | `PADLOCK_RIDDLES` dans `src/app/hunt/hunt-content.ts` |
+| Réponse et indices du mot de passe                       | `PASSWORD`                                            |
+| Grille, définitions, cases de AGRANDIRA                  | `CROSSWORD`                                           |
+| Liste des mots mêlés, taille de grille                   | `WORD_SEARCH`                                         |
+| Message final                                            | `TREASURE`                                            |
+| Image de la carte, position des étapes (en % de l'image) | `MAP`                                                 |
+| Seuil d'échecs avant « Passer l'énigme »                 | `MAX_FAILURES_BEFORE_SKIP`                            |
+| Fichiers médias                                          | `assets/` : `map.svg`, `photo-us.jpg`                 |
 
 Ne modifie pas les composants pour un changement de contenu : si c'est nécessaire, c'est que la
 demande dépasse le contenu, et elle mérite son propre design.
@@ -32,7 +32,7 @@ demande dépasse le contenu, et elle mérite son propre design.
 - Mots mêlés : chaque mot doit tenir dans la grille (le plus long ≤ taille) ; le test du
   générateur vérifie que tous les mots sont placés.
 - Remplacer un média : garder le même nom de fichier, ou mettre à jour le chemin dans
-  `hunt-content.ts`. Vidéo en MP4 (H.264), la plus légère possible (le public est sur mobile).
+  `hunt-content.ts`. Image la plus légère possible (le public est sur mobile).
 - Si tu changes la structure de la progression sauvegardée, la clé `potixx.progress.v1` doit
   passer à `v2` ; un simple changement de texte ne l'exige pas.
 

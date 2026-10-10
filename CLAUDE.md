@@ -1,9 +1,9 @@
 # Potixx — Chasse au trésor
 
 Site d'annonce de grossesse au thème pirate : le visiteur suit une carte au trésor, résout quatre
-énigmes (cadenas, mot de passe, mots croisés, mots mêlés) et découvre le trésor (vidéo de
-l'échographie + « Notre famille s'agrandira en Avril 2027 »). Public familial, surtout sur
-téléphone.
+énigmes (cadenas, mot de passe, mots croisés, mots mêlés) et découvre le trésor : « Notre famille
+s'agrandira en Avril 2027 » et une scène animée tirée au sort (le bébé qui sort du coffre, ou
+porté par une mouette). Public familial, surtout sur téléphone.
 
 - Spec (référence) : `docs/superpowers/specs/2026-09-26-potixx-chasse-au-tresor-design.md`
 - Plan d'implémentation : `docs/superpowers/plans/2026-09-26-potixx-chasse-au-tresor.md`
@@ -29,7 +29,7 @@ Node 24.16.0 (`.tool-versions`), Angular 22.2, npm.
 ## Arborescence
 
 ```
-assets/                     images, vidéo, carte — servis sous /assets/
+assets/                     images, carte — servis sous /assets/
 public/robots.txt           interdit l'indexation
 src/app/hunt/
   hunt-content.ts           TOUT le contenu éditable (textes, réponses, grilles, positions)

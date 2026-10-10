@@ -100,6 +100,121 @@
   fill: var(--color-baby-pink);
 }
 
+/*
+ * Le bébé pirate, caché derrière le tas d'or. Il attend la fin de l'ouverture du coffre
+ * (`animation-delay` + `backwards` : il reste caché pendant ce délai), puis boucle sur 7 s :
+ * il jaillit, cligne des yeux, fait coucou, se recache. Sa pose de repos (sans animation, donc
+ * aussi en « mouvements réduits ») est la tête sortie. Teintes neutres, ni rose ni bleu layette.
+ */
+.baby {
+  --baby-cream: #fffaf0;
+  --baby-raspberry: #c9184a;
+
+  animation: baby-peek 7s var(--opening-duration) infinite backwards;
+
+  .ink,
+  .line {
+    stroke-linecap: round;
+  }
+
+  .line {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+  }
+
+  .thin {
+    stroke-width: 1.4;
+  }
+
+  .skin {
+    fill: #ffd9b3;
+  }
+
+  .mint {
+    fill: #8fd3c1;
+  }
+
+  .cheek {
+    fill: var(--color-coral);
+    opacity: 0.45;
+  }
+
+  .eye {
+    fill: var(--color-ink);
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: baby-blink 3.5s infinite;
+  }
+}
+
+.baby-hand {
+  transform-origin: 196px 130px;
+  animation: baby-wave 7s var(--opening-duration) ease-in-out infinite;
+}
+
+@keyframes baby-peek {
+  0%,
+  8% {
+    transform: translateY(80px);
+    animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.4);
+  }
+  20%,
+  84% {
+    transform: translateY(0);
+    animation-timing-function: ease-in;
+  }
+  94%,
+  100% {
+    transform: translateY(80px);
+  }
+}
+
+@keyframes baby-wave {
+  0%,
+  38%,
+  74%,
+  100% {
+    transform: rotate(0deg);
+  }
+  44%,
+  56%,
+  68% {
+    transform: rotate(-16deg);
+  }
+  50%,
+  62% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes baby-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95%,
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+
+/*
+ * L'autre scène : la mouette-cigogne, dans un cadre doré à la place du coffre. Son arrivée en vol
+ * dure `--opening-duration`, comme l'ouverture du coffre.
+ */
+.gull-scene {
+  width: min(20rem, 100%);
+  aspect-ratio: 320 / 240;
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-paper);
+  background: var(--color-parchment-light);
+  box-shadow: var(--shadow-paper);
+  overflow: hidden;
+}
+
 /* Couvercle fermé : il bascule autour de sa charnière (haut du dôme) puis disparaît. */
 .lid-outer {
   transform-origin: 50% 36%;
@@ -260,8 +375,8 @@
 }
 
 /*
- * La révélation : l'annonce d'abord (visible sans défiler sous le coffre), puis la vidéo. Invisible
- * (et ignorée des lecteurs d'écran) tant que le coffre n'est pas ouvert, mais sa place est réservée
+ * La révélation : l'annonce d'abord (visible sans défiler sous la scène). Invisible
+ * (et ignorée des lecteurs d'écran) tant que la scène n'est pas installée, mais sa place est réservée
  * pour que rien ne saute à l'apparition.
  */
 .reveal {
@@ -288,12 +403,8 @@
     animation-delay: 120ms;
   }
 
-  > .video {
-    animation-delay: 260ms;
-  }
-
   > .restart {
-    animation-delay: 400ms;
+    animation-delay: 260ms;
   }
 }
 
@@ -338,19 +449,6 @@
   }
 }
 
-.video {
-  width: 100%;
-  max-width: 20rem;
-  max-height: 60vh;
-  aspect-ratio: 9 / 16;
-  margin-top: var(--space-6);
-  border: 3px solid var(--color-gold);
-  border-radius: var(--radius-paper);
-  background: var(--color-sea-deep);
-  box-shadow: var(--shadow-paper);
-  object-fit: contain;
-}
-
 .restart {
   margin-top: var(--space-6);
 }
@@ -365,13 +463,19 @@
     font-size: clamp(2.4rem, 3.4vw, 2.9rem);
   }
 
-  .video {
-    max-width: 24rem;
+  .gull-scene {
+    width: 24rem;
   }
 }
 
 /* Mouvements réduits : coffre directement ouvert, révélation sans effet. */
 @media (prefers-reduced-motion: reduce) {
+  .baby,
+  .baby .eye,
+  .baby-hand {
+    animation: none;
+  }
+
   .chest,
   .lid-outer,
   .lid-inner,

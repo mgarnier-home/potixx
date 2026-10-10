@@ -1,0 +1,227 @@
+/*
+ * Mouette-cigogne : trait d'encre brune et aplats façon aquarelle, comme la carte et le coffre.
+ * Les teintes restent neutres (ni rose ni bleu layette).
+ */
+:host {
+  --baby-skin: #ffd9b3;
+  --baby-mint: #8fd3c1;
+  --baby-cream: #fffaf0;
+
+  display: block;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ink {
+  stroke: var(--color-ink);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.line {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.thin {
+  stroke-width: 1.4;
+}
+
+.skin {
+  fill: var(--baby-skin);
+}
+
+.cheek {
+  fill: var(--color-coral);
+  opacity: 0.45;
+}
+
+.eye {
+  fill: var(--color-ink);
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.wash {
+  opacity: 0.55;
+}
+
+.gold {
+  fill: var(--color-gold);
+}
+
+.mint {
+  fill: var(--baby-mint);
+}
+
+.cream {
+  fill: var(--baby-cream);
+}
+
+@keyframes blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95%,
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes wave-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(40px);
+  }
+}
+
+/* La mouette reste au centre : ce sont les nuages, l'île et les vagues qui défilent. */
+/* Arrivée en vol depuis la gauche, le temps que l'écran du trésor se dévoile. */
+.flight {
+  animation: fly-in var(--opening-duration, 0s) cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.gull {
+  animation: bob 1.8s ease-in-out infinite;
+}
+
+.wing {
+  transform-origin: 150px 88px;
+  animation: flap 0.9s ease-in-out infinite;
+}
+
+.wing-far {
+  animation-delay: -0.08s;
+}
+
+/* Le baluchon se balance sous le bec, à contretemps du vol. */
+.bundle {
+  transform-origin: 216px 86px;
+  animation: swing 1.8s ease-in-out infinite;
+
+  .eye {
+    animation: blink 4s infinite;
+  }
+}
+
+.cloud {
+  fill: var(--baby-cream);
+  stroke: var(--color-ink);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  animation: drift 16s linear infinite;
+}
+
+.cloud2 {
+  animation-duration: 22s;
+  animation-delay: -9s;
+}
+
+.cloud3 {
+  animation-duration: 19s;
+  animation-delay: -14s;
+}
+
+.island {
+  animation: drift 24s linear infinite;
+  animation-delay: -6s;
+}
+
+.wave-back {
+  animation: wave-slide 3.2s linear infinite reverse;
+}
+
+.wave-front {
+  animation: wave-slide 2s linear infinite reverse;
+}
+
+@keyframes fly-in {
+  from {
+    transform: translate(-270px, -30px);
+  }
+  to {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(-4px);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+@keyframes flap {
+  0%,
+  100% {
+    transform: scaleY(1) rotate(0deg);
+  }
+  50% {
+    transform: scaleY(-0.55) rotate(-8deg);
+  }
+}
+
+@keyframes swing {
+  0%,
+  100% {
+    transform: rotate(7deg);
+  }
+  50% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(360px);
+  }
+  to {
+    transform: translateX(-140px);
+  }
+}
+
+/* Mouvements réduits : image fixe, avec les nuages et l'île posés dans le cadre. */
+@media (prefers-reduced-motion: reduce) {
+  .flight,
+  .gull,
+  .wing,
+  .bundle,
+  .bundle .eye,
+  .cloud,
+  .island,
+  .wave-back,
+  .wave-front {
+    animation: none;
+  }
+
+  .cloud {
+    transform: translateX(256px);
+  }
+
+  .cloud2 {
+    transform: translateX(70px);
+  }
+
+  .cloud3 {
+    transform: translateX(40px);
+  }
+
+  .island {
+    transform: translateX(40px);
+  }
+}

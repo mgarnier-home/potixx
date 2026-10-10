@@ -158,9 +158,7 @@ export const WORD_SEARCH: { size: number; words: readonly string[] } = {
 };
 
 /** Contenu de l'écran final du trésor (spec §4.7). */
-export const TREASURE: { videoSrc: string; posterSrc: string; message: string } = {
-  videoSrc: "/assets/treasure.mp4",
-  posterSrc: "/assets/treasure-poster.jpg",
+export const TREASURE: { message: string } = {
   message: "Notre famille s'agrandira en Avril 2027",
 };
 

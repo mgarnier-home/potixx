@@ -1,0 +1,117 @@
+<!-- Mouette-cigogne qui transporte le bébé dans un baluchon (viewBox 320 × 240). -->
+<svg
+  viewBox="0 0 320 240"
+  role="img"
+  aria-label="Une mouette transporte un bébé dans un baluchon au-dessus de la mer"
+>
+  <!-- Lavis du ciel. -->
+  <path
+    class="wash"
+    fill="var(--color-sea-pale)"
+    d="M10 100 C8 44 84 8 170 14 C254 18 314 56 306 112 C300 160 240 170 160 172 C80 174 14 160 10 100 Z"
+  />
+
+  <!-- Nuages qui défilent : c'est la mouette qui avance. -->
+  <path
+    class="cloud"
+    d="M0 44 c0 -12 16 -14 20 -6 c4 -12 24 -10 24 2 c12 -2 14 14 2 14 h-44 c-10 0 -10 -10 -2 -10 z"
+  />
+  <path
+    class="cloud cloud2"
+    d="M0 134 c0 -10 13 -12 16 -5 c3 -10 20 -8 20 2 c10 -2 12 12 2 12 h-37 c-8 0 -8 -9 -1 -9 z"
+  />
+  <path
+    class="cloud cloud3"
+    d="M0 22 c0 -8 11 -10 14 -4 c3 -8 17 -7 17 2 c8 -2 10 10 1 10 h-31 c-7 0 -7 -8 -1 -8 z"
+  />
+
+  <!-- Île au loin. -->
+  <g class="island">
+    <g transform="translate(27 208) scale(0.5) translate(-27 -206)">
+      <path class="ink" fill="var(--color-parchment-dark)" d="M0 206 C8 190 44 190 54 206 Z" />
+      <path class="line" d="M28 194 C30 182 30 172 26 162" />
+      <path
+        class="ink"
+        fill="#38b000"
+        d="M26 162 c-10 -6 -20 -2 -24 6 c8 -4 16 -4 24 -6 c8 -8 20 -8 26 0 c-8 -2 -18 -2 -26 0 c-2 -10 4 -18 12 -20 c-6 6 -10 12 -12 20 z"
+      />
+    </g>
+  </g>
+
+  <!-- La mouette. -->
+  <g class="flight">
+    <g transform="translate(0 -8)">
+      <g class="gull">
+        <!-- Aile du fond. -->
+        <g class="wing wing-far">
+          <path
+            class="ink"
+            fill="#d9d4c7"
+            d="M160 88 C156 58 138 38 114 28 C122 48 124 68 132 90 Z"
+          />
+        </g>
+
+        <!-- Queue, corps, tête. -->
+        <path class="ink cream" d="M114 92 l-26 -10 8 11 -10 9 z" />
+        <path
+          class="ink cream"
+          d="M108 92 C120 72 170 68 192 84 C202 92 196 102 184 106 C160 114 124 110 108 92 Z"
+        />
+        <circle class="ink cream" cx="196" cy="78" r="13" />
+        <path class="ink gold" d="M207 73 L230 82 L206 87 Z" />
+        <circle fill="var(--color-ink)" cx="199" cy="75" r="2.2" />
+        <!-- Foulard de pirate autour du cou. -->
+        <path
+          class="ink"
+          fill="var(--color-coral)"
+          d="M184 88 C190 94 198 94 204 89 L200 100 C194 102 188 100 184 88 Z"
+        />
+
+        <!-- Le baluchon suspendu au bec, qui se balance. -->
+        <g class="bundle">
+          <path class="ink mint" d="M216 86 L190 134 L242 134 Z" />
+          <circle class="ink skin" cx="216" cy="132" r="15" />
+          <path class="line thin" d="M216 117 c-4 -7 5 -10 5 -3" />
+          <circle class="cheek" cx="207" cy="137" r="4" />
+          <circle class="cheek" cx="225" cy="137" r="4" />
+          <ellipse class="eye" cx="210" cy="131" rx="2" ry="2.4" />
+          <ellipse class="eye" cx="222" cy="131" rx="2" ry="2.4" />
+          <path class="line thin" d="M212 138 q4 4 8 0" />
+          <path
+            class="ink mint"
+            d="M188 134 C198 144 234 144 244 134 C250 164 238 180 216 180 C194 180 182 164 188 134 Z"
+          />
+          <g fill="var(--baby-cream)">
+            <circle cx="202" cy="156" r="2.6" />
+            <circle cx="216" cy="166" r="2.6" />
+            <circle cx="230" cy="156" r="2.6" />
+            <circle cx="216" cy="150" r="2.2" />
+          </g>
+          <circle class="ink mint" cx="216" cy="87" r="5" />
+        </g>
+
+        <!-- Aile de devant. -->
+        <g class="wing">
+          <path class="ink cream" d="M168 90 C162 56 138 34 108 26 C118 46 122 68 134 92 Z" />
+          <path
+            class="ink"
+            fill="var(--color-ink-soft)"
+            d="M108 26 C116 30 124 36 130 44 L118 46 C116 38 112 32 108 26 Z"
+          />
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- La mer. -->
+  <path
+    class="wave-back ink thin"
+    fill="var(--color-sea-light)"
+    d="M-40 206 q10 -8 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 V250 H-40 Z"
+  />
+  <path
+    class="wave-front ink thin"
+    fill="var(--color-sea)"
+    d="M-40 222 q10 -9 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 V250 H-40 Z"
+  />
+</svg>
