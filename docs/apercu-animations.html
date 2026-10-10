@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Potixx — aperçu des animations du trésor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <!--
+      Page provisoire, hors du site : elle sert uniquement à comparer les trois animations de bébé
+      proposées pour remplacer la vidéo du trésor. À supprimer une fois le choix fait.
+    -->
+    <style>
+      :root {
+        /* Mêmes valeurs que les jetons de src/styles.scss. */
+        --color-parchment: #ffe8b8;
+        --color-parchment-light: #fff3d6;
+        --color-parchment-dark: #f0c987;
+        --color-ink: #3a2715;
+        --color-ink-soft: #6b4f32;
+        --color-sea: #00b4d8;
+        --color-sea-light: #90e0ef;
+        --color-sea-pale: #c9f1f8;
+        --color-coral: #ff6b6b;
+        --color-treasure-dark: #b3202f;
+        --color-gold: #ffc300;
+        --color-gold-light: #ffd95a;
+        --color-gold-pale: #fff0b3;
+        --color-gold-deep: #9a6f00;
+        /* Teintes propres aux animations : neutres, ni rose ni bleu layette. */
+        --color-skin: #ffd9b3;
+        --color-mint: #8fd3c1;
+        --color-mint-dark: #5fb7a2;
+        --color-cream: #fffaf0;
+        --color-wood: #a8642c;
+        --color-wood-dark: #7a4520;
+        --color-raspberry: #c9184a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 1.5rem 1rem 3rem;
+        font-family: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+        font-size: 1.125rem;
+        line-height: 1.5;
+        color: var(--color-ink);
+        background: var(--color-parchment);
+      }
+
+      header {
+        max-width: 40rem;
+        margin: 0 auto 2rem;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.75rem;
+        font-weight: 500;
+        line-height: 1.2;
+        text-wrap: balance;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--color-ink-soft);
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+        gap: 2.5rem 1.5rem;
+        max-width: 68rem;
+        margin: 0 auto;
+      }
+
+      .option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .option h2 {
+        margin: 0 0 0.75rem;
+        font-size: 1.3rem;
+        font-weight: 500;
+      }
+
+      /* Le message du trésor, repris tel qu'il apparaît au-dessus de l'animation sur le site. */
+      .message {
+        max-width: 18rem;
+        margin: 0 0 0.75rem;
+        font-size: 1.5rem;
+        font-weight: 500;
+        line-height: 1.15;
+        color: var(--color-treasure-dark);
+        text-wrap: balance;
+      }
+
+      .frame {
+        width: 100%;
+        max-width: 22rem;
+        border: 3px solid var(--color-gold);
+        border-radius: 6px;
+        background: var(--color-parchment-light);
+        box-shadow:
+          0 1px 0 rgb(58 39 21 / 0.08),
+          0 10px 30px -12px rgb(58 39 21 / 0.45);
+        overflow: hidden;
+      }
+
+      .frame svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .option p.note {
+        max-width: 20rem;
+        margin: 0.75rem 0 0;
+        font-size: 1rem;
+        color: var(--color-ink-soft);
+      }
+
+      /* ------------------------------------------------------------------ */
+      /* Trait commun aux trois scènes : encre brune, aplats façon aquarelle */
+      /* ------------------------------------------------------------------ */
+      .ink {
+        stroke: var(--color-ink);
+        stroke-width: 2.2;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+      }
+
+      .line {
+        fill: none;
+        stroke: var(--color-ink);
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .thin {
+        stroke-width: 1.4;
+      }
+
+      .skin {
+        fill: var(--color-skin);
+      }
+
+      .cheek {
+        fill: var(--color-coral);
+        opacity: 0.45;
+      }
+
+      .eye {
+        fill: var(--color-ink);
+        transform-box: fill-box;
+        transform-origin: 50% 50%;
+      }
+
+      .wash {
+        opacity: 0.55;
+      }
+
+      .gold {
+        fill: var(--color-gold);
+      }
+
+      .wood {
+        fill: var(--color-wood);
+      }
+
+      .wood-dark {
+        fill: var(--color-wood-dark);
+      }
+
+      .mint {
+        fill: var(--color-mint);
+      }
+
+      .cream {
+        fill: var(--color-cream);
+      }
+
+      .sparkle {
+        fill: #fffbe6;
+        stroke: var(--color-coral);
+        stroke-width: 0.8;
+        transform-box: fill-box;
+        transform-origin: 50% 50%;
+        animation: twinkle 2.4s ease-in-out infinite;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.25;
+          transform: scale(0.6) rotate(-20deg);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.1) rotate(0deg);
+        }
+      }
+
+      @keyframes blink {
+        0%,
+        92%,
+        100% {
+          transform: scaleY(1);
+        }
+        95%,
+        97% {
+          transform: scaleY(0.1);
+        }
+      }
+
+      /* ------------------------------------------------------------------ */
+      /* A — Bébé pirate dans le coffre (boucle de 7 s)                      */
+      /* ------------------------------------------------------------------ */
+      .a-baby {
+        animation: a-peek 7s infinite;
+      }
+
+      @keyframes a-peek {
+        0%,
+        8% {
+          transform: translateY(80px);
+          animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.4);
+        }
+        20%,
+        84% {
+          transform: translateY(0);
+          animation-timing-function: ease-in;
+        }
+        94%,
+        100% {
+          transform: translateY(80px);
+        }
+      }
+
+      .a-baby .eye {
+        animation: blink 3.5s infinite;
+      }
+
+      .a-hand {
+        transform-origin: 196px 130px;
+        animation: a-wave 7s ease-in-out infinite;
+      }
+
+      @keyframes a-wave {
+        0%,
+        38%,
+        74%,
+        100% {
+          transform: rotate(0deg);
+        }
+        44%,
+        56%,
+        68% {
+          transform: rotate(-16deg);
+        }
+        50%,
+        62% {
+          transform: rotate(14deg);
+        }
+      }
+
+      .a-s2 {
+        animation-delay: -0.8s;
+      }
+
+      .a-s3 {
+        animation-delay: -1.6s;
+      }
+
+      /* ------------------------------------------------------------------ */
+      /* B — Berceau-bateau sur les vagues                                   */
+      /* ------------------------------------------------------------------ */
+      .b-boat {
+        transform-origin: 160px 176px;
+        animation: b-rock 4.5s ease-in-out infinite;
+      }
+
+      @keyframes b-rock {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-4deg);
+        }
+        50% {
+          transform: translateY(4px) rotate(4deg);
+        }
+      }
+
+      .b-flag {
+        transform-origin: 196px 52px;
+        animation: b-flutter 1.4s ease-in-out infinite;
+      }
+
+      @keyframes b-flutter {
+        0%,
+        100% {
+          transform: skewY(-6deg);
+        }
+        50% {
+          transform: skewY(8deg);
+        }
+      }
+
+      .b-wave-back {
+        animation: wave-slide 7s linear infinite reverse;
+      }
+
+      .b-wave-front {
+        animation: wave-slide 4.5s linear infinite;
+      }
+
+      @keyframes wave-slide {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(40px);
+        }
+      }
+
+      .b-z {
+        font-family: "Fredoka", "Trebuchet MS", sans-serif;
+        font-weight: 500;
+        fill: var(--color-ink-soft);
+        opacity: 0;
+        animation: b-snore 4.5s ease-out infinite;
+      }
+
+      .b-z2 {
+        animation-delay: 1.5s;
+      }
+
+      .b-z3 {
+        animation-delay: 3s;
+      }
+
+      @keyframes b-snore {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0);
+        }
+        15% {
+          opacity: 0.9;
+        }
+        70% {
+          opacity: 0.6;
+        }
+        100% {
+          opacity: 0;
+          transform: translate(22px, -52px);
+        }
+      }
+
+      .b-star {
+        fill: var(--color-gold);
+        stroke: var(--color-ink);
+        stroke-width: 1.2;
+        stroke-linejoin: round;
+        transform-box: fill-box;
+        transform-origin: 50% 50%;
+        animation: twinkle 3s ease-in-out infinite;
+      }
+
+      .b-star2 {
+        animation-delay: -1s;
+      }
+
+      .b-star3 {
+        animation-delay: -2s;
+      }
+
+      /* ------------------------------------------------------------------ */
+      /* C — Mouette-cigogne et baluchon                                     */
+      /* ------------------------------------------------------------------ */
+      .c-gull {
+        animation: c-bob 1.8s ease-in-out infinite;
+      }
+
+      @keyframes c-bob {
+        0%,
+        100% {
+          transform: translateY(-4px);
+        }
+        50% {
+          transform: translateY(5px);
+        }
+      }
+
+      .c-wing {
+        transform-origin: 150px 88px;
+        animation: c-flap 0.9s ease-in-out infinite;
+      }
+
+      .c-wing-far {
+        animation-delay: -0.08s;
+      }
+
+      @keyframes c-flap {
+        0%,
+        100% {
+          transform: scaleY(1) rotate(0deg);
+        }
+        50% {
+          transform: scaleY(-0.55) rotate(-8deg);
+        }
+      }
+
+      .c-bundle {
+        transform-origin: 216px 86px;
+        animation: c-swing 1.8s ease-in-out infinite;
+      }
+
+      @keyframes c-swing {
+        0%,
+        100% {
+          transform: rotate(7deg);
+        }
+        50% {
+          transform: rotate(-5deg);
+        }
+      }
+
+      .c-bundle .eye {
+        animation: blink 4s infinite;
+      }
+
+      .c-cloud {
+        fill: var(--color-cream);
+        stroke: var(--color-ink);
+        stroke-width: 1.8;
+        stroke-linejoin: round;
+        animation: c-drift 16s linear infinite;
+      }
+
+      .c-cloud2 {
+        animation-duration: 22s;
+        animation-delay: -9s;
+      }
+
+      .c-cloud3 {
+        animation-duration: 19s;
+        animation-delay: -14s;
+      }
+
+      @keyframes c-drift {
+        from {
+          transform: translateX(360px);
+        }
+        to {
+          transform: translateX(-140px);
+        }
+      }
+
+      .c-island {
+        animation: c-drift 24s linear infinite;
+        animation-delay: -6s;
+      }
+
+      .c-wave-back {
+        animation: wave-slide 3.2s linear infinite reverse;
+      }
+
+      .c-wave-front {
+        animation: wave-slide 2s linear infinite reverse;
+      }
+
+      /* Mouvements réduits : chaque scène reste sur sa pose de repos. */
+      @media (prefers-reduced-motion: reduce) {
+        .frame svg * {
+          animation: none !important;
+        }
+
+        .b-z {
+          opacity: 0.8;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Trois animations pour le trésor</h1>
+      <p>
+        Chacune remplacerait la vidéo, sous le message, une fois le coffre ouvert. Elles tournent en
+        boucle, sans son.
+      </p>
+    </header>
+
+    <main>
+      <!-- ============================ A ============================ -->
+      <section class="option">
+        <h2>A · Bébé pirate dans le coffre</h2>
+        <p class="message">Notre famille s'agrandira en Avril 2027</p>
+        <div class="frame">
+          <svg
+            viewBox="0 0 320 240"
+            role="img"
+            aria-label="Un bébé pirate sort la tête d'un coffre"
+          >
+            <defs>
+              <clipPath id="a-clip">
+                <rect x="0" y="0" width="320" height="136" />
+              </clipPath>
+            </defs>
+
+            <!-- Lavis d'aquarelle derrière la scène. -->
+            <path
+              class="wash"
+              fill="var(--color-gold-pale)"
+              d="M30 120 C20 60 90 14 170 20 C250 24 304 70 292 130 C284 176 240 150 160 156 C90 160 40 176 30 120 Z"
+            />
+            <ellipse cx="160" cy="214" rx="118" ry="10" fill="rgb(58 39 21 / 0.22)" />
+
+            <!-- Couvercle relevé, doublé de velours. -->
+            <path
+              class="ink wood-dark"
+              d="M64 134 L64 66 C64 42 108 30 160 30 C212 30 256 42 256 66 L256 134 Z"
+            />
+            <path
+              class="ink"
+              fill="var(--color-raspberry)"
+              d="M78 134 L78 70 C78 52 114 44 160 44 C206 44 242 52 242 70 L242 134 Z"
+            />
+            <path
+              class="ink gold"
+              d="M64 66 C64 42 108 30 160 30 C212 30 256 42 256 66 L256 76 C256 54 212 42 160 42 C108 42 64 54 64 76 Z"
+            />
+
+            <!-- Le bébé : il monte et redescend derrière le tas de pièces. -->
+            <g clip-path="url(#a-clip)">
+              <g class="a-baby">
+                <!-- Main qui fait coucou. -->
+                <g class="a-hand">
+                  <path
+                    class="ink skin"
+                    d="M192 132 C194 116 202 104 210 98 L220 106 C212 114 208 124 208 134 Z"
+                  />
+                  <circle class="ink skin" cx="216" cy="96" r="10" />
+                  <path class="line thin" d="M212 90 v-5 M217 88 v-6 M222 91 l2 -5" />
+                </g>
+                <!-- Main posée sur le bord. -->
+                <circle class="ink skin" cx="118" cy="124" r="9" />
+
+                <circle class="ink skin" cx="126" cy="102" r="6" />
+                <circle class="ink skin" cx="194" cy="102" r="6" />
+                <circle class="ink skin" cx="160" cy="98" r="34" />
+
+                <!-- Bandana vert d'eau à pois, noué sur le côté. -->
+                <path class="ink mint" d="M193 88 l18 -8 -4 12 z" />
+                <path class="ink mint" d="M193 90 l15 11 -12 3 z" />
+                <path
+                  class="ink mint"
+                  d="M126 92 C126 70 142 62 160 62 C178 62 194 70 194 92 C172 82 148 82 126 92 Z"
+                />
+                <g fill="var(--color-cream)">
+                  <circle cx="143" cy="76" r="2.6" />
+                  <circle cx="160" cy="71" r="2.6" />
+                  <circle cx="177" cy="76" r="2.6" />
+                  <circle cx="152" cy="82" r="2.2" />
+                  <circle cx="169" cy="82" r="2.2" />
+                </g>
+
+                <circle class="cheek" cx="140" cy="112" r="7" />
+                <circle class="cheek" cx="180" cy="112" r="7" />
+                <ellipse class="eye" cx="148" cy="102" rx="3.2" ry="3.8" />
+                <ellipse class="eye" cx="172" cy="102" rx="3.2" ry="3.8" />
+                <path class="ink" fill="var(--color-raspberry)" d="M152 113 Q160 124 168 113 Z" />
+              </g>
+            </g>
+
+            <!-- Tas de pièces, devant le bébé. -->
+            <path
+              class="ink gold"
+              d="M72 140 C76 122 96 120 110 128 C120 114 146 118 158 128 C170 114 198 114 210 128 C224 118 246 124 250 140 Z"
+            />
+            <g class="ink thin" fill="var(--color-gold-light)">
+              <ellipse cx="96" cy="130" rx="11" ry="5" />
+              <ellipse cx="134" cy="126" rx="11" ry="5" />
+              <ellipse cx="184" cy="124" rx="11" ry="5" />
+              <ellipse cx="228" cy="130" rx="11" ry="5" />
+            </g>
+
+            <!-- Caisse du coffre. -->
+            <rect class="ink wood" x="58" y="136" width="204" height="72" rx="6" />
+            <path
+              class="line thin"
+              stroke="#5e3a1b"
+              opacity="0.55"
+              d="M96 162 h44 M180 174 h50 M100 192 h36 M190 194 h34"
+            />
+            <rect class="ink gold" x="58" y="136" width="204" height="13" rx="4" />
+            <rect class="ink gold" x="76" y="136" width="15" height="72" />
+            <rect class="ink gold" x="229" y="136" width="15" height="72" />
+            <rect class="ink gold" x="146" y="142" width="28" height="32" rx="5" />
+            <circle fill="var(--color-ink)" cx="160" cy="154" r="4" />
+            <path fill="var(--color-ink)" d="M158 155 h4 l2 11 h-8 z" />
+
+            <!-- Pièces tombées au sol. -->
+            <g class="ink thin" fill="var(--color-gold-light)">
+              <ellipse cx="44" cy="208" rx="10" ry="4.5" />
+              <ellipse cx="282" cy="206" rx="10" ry="4.5" />
+            </g>
+
+            <path class="sparkle" d="M44 60 l3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3 z" />
+            <path
+              class="sparkle a-s2"
+              d="M282 50 l2.4 7 7 2.4 -7 2.4 -2.4 7 -2.4 -7 -7 -2.4 7 -2.4 z"
+            />
+            <path class="sparkle a-s3" d="M270 112 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2 z" />
+          </svg>
+        </div>
+        <p class="note">
+          Il sort la tête des pièces d'or, cligne des yeux, fait coucou, puis se recache.
+        </p>
+      </section>
+
+      <!-- ============================ B ============================ -->
+      <section class="option">
+        <h2>B · Berceau-bateau sur les vagues</h2>
+        <p class="message">Notre famille s'agrandira en Avril 2027</p>
+        <div class="frame">
+          <svg
+            viewBox="0 0 320 240"
+            role="img"
+            aria-label="Un bébé dort dans un berceau en forme de bateau"
+          >
+            <!-- Lavis du ciel du soir. -->
+            <path
+              class="wash"
+              fill="var(--color-sea-pale)"
+              d="M14 110 C10 50 80 10 170 16 C256 20 312 60 304 120 C298 170 240 150 160 154 C80 158 20 170 14 110 Z"
+            />
+
+            <!-- Lune et étoiles. -->
+            <path
+              class="ink"
+              fill="var(--color-gold-light)"
+              d="M266 28 C248 32 240 52 250 68 C258 80 274 84 286 76 C270 74 260 60 262 46 C263 38 264 32 266 28 Z"
+            />
+            <path class="b-star" d="M52 40 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 z" />
+            <path
+              class="b-star b-star2"
+              d="M228 96 l2.2 6 6 2.2 -6 2.2 -2.2 6 -2.2 -6 -6 -2.2 6 -2.2 z"
+            />
+            <path class="b-star b-star3" d="M36 112 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" />
+
+            <!-- Vague du fond. -->
+            <path
+              class="b-wave-back ink thin"
+              fill="var(--color-sea-light)"
+              d="M-40 184 q10 -9 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 V250 H-40 Z"
+            />
+
+            <!-- Le berceau-bateau, qui tangue. -->
+            <g class="b-boat">
+              <!-- Mât, voile et fanion. -->
+              <path class="line" stroke-width="3.2" d="M196 146 V52" />
+              <path class="ink cream" d="M201 66 C222 84 236 106 240 132 L201 132 Z" />
+              <path
+                class="line thin"
+                stroke="var(--color-gold-deep)"
+                d="M201 98 C212 100 224 104 232 110"
+              />
+              <g class="b-flag">
+                <path class="ink" fill="var(--color-coral)" d="M196 52 L172 59 L196 67 Z" />
+              </g>
+
+              <!-- Capote du berceau. -->
+              <path class="ink mint" d="M70 146 C66 104 96 84 132 94 L132 146 Z" />
+              <path
+                class="line thin"
+                stroke="var(--color-mint-dark)"
+                d="M84 142 C82 118 96 102 122 98 M100 144 C100 124 108 110 128 104"
+              />
+              <path
+                class="ink cream"
+                d="M132 94 c5 4 5 9 0 13 c5 4 5 9 0 13 c5 4 5 9 0 13 c4 3 4 9 0 13"
+                fill="none"
+              />
+
+              <!-- Le bébé endormi. -->
+              <circle class="ink skin" cx="150" cy="128" r="20" />
+              <path class="line thin" d="M150 108 c-5 -8 6 -12 6 -4" />
+              <circle class="cheek" cx="140" cy="135" r="5" />
+              <circle class="cheek" cx="162" cy="135" r="5" />
+              <path class="line thin" d="M138 127 q4 4 8 0 M155 127 q4 4 8 0" />
+              <path class="line thin" d="M147 138 q4 3 7 0" />
+
+              <!-- Couverture. -->
+              <path
+                class="ink"
+                fill="var(--color-gold-pale)"
+                d="M158 150 C160 128 184 124 192 150 Z"
+              />
+
+              <!-- Coque. -->
+              <path
+                class="ink wood"
+                d="M62 146 L256 146 C252 182 226 198 160 198 C94 198 66 182 62 146 Z"
+              />
+              <path
+                class="line thin"
+                stroke="#5e3a1b"
+                opacity="0.55"
+                d="M78 168 C110 176 210 176 242 168 M96 184 C130 190 190 190 224 184"
+              />
+              <path class="ink gold" d="M58 142 h202 a4 4 0 0 1 0 12 h-202 a4 4 0 0 1 0 -12 z" />
+              <circle class="ink thin" fill="var(--color-gold-light)" cx="160" cy="172" r="9" />
+              <path
+                fill="var(--color-coral)"
+                d="M160 177 c-8 -5 -6 -11 -2.6 -11 c1.6 0 2.6 1.4 2.6 2.4 c0 -1 1 -2.4 2.6 -2.4 c3.400 0 5.400 6 -2.600 11 z"
+              />
+            </g>
+
+            <!-- Ronflements : des « z » qui s'envolent. -->
+            <text class="b-z" x="170" y="100" font-size="15">z</text>
+            <text class="b-z b-z2" x="172" y="100" font-size="19">z</text>
+            <text class="b-z b-z3" x="168" y="100" font-size="23">Z</text>
+
+            <!-- Vague de devant. -->
+            <path
+              class="b-wave-front ink thin"
+              fill="var(--color-sea)"
+              d="M-40 204 q10 -10 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 V250 H-40 Z"
+            />
+          </svg>
+        </div>
+        <p class="note">Le berceau tangue doucement, le bébé dort, ses « z » s'envolent.</p>
+      </section>
+
+      <!-- ============================ C ============================ -->
+      <section class="option">
+        <h2>C · Mouette-cigogne et baluchon</h2>
+        <p class="message">Notre famille s'agrandira en Avril 2027</p>
+        <div class="frame">
+          <svg
+            viewBox="0 0 320 240"
+            role="img"
+            aria-label="Une mouette transporte un bébé dans un baluchon au-dessus de la mer"
+          >
+            <!-- Lavis du ciel. -->
+            <path
+              class="wash"
+              fill="var(--color-sea-pale)"
+              d="M10 100 C8 44 84 8 170 14 C254 18 314 56 306 112 C300 160 240 170 160 172 C80 174 14 160 10 100 Z"
+            />
+
+            <!-- Nuages qui défilent : c'est la mouette qui avance. -->
+            <path
+              class="c-cloud"
+              d="M0 44 c0 -12 16 -14 20 -6 c4 -12 24 -10 24 2 c12 -2 14 14 2 14 h-44 c-10 0 -10 -10 -2 -10 z"
+            />
+            <path
+              class="c-cloud c-cloud2"
+              d="M0 134 c0 -10 13 -12 16 -5 c3 -10 20 -8 20 2 c10 -2 12 12 2 12 h-37 c-8 0 -8 -9 -1 -9 z"
+            />
+            <path
+              class="c-cloud c-cloud3"
+              d="M0 22 c0 -8 11 -10 14 -4 c3 -8 17 -7 17 2 c8 -2 10 10 1 10 h-31 c-7 0 -7 -8 -1 -8 z"
+            />
+
+            <!-- Île au loin. -->
+            <g class="c-island">
+              <g transform="translate(27 208) scale(0.5) translate(-27 -206)">
+                <path
+                  class="ink"
+                  fill="var(--color-parchment-dark)"
+                  d="M0 206 C8 190 44 190 54 206 Z"
+                />
+                <path class="line" d="M28 194 C30 182 30 172 26 162" />
+                <path
+                  class="ink"
+                  fill="#38b000"
+                  d="M26 162 c-10 -6 -20 -2 -24 6 c8 -4 16 -4 24 -6 c8 -8 20 -8 26 0 c-8 -2 -18 -2 -26 0 c-2 -10 4 -18 12 -20 c-6 6 -10 12 -12 20 z"
+                />
+              </g>
+            </g>
+
+            <!-- La mouette. -->
+            <g transform="translate(0 -8)">
+              <g class="c-gull">
+                <!-- Aile du fond. -->
+                <g class="c-wing c-wing-far">
+                  <path
+                    class="ink"
+                    fill="#d9d4c7"
+                    d="M160 88 C156 58 138 38 114 28 C122 48 124 68 132 90 Z"
+                  />
+                </g>
+
+                <!-- Queue, corps, tête. -->
+                <path class="ink cream" d="M114 92 l-26 -10 8 11 -10 9 z" />
+                <path
+                  class="ink cream"
+                  d="M108 92 C120 72 170 68 192 84 C202 92 196 102 184 106 C160 114 124 110 108 92 Z"
+                />
+                <circle class="ink cream" cx="196" cy="78" r="13" />
+                <path class="ink gold" d="M207 73 L230 82 L206 87 Z" />
+                <circle fill="var(--color-ink)" cx="199" cy="75" r="2.2" />
+                <!-- Foulard de pirate autour du cou. -->
+                <path
+                  class="ink"
+                  fill="var(--color-coral)"
+                  d="M184 88 C190 94 198 94 204 89 L200 100 C194 102 188 100 184 88 Z"
+                />
+
+                <!-- Le baluchon suspendu au bec, qui se balance. -->
+                <g class="c-bundle">
+                  <path class="ink mint" d="M216 86 L190 134 L242 134 Z" />
+                  <circle class="ink skin" cx="216" cy="132" r="15" />
+                  <path class="line thin" d="M216 117 c-4 -7 5 -10 5 -3" />
+                  <circle class="cheek" cx="207" cy="137" r="4" />
+                  <circle class="cheek" cx="225" cy="137" r="4" />
+                  <ellipse class="eye" cx="210" cy="131" rx="2" ry="2.4" />
+                  <ellipse class="eye" cx="222" cy="131" rx="2" ry="2.4" />
+                  <path class="line thin" d="M212 138 q4 4 8 0" />
+                  <path
+                    class="ink mint"
+                    d="M188 134 C198 144 234 144 244 134 C250 164 238 180 216 180 C194 180 182 164 188 134 Z"
+                  />
+                  <g fill="var(--color-cream)">
+                    <circle cx="202" cy="156" r="2.6" />
+                    <circle cx="216" cy="166" r="2.6" />
+                    <circle cx="230" cy="156" r="2.6" />
+                    <circle cx="216" cy="150" r="2.2" />
+                  </g>
+                  <circle class="ink mint" cx="216" cy="87" r="5" />
+                </g>
+
+                <!-- Aile de devant. -->
+                <g class="c-wing">
+                  <path
+                    class="ink cream"
+                    d="M168 90 C162 56 138 34 108 26 C118 46 122 68 134 92 Z"
+                  />
+                  <path
+                    class="ink"
+                    fill="var(--color-ink-soft)"
+                    d="M108 26 C116 30 124 36 130 44 L118 46 C116 38 112 32 108 26 Z"
+                  />
+                </g>
+              </g>
+            </g>
+
+            <!-- La mer. -->
+            <path
+              class="c-wave-back ink thin"
+              fill="var(--color-sea-light)"
+              d="M-40 206 q10 -8 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 V250 H-40 Z"
+            />
+            <path
+              class="c-wave-front ink thin"
+              fill="var(--color-sea)"
+              d="M-40 222 q10 -9 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 V250 H-40 Z"
+            />
+          </svg>
+        </div>
+        <p class="note">
+          La mouette survole la mer, le baluchon se balance sous son bec, le bébé regarde le
+          paysage.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
