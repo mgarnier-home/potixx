@@ -1,0 +1,4 @@
+github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
+github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
+github.com/mgarnier-home/utils v1.4.0 h1:uvA+j1m/yblD0KFN1orYA6rymSgyBevHeICLJA9evdA=
+github.com/mgarnier-home/utils v1.4.0/go.mod h1:sk7i0gNEuMmwE+5dxgxtqsblO8o6fSV4pdqGYW4Hi/I=

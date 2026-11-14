@@ -48,3 +48,10 @@ Thumbs.db
 .superpowers/
 /test-results
 /playwright-report
+
+# Build Angular copié dans le binaire Go (Dockerfile) ; seul le .gitkeep est versionné.
+backend/web/browser/*
+!backend/web/browser/.gitkeep
+
+# Données locales du backend en développement.
+tmp/
