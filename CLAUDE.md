@@ -76,10 +76,9 @@ Annonce le résultat réel des commandes, pas celui attendu.
 
 ## Interdits
 
-- **Git : commits locaux autorisés, jamais de `git push`** ni de réécriture d'historique
-  (`rebase`, `reset --hard`, `commit --amend` sur un commit existant) sans demande explicite. Le
-  propriétaire gère le dépôt distant. Messages au format Conventional Commits (`feat: …`,
-  `test: …`, `chore: …`).
+- **Git : workflow de développement commun** (branche `release/vX.Y.Z` + PR vers `master`, voir
+  `/mnt/dev/CLAUDE.md`). Jamais de réécriture d'historique (`rebase`, `reset --hard`,
+  `commit --amend` sur un commit existant) sans demande explicite.
 - Ne jamais retirer le `noindex` (meta robots dans `src/index.html`, `public/robots.txt`,
   en-tête `X-Robots-Tag` dans `nginx.conf`).
 - Ne jamais publier d'image Docker (`docker push`) : c'est le rôle de la CI GitHub.
