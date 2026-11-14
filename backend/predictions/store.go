@@ -64,7 +64,7 @@ func (s *Store) Add(in Input, now time.Time) (Prediction, error) {
 func (s *Store) List() []Prediction {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	out := slices.Clone(s.items)
+	out := append([]Prediction{}, s.items...) // jamais nil : l'API renvoie [] et non null
 	slices.SortStableFunc(out, func(a, b Prediction) int { return b.CreatedAt.Compare(a.CreatedAt) })
 	return out
 }
