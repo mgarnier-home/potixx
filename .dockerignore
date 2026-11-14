@@ -17,3 +17,7 @@ playwright-report
 site.md
 activity.png
 *.md
+
+# Backend : build Angular local et données de développement, recréés par le build.
+backend/web/browser
+tmp
