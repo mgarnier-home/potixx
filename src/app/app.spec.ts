@@ -1,68 +1,63 @@
+import { provideHttpClient } from "@angular/common/http";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
+import type { ComponentFixture } from "@angular/core/testing";
 import { TestBed } from "@angular/core/testing";
+import { Router, provideRouter } from "@angular/router";
 import { App } from "./app";
+import { routes } from "./app.routes";
 import { PROGRESS_STORAGE, SEED_FACTORY } from "./hunt/hunt-progress.service";
 
-describe("App", () => {
+describe("App (onglets)", () => {
+  let fixture: ComponentFixture<App>;
+  let element: HTMLElement;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [App],
       providers: [
+        provideRouter(routes),
+        provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: PROGRESS_STORAGE, useValue: null },
         { provide: SEED_FACTORY, useValue: () => 42 },
       ],
     });
+    fixture = TestBed.createComponent(App);
+    element = fixture.nativeElement as HTMLElement;
   });
 
-  it("affiche la carte au démarrage, ouvre une étape puis revient à la carte", async () => {
-    const fixture = TestBed.createComponent(App);
+  async function navigate(url: string): Promise<void> {
+    await TestBed.inject(Router).navigateByUrl(url);
     await fixture.whenStable();
-    const element = fixture.nativeElement as HTMLElement;
+  }
 
-    expect(element.querySelector("app-treasure-map")).not.toBeNull();
-    expect(element.querySelector("app-riddle-panel")).toBeNull();
+  const tab = (id: string) => element.querySelector<HTMLAnchorElement>(`[data-testid="${id}"]`);
 
-    element.querySelector<HTMLButtonElement>('[data-testid="step-padlock"]')?.click();
-    await fixture.whenStable();
-    expect(element.querySelector("app-treasure-map")).toBeNull();
-    expect(element.querySelector("app-riddle-panel h2")?.textContent).toContain("Le cadenas");
-
-    element.querySelector<HTMLButtonElement>('[data-testid="back-to-map"]')?.click();
-    await fixture.whenStable();
-    expect(element.querySelector("app-treasure-map")).not.toBeNull();
-    expect(element.querySelector("app-riddle-panel")).toBeNull();
+  it("affiche la chasse sur / avec l'onglet correspondant actif", async () => {
+    await navigate("/");
+    expect(element.querySelector("app-hunt")).not.toBeNull();
+    expect(tab("tab-hunt")?.getAttribute("aria-current")).toBe("page");
+    expect(tab("tab-predictions")?.getAttribute("aria-current")).toBeNull();
   });
 
-  it("trésor : « Recommencer » confirmé réinitialise la progression et revient à la carte", async () => {
-    // Les quatre énigmes déjà résolues : le trésor est l'étape courante à l'ouverture.
-    const solvedProgress = JSON.stringify({
-      version: 1,
-      padlock: { digitIndex: 4, failures: 0, solved: true },
-      password: { failures: 0, solved: true },
-      crossword: { letters: {}, locked: [], failures: 0, solved: true },
-      wordSearch: { seed: 42, found: [], failures: 0, solved: true },
-    });
-    const storage = {
-      getItem: () => solvedProgress,
-      setItem: () => undefined,
-    } as unknown as Storage;
-
-    TestBed.overrideProvider(PROGRESS_STORAGE, { useValue: storage });
-    const fixture = TestBed.createComponent(App);
+  it("passe à l'onglet Pronostics au clic", async () => {
+    await navigate("/");
+    tab("tab-predictions")?.click();
     await fixture.whenStable();
-    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector("app-prediction-form")).not.toBeNull();
+    expect(element.querySelector("app-hunt")).toBeNull();
+    expect(tab("tab-predictions")?.getAttribute("aria-current")).toBe("page");
+    expect(tab("tab-hunt")?.getAttribute("aria-current")).toBeNull();
+  });
 
-    element.querySelector<HTMLButtonElement>('[data-testid="step-treasure"]')?.click();
-    await fixture.whenStable();
-    expect(element.querySelector("app-riddle-panel h2")?.textContent).toContain("Le trésor");
+  it("affiche l'admin sur /admin sans onglet actif", async () => {
+    await navigate("/admin");
+    expect(element.querySelector("app-admin")).not.toBeNull();
+    expect(element.querySelector('[aria-current="page"]')).toBeNull();
+  });
 
-    vi.spyOn(window, "confirm").mockReturnValue(true);
-    element.querySelector<HTMLButtonElement>('[data-testid="restart"]')?.click();
-    await fixture.whenStable();
-
-    expect(element.querySelector("app-treasure-map")).not.toBeNull();
-    expect(
-      element.querySelector('[data-testid="step-padlock"]')?.classList.contains("current"),
-    ).toBe(true);
-    vi.restoreAllMocks();
+  it("ramène une route inconnue vers la chasse", async () => {
+    await navigate("/nimporte");
+    expect(element.querySelector("app-hunt")).not.toBeNull();
   });
 });

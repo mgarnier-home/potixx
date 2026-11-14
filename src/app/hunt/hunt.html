@@ -1,0 +1,29 @@
+@if (openStep(); as step) {
+  <app-riddle-panel [title]="stepLabel(step)" (closed)="backToMap()">
+    @switch (step) {
+      @case ("padlock") {
+        <app-padlock-riddle (solved)="backToMap()" />
+      }
+      @case ("password") {
+        <app-password-riddle (solved)="backToMap()" />
+      }
+      @case ("crossword") {
+        <app-crossword (solved)="backToMap()" />
+      }
+      @case ("wordSearch") {
+        <app-word-search (solved)="backToMap()" />
+      }
+      @case ("treasure") {
+        <app-treasure (restarted)="backToMap()" />
+      }
+    }
+  </app-riddle-panel>
+} @else {
+  <main class="map-screen">
+    <header class="intro">
+      <h1 class="title">La chasse au trésor</h1>
+      <p class="lead">Suivez le chemin et résolvez chaque énigme pour trouver le trésor.</p>
+    </header>
+    <app-treasure-map class="map" (stepSelected)="openMapStep($event)" />
+  </main>
+}
