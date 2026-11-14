@@ -123,7 +123,7 @@ octets. Les champs inconnus sont refusés (`DisallowUnknownFields`).
 - `*.js`, `*.css` : `Cache-Control: public, max-age=31536000, immutable` ;
 - `/assets/*` : `Cache-Control: public, max-age=3600`.
 
-La compression gzip de nginx est abandonnée : le reverse proxy (Traefik) peut s'en charger.
+Le serveur Go compresse en gzip les fichiers texte (html, js, css, svg, json), comme nginx.
 
 ### Version
 
@@ -235,4 +235,4 @@ Les secrets GitHub `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN` ne servent plus (aut
 ## Hors périmètre
 
 Modification d'un pronostic envoyé, affichage public des pronostics, export CSV, statistiques,
-affichage de la version dans l'interface, gzip.
+affichage de la version dans l'interface.

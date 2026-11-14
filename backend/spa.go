@@ -1,11 +1,19 @@
 package main
 
 import (
+	"compress/gzip"
 	"io/fs"
+	"mime"
 	"net/http"
 	"path"
 	"strings"
 )
+
+// compressible reprend la liste gzip de l'ancien nginx.conf : texte uniquement, les images et
+// polices étant déjà compressées.
+var compressible = map[string]bool{
+	".html": true, ".js": true, ".css": true, ".svg": true, ".json": true, ".txt": true, ".xml": true,
+}
 
 // spaHandler sert les fichiers du front, et index.html pour toute autre route afin que le
 // routeur Angular gère les URL profondes (/pronostics). Les en-têtes de cache reprennent
@@ -16,14 +24,40 @@ func spaHandler(fsys fs.FS) http.Handler {
 		name := strings.TrimPrefix(r.URL.Path, "/")
 		if info, err := fs.Stat(fsys, name); name != "" && err == nil && !info.IsDir() {
 			w.Header().Set("Cache-Control", cacheControl(name))
-			files.ServeHTTP(w, r)
+			if !serveGzip(w, r, fsys, name) {
+				files.ServeHTTP(w, r)
+			}
 			return
 		}
 		// index.html référence les fichiers hashés : jamais en cache, sinon un visiteur déjà
 		// venu ne verrait pas un déploiement.
 		w.Header().Set("Cache-Control", "no-cache")
-		http.ServeFileFS(w, r, fsys, "index.html")
+		if !serveGzip(w, r, fsys, "index.html") {
+			http.ServeFileFS(w, r, fsys, "index.html")
+		}
 	})
+}
+
+// serveGzip envoie un fichier texte compressé si le client l'accepte ; false sinon, pour laisser
+// le serveur de fichiers standard répondre. shortcut: pas de Range ni d'ETag sur les réponses
+// compressées, inutiles pour des fichiers de quelques centaines de Ko.
+func serveGzip(w http.ResponseWriter, r *http.Request, fsys fs.FS, name string) bool {
+	ext := path.Ext(name)
+	if !compressible[ext] || !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+		return false
+	}
+	data, err := fs.ReadFile(fsys, name)
+	if err != nil {
+		return false
+	}
+	h := w.Header()
+	h.Set("Content-Type", mime.TypeByExtension(ext))
+	h.Set("Content-Encoding", "gzip")
+	h.Set("Vary", "Accept-Encoding")
+	zw := gzip.NewWriter(w)
+	_, _ = zw.Write(data)
+	_ = zw.Close()
+	return true
 }
 
 func cacheControl(name string) string {

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"compress/gzip"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -50,5 +52,40 @@ func TestSecurityHeaders(t *testing.T) {
 		if got := rec.Header().Get(k); got != v {
 			t.Errorf("%s = %q, attendu %q", k, got, v)
 		}
+	}
+}
+
+func getGzip(h http.Handler, path string) *httptest.ResponseRecorder {
+	rec := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodGet, path, nil)
+	r.Header.Set("Accept-Encoding", "gzip, deflate, br")
+	h.ServeHTTP(rec, r)
+	return rec
+}
+
+func TestSPAGzipsText(t *testing.T) {
+	h := spaHandler(front)
+	for path, want := range map[string]string{"/main-abc.js": "console.log(1)", "/pronostics": "<html>index</html>"} {
+		rec := getGzip(h, path)
+		if rec.Header().Get("Content-Encoding") != "gzip" || rec.Header().Get("Vary") != "Accept-Encoding" {
+			t.Fatalf("%s : en-têtes %v", path, rec.Header())
+		}
+		zr, err := gzip.NewReader(rec.Body)
+		if err != nil {
+			t.Fatalf("%s : %v", path, err)
+		}
+		if got, _ := io.ReadAll(zr); string(got) != want {
+			t.Fatalf("%s : contenu décompressé %q", path, got)
+		}
+	}
+}
+
+func TestSPANoGzip(t *testing.T) {
+	h := spaHandler(front)
+	if rec := get(h, "/main-abc.js"); rec.Header().Get("Content-Encoding") != "" || rec.Body.String() != "console.log(1)" {
+		t.Fatal("sans Accept-Encoding: gzip, la réponse doit rester en clair")
+	}
+	if rec := getGzip(h, "/assets/map.webp"); rec.Header().Get("Content-Encoding") != "" || rec.Body.String() != "webp" {
+		t.Fatal("une image déjà compressée ne doit pas être regzippée")
 	}
 }
