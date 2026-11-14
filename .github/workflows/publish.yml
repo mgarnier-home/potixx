@@ -1,71 +1,101 @@
 name: Publication
 
-run-name: Publication de la version ${{ inputs.version }}
+run-name: Publication de ${{ github.ref_name }}
 
+# Lancé par le push d'un tag de version (ex. v1.2.3, poussé par `tag-release 1.2.3`). Le motif
+# ci-dessous est large : le job « version » vérifie le format exact et que le tag est sur la
+# branche par défaut avant toute construction.
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Numéro de version à publier (ex. 1.2.0)"
-        required: true
-        type: string
+  push:
+    tags:
+      - "v*.*.*"
 
-# Deux publications simultanées de la même version se marcheraient dessus : la seconde attend
-# la fin de la première au lieu de l'annuler (une publication interrompue laisserait des tags
-# à moitié poussés).
+# Une seule publication à la fois : les images intermédiaires « amd64 » et « arm64 » sont
+# communes à toutes les versions, deux publications en parallèle pourraient se les échanger.
+# La suivante attend au lieu d'annuler (une publication interrompue laisserait des images à
+# moitié poussées).
 concurrency:
-  group: ${{ github.workflow }}-${{ inputs.version }}
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
-  docker:
-    name: Image Docker
-    runs-on: ubuntu-latest
+  version:
+    name: Vérification du tag
+    runs-on: linux/amd64
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      date: ${{ steps.check.outputs.date }}
     steps:
-      # La version saisie passe par une variable d'environnement, jamais par interpolation
-      # directe dans le script : une saisie malveillante ne peut ainsi pas injecter de commande.
-      - name: Vérification du numéro de version
+      # Historique complet pour pouvoir vérifier que le commit du tag appartient à la branche par
+      # défaut.
+      - name: Récupération du code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # Le nom du tag passe par une variable d'environnement, jamais par interpolation directe
+      # dans le script : un nom de tag malveillant ne peut ainsi pas injecter de commande.
+      - name: Vérification du format vX.Y.Z et de la présence sur la branche par défaut
+        id: check
         env:
-          VERSION: ${{ inputs.version }}
+          TAG: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
-            echo "::error::Version invalide « $VERSION » : format attendu X.Y.Z (ex. 1.2.0 ou 1.2.0-rc.1), sans préfixe « v »."
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag invalide « $TAG » : format attendu vX.Y.Z (ex. v1.2.3)."
             exit 1
           fi
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" "origin/$DEFAULT_BRANCH"; then
+            echo "::error::Le tag « $TAG » ne pointe pas sur un commit de $DEFAULT_BRANCH."
+            exit 1
+          fi
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          echo "date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
 
+  build:
+    name: Image ${{ matrix.arch }}
+    needs: version
+    runs-on: linux/${{ matrix.arch }}
+    strategy:
+      matrix:
+        arch:
+          - amd64
+          - arm64
+    steps:
       - name: Récupération du code
         uses: actions/checkout@v7
 
-      - name: Préparation de Buildx
-        uses: docker/setup-buildx-action@v4
+      # Construction native sur le runner de l'architecture ; l'authentification Docker Hub est
+      # celle déjà configurée sur les runners auto-hébergés.
+      - name: Construction et envoi de l'image
+        env:
+          ARCH: ${{ matrix.arch }}
+          VERSION: ${{ needs.version.outputs.version }}
+          BUILD_DATE: ${{ needs.version.outputs.date }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          docker buildx build \
+            --tag "mgarnier11/potixx:$ARCH" \
+            --build-arg "VERSION=$VERSION" \
+            --build-arg "COMMIT=$COMMIT" \
+            --build-arg "DATE=$BUILD_DATE" \
+            --push \
+            .
 
-      # `latest` n'accompagne la version que si le workflow est lancé depuis la branche par
-      # défaut du dépôt : publier depuis une autre branche ne doit pas déplacer `latest`.
-      - name: Calcul des tags et labels de l'image
-        id: meta
-        uses: docker/metadata-action@v6
-        with:
-          images: docker.io/mgarnier11/potixx
-          tags: |
-            type=raw,value=${{ inputs.version }}
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Connexion à Docker Hub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build et publication de l'image
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          platforms: linux/amd64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+  publish:
+    name: Image multi-arch
+    needs: [version, build]
+    runs-on: linux/amd64
+    steps:
+      - name: Publication des tags version et latest
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          docker buildx imagetools create \
+            --tag "mgarnier11/potixx:$VERSION" \
+            --tag mgarnier11/potixx:latest \
+            mgarnier11/potixx:amd64 \
+            mgarnier11/potixx:arm64
