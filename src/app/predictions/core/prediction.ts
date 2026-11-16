@@ -1,4 +1,4 @@
-import { EYE_COLORS, PREDICTION_LIMITS, SEXES } from "../prediction-content";
+import { BIRTH_YEAR, EYE_COLORS, PREDICTION_LIMITS, SEXES } from "../prediction-content";
 
 export type Sex = "girl" | "boy";
 export type EyeColor = "blue" | "green" | "brown" | "grey" | "hazel";
@@ -79,9 +79,13 @@ function textError(text: string, maxLength: number): string | null {
 function dateError(date: string): string | null {
   if (!date) return REQUIRED;
   const { min, max } = PREDICTION_LIMITS.birthDate;
-  return isRealDate(date) && date >= min && date <= max
-    ? null
-    : "Entre le 1er janvier et le 31 juillet 2027.";
+  if (!isRealDate(date)) return "Cette date n'existe pas.";
+  return date >= min && date <= max ? null : "Entre le 1er janvier et le 31 juillet.";
+}
+
+/** Date AAAA-MM-JJ envoyée au serveur à partir du jour et du mois choisis (année implicite). */
+export function birthDateOf(day: string, month: string): string {
+  return day && month ? `${BIRTH_YEAR}-${month}-${day}` : "";
 }
 
 /** Vérifie AAAA-MM-JJ sans passer par l'heure locale : `Date.UTC` ne dépend d'aucun fuseau. */

@@ -66,7 +66,8 @@ describe("Admin", () => {
     expect(text).toContain("Fille");
     expect(text).toContain("Bleus");
     expect(text).toContain("3,4 kg");
-    expect(text).toContain("12/04/2027");
+    expect(text).toContain("12/04");
+    expect(text).not.toContain("12/04/2027");
     expect(text).toContain("14/11/2026");
     expect(byTestId("admin-password")).toBeNull();
   });

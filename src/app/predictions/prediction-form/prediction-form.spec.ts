@@ -31,10 +31,17 @@ describe("PredictionForm", () => {
     input.dispatchEvent(new Event("input"));
   }
 
+  function select(id: string, value: string): void {
+    const field = byTestId<HTMLSelectElement>(id)!;
+    field.value = value;
+    field.dispatchEvent(new Event("change"));
+  }
+
   function fillValid(): void {
     type("prediction-name", "Mamie");
     byTestId<HTMLInputElement>("prediction-sex-girl")!.click();
-    type("prediction-birth-date", "2027-04-12");
+    select("prediction-birth-day", "12");
+    select("prediction-birth-month", "04");
     type("prediction-height", "50");
     type("prediction-weight", "3.4");
     byTestId<HTMLInputElement>("prediction-eye-blue")!.click();
@@ -73,6 +80,25 @@ describe("PredictionForm", () => {
     await fixture.whenStable();
     expect(byTestId("prediction-thanks")).not.toBeNull();
     expect(byTestId("prediction-submit")).toBeNull();
+  });
+
+  it("propose uniquement les mois de janvier à juillet, sans année", () => {
+    const months = [...byTestId<HTMLSelectElement>("prediction-birth-month")!.options]
+      .map((o) => o.text)
+      .filter((t) => t !== "Mois");
+    expect(months).toEqual(["janvier", "février", "mars", "avril", "mai", "juin", "juillet"]);
+    expect(byTestId<HTMLSelectElement>("prediction-birth-day")!.options).toHaveLength(32);
+  });
+
+  it("refuse une date qui n'existe pas", async () => {
+    fillValid();
+    select("prediction-birth-day", "30");
+    select("prediction-birth-month", "02");
+    await submit();
+    http.expectNone("/api/predictions");
+    expect(byTestId("prediction-birth-date-error")?.textContent).toContain(
+      "Cette date n'existe pas.",
+    );
   });
 
   it("affiche le message du serveur sur une erreur 400 et garde la saisie", async () => {

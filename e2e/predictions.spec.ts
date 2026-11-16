@@ -17,7 +17,8 @@ const saved = {
 async function fillPrediction(page: Page): Promise<void> {
   await page.getByTestId("prediction-name").fill("Mamie");
   await page.getByTestId("prediction-sex-girl").check();
-  await page.getByTestId("prediction-birth-date").fill("2027-04-12");
+  await page.getByTestId("prediction-birth-day").selectOption("12");
+  await page.getByTestId("prediction-birth-month").selectOption({ label: "avril" });
   await page.getByTestId("prediction-height").fill("50");
   await page.getByTestId("prediction-weight").fill("3.4");
   await page.getByTestId("prediction-eye-hazel").check();

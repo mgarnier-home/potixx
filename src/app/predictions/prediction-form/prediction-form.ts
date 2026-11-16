@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@a
 import { toSignal } from "@angular/core/rxjs-interop";
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { map } from "rxjs";
-import { validatePrediction } from "../core/prediction";
+import { birthDateOf, validatePrediction } from "../core/prediction";
 import type { PredictionErrors, PredictionFormValue, PredictionInput } from "../core/prediction";
-import { EYE_COLORS, PREDICTION_LIMITS, SEXES } from "../prediction-content";
+import { BIRTH_MONTHS, EYE_COLORS, PREDICTION_LIMITS, SEXES } from "../prediction-content";
 import { PredictionsApi } from "../predictions-api";
 
 /** Onglet « Pronostics » : formulaire d'envoi d'un pronostic sur le bébé. */
@@ -26,17 +26,22 @@ export class PredictionForm {
   protected readonly form = new FormGroup({
     name: new FormControl("", { nonNullable: true }),
     sex: new FormControl("", { nonNullable: true }),
-    birthDate: new FormControl("", { nonNullable: true }),
+    birthDay: new FormControl("", { nonNullable: true }),
+    birthMonth: new FormControl("", { nonNullable: true }),
     heightCm: new FormControl<number | null>(null),
     weightKg: new FormControl<number | null>(null),
     eyeColor: new FormControl("", { nonNullable: true }),
     firstName: new FormControl("", { nonNullable: true }),
   });
 
-  private readonly value = toSignal(
-    this.form.valueChanges.pipe(map((): PredictionFormValue => this.form.getRawValue())),
-    { initialValue: this.form.getRawValue() },
+  protected readonly birthDays = Array.from({ length: 31 }, (_, i) =>
+    String(i + 1).padStart(2, "0"),
   );
+  protected readonly birthMonths = BIRTH_MONTHS;
+
+  private readonly value = toSignal(this.form.valueChanges.pipe(map(() => this.formValue())), {
+    initialValue: this.formValue(),
+  });
 
   /** Les erreurs ne s'affichent qu'après la première tentative d'envoi, puis suivent la saisie. */
   private readonly attempted = signal(false);
@@ -47,9 +52,14 @@ export class PredictionForm {
   protected readonly status = signal<"editing" | "sending" | "sent">("editing");
   protected readonly serverError = signal<string | null>(null);
 
+  private formValue(): PredictionFormValue {
+    const { birthDay, birthMonth, ...rest } = this.form.getRawValue();
+    return { ...rest, birthDate: birthDateOf(birthDay, birthMonth) };
+  }
+
   protected submit(): void {
     this.attempted.set(true);
-    const value = this.form.getRawValue();
+    const value = this.formValue();
     if (Object.keys(validatePrediction(value)).length > 0 || this.status() !== "editing") {
       return;
     }

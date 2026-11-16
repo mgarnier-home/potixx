@@ -149,8 +149,8 @@ v1.4.0). Le healthcheck Docker interroge `/version`.
 
 ### Onglet Pronostics
 
-- Reactive Forms : nom, sexe (deux boutons radio Fille / Garçon), date (`<input type="date">`
-  bornée par `min`/`max`), taille (`number`, cm), poids (`number`, pas de 0,1 kg), couleur des
+- Reactive Forms : nom, sexe (deux boutons radio Fille / Garçon), date (deux listes « Jour » 1 à
+  31 et « Mois » janvier à juillet, sans année : le front envoie `2027-MM-JJ`, depuis la 0.1.1), taille (`number`, cm), poids (`number`, pas de 0,1 kg), couleur des
   yeux (radios Bleus / Verts / Marron / Gris / Noisette), prénom.
 - Les bornes, la liste des couleurs et les libellés vivent dans `prediction-content.ts`. Les
   mêmes bornes sont dupliquées côté Go : le serveur reste la référence.
@@ -164,7 +164,7 @@ v1.4.0). Le healthcheck Docker interroge `/version`.
 ### Page admin
 
 - Un champ mot de passe ; le mot de passe reste en mémoire (signal), jamais en stockage local.
-- Après connexion : tableau (nom, sexe, date, taille, poids, yeux, prénom, date d'envoi), plus
+- Après connexion : tableau (nom, sexe, date au format JJ/MM, taille, poids, yeux, prénom, date d'envoi), plus
   récent en tête, bouton « Supprimer » par ligne avec confirmation.
 - 401 : « Mot de passe incorrect » et retour au champ. 503 : « Admin non configuré ».
 - En 390 px de large, le tableau défile horizontalement dans son conteneur.

@@ -46,23 +46,38 @@
         <p class="error" data-testid="prediction-sex-error">{{ errors().sex }}</p>
       </fieldset>
 
-      <div class="field">
-        <label class="label" for="prediction-birth-date">Date de naissance</label>
-        <input
-          id="prediction-birth-date"
-          class="input"
-          type="date"
-          data-testid="prediction-birth-date"
-          formControlName="birthDate"
-          [min]="limits.birthDate.min"
-          [max]="limits.birthDate.max"
-          [attr.aria-invalid]="!!errors().birthDate"
-          aria-describedby="prediction-birth-date-error"
-        />
+      <fieldset class="field" [attr.aria-invalid]="!!errors().birthDate">
+        <legend class="label">Date de naissance</legend>
+        <div class="date">
+          <select
+            class="input"
+            aria-label="Jour"
+            data-testid="prediction-birth-day"
+            formControlName="birthDay"
+            aria-describedby="prediction-birth-date-error"
+          >
+            <option value="">Jour</option>
+            @for (day of birthDays; track day) {
+              <option [value]="day">{{ +day }}</option>
+            }
+          </select>
+          <select
+            class="input"
+            aria-label="Mois"
+            data-testid="prediction-birth-month"
+            formControlName="birthMonth"
+            aria-describedby="prediction-birth-date-error"
+          >
+            <option value="">Mois</option>
+            @for (month of birthMonths; track month.value) {
+              <option [value]="month.value">{{ month.label }}</option>
+            }
+          </select>
+        </div>
         <p id="prediction-birth-date-error" class="error" data-testid="prediction-birth-date-error">
           {{ errors().birthDate }}
         </p>
-      </div>
+      </fieldset>
 
       <div class="row">
         <div class="field">
