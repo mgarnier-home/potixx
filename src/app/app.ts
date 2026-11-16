@@ -1,47 +1,12 @@
-import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
-import { Crossword } from "./hunt/crossword/crossword";
-import { MAP } from "./hunt/hunt-content";
-import type { StepId } from "./hunt/hunt-content";
-import { PadlockRiddle } from "./hunt/padlock-riddle/padlock-riddle";
-import { PasswordRiddle } from "./hunt/password-riddle/password-riddle";
-import { RiddlePanel } from "./hunt/shared/riddle-panel/riddle-panel";
-import { Treasure } from "./hunt/treasure/treasure";
-import { TreasureMap } from "./hunt/treasure-map/treasure-map";
-import { WordSearch } from "./hunt/word-search/word-search";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 
-/**
- * Coquille de l'application : la carte au trésor, ou l'écran de l'étape ouverte dans un
- * `RiddlePanel`. Chaque composant d'énigme émet `solved`, ce qui ramène à la carte.
- */
+/** Coquille de l'application : la barre d'onglets, puis la page de l'onglet actif. */
 @Component({
   selector: "app-root",
-  imports: [
-    RiddlePanel,
-    TreasureMap,
-    PadlockRiddle,
-    PasswordRiddle,
-    Crossword,
-    WordSearch,
-    Treasure,
-  ],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: "./app.html",
   styleUrl: "./app.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {
-  /** Étape ouverte, ou `null` quand la carte est affichée. */
-  readonly openStep = signal<StepId | null>(null);
-
-  protected stepLabel(step: StepId): string {
-    return MAP.steps[step].label;
-  }
-
-  protected openMapStep(step: StepId): void {
-    this.openStep.set(step);
-  }
-
-  /** Retour à la carte (bouton « Retour à la carte » ou énigme résolue). */
-  protected backToMap(): void {
-    this.openStep.set(null);
-  }
-}
+export class App {}

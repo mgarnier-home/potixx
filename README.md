@@ -1,59 +1,49 @@
 # Potixx
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.0.
+Site familial d'annonce de grossesse au thème pirate, avec deux onglets :
 
-## Development server
+- **Chasse au trésor** : quatre énigmes sur une carte, puis la révélation du trésor ;
+- **Pronostics** : chacun parie sur le sexe, la date de naissance, la taille, le poids, la couleur
+  des yeux et le prénom du bébé. Les pronostics ne sont visibles que sur la page `/admin`,
+  protégée par mot de passe.
 
-To start a local development server, run:
+Front Angular 22, servi avec l'API par un binaire Go (`backend/`) qui stocke les pronostics dans
+un fichier JSON.
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Développement
 
 ```bash
-ng generate component component-name
+npm ci
+npm start                       # front sur http://localhost:4200, /api relayé vers :18080
+
+cd backend                      # dans un autre terminal
+POTIXX_PORT=18080 POTIXX_ADMIN_PASSWORD=dev POTIXX_DATA_PATH=../tmp/predictions.json go run .
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Vérifications
 
 ```bash
-ng generate --help
+npm run lint && npm run format:check && npm test && npm run e2e
+cd backend && go vet ./... && go test -race ./... && golangci-lint run
 ```
 
-## Building
-
-To build the project run:
+## Image Docker
 
 ```bash
-ng build
+docker build -t potixx . && docker run --rm -p 8080:8080 -e POTIXX_ADMIN_PASSWORD=dev potixx
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+| Variable                | Défaut                   | Rôle                                    |
+| ----------------------- | ------------------------ | --------------------------------------- |
+| `POTIXX_ADMIN_PASSWORD` | vide (admin désactivée)  | Mot de passe de la page `/admin`        |
+| `POTIXX_DATA_PATH`      | `/data/predictions.json` | Fichier des pronostics (volume `/data`) |
+| `POTIXX_PORT`           | `8080`                   | Port d'écoute                           |
 
-## Running unit tests
+Le dossier monté sur `/data` doit appartenir à `10001:10001`. `GET /version` renvoie la version,
+le commit et la date de build.
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Publication
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Après fusion dans `master` : `tag-release X.Y.Z`. Le tag `vX.Y.Z` déclenche
+`.github/workflows/publish.yml`, qui publie `mgarnier11/potixx:X.Y.Z` et `latest` (amd64 et
+arm64).

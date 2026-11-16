@@ -208,3 +208,59 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Feuillet de parchemin des onglets Pronostics et Administration (même allure que le panneau
+ * des énigmes) : plein écran sur téléphone, feuille centrée sur ordinateur.
+ */
+.sheet {
+  min-height: calc(100dvh - 4rem);
+  margin-top: var(--space-3);
+  padding: var(--space-5) var(--space-4) var(--space-7);
+  background-color: var(--color-parchment);
+  background-image: var(--texture-parchment);
+  box-shadow: var(--shadow-inset);
+}
+
+.sheet-header {
+  max-width: var(--content-width);
+  margin: 0 auto var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 3px dotted var(--color-coral);
+}
+
+.sheet-title {
+  font-size: var(--font-size-display);
+}
+
+.sheet > :not(.sheet-header) {
+  max-width: var(--content-width);
+  margin-inline: auto;
+}
+
+/* Champ de saisie sur parchemin. */
+.input {
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--color-ink-soft);
+  border-radius: var(--radius-control);
+  background: var(--color-parchment-light);
+
+  &[aria-invalid="true"] {
+    border-color: var(--color-treasure-dark);
+  }
+}
+
+@media (min-width: 700px) {
+  .sheet {
+    min-height: auto;
+    max-width: 48rem;
+    margin: var(--space-5) auto var(--space-6);
+    padding: var(--space-6) var(--space-7) var(--space-7);
+    border-radius: var(--radius-paper);
+    box-shadow:
+      var(--shadow-inset),
+      0 24px 50px -20px rgb(1 24 36 / 0.8);
+  }
+}

@@ -1,0 +1,156 @@
+<section class="sheet" aria-labelledby="predictions-title">
+  <header class="sheet-header">
+    <h1 id="predictions-title" class="sheet-title">Les pronostics</h1>
+    <p class="lead">Fille ou garçon&nbsp;? Quel jour&nbsp;? Faites vos paris&nbsp;!</p>
+  </header>
+
+  @if (status() === "sent") {
+    <div class="thanks" data-testid="prediction-thanks" role="status">
+      <p class="thanks-title">Merci, votre pronostic est bien enregistré&nbsp;!</p>
+      <p>Rendez-vous à la naissance pour découvrir qui avait vu juste.</p>
+    </div>
+  } @else {
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label class="label" for="prediction-name">Votre nom</label>
+        <input
+          id="prediction-name"
+          class="input"
+          data-testid="prediction-name"
+          formControlName="name"
+          autocomplete="name"
+          [attr.maxlength]="limits.nameMaxLength"
+          [attr.aria-invalid]="!!errors().name"
+          aria-describedby="prediction-name-error"
+        />
+        <p id="prediction-name-error" class="error" data-testid="prediction-name-error">
+          {{ errors().name }}
+        </p>
+      </div>
+
+      <fieldset class="field" [attr.aria-invalid]="!!errors().sex">
+        <legend class="label">Fille ou garçon&nbsp;?</legend>
+        <div class="choices">
+          @for (sex of sexes; track sex.value) {
+            <label class="choice">
+              <input
+                type="radio"
+                formControlName="sex"
+                [value]="sex.value"
+                [attr.data-testid]="'prediction-sex-' + sex.value"
+              />
+              <span>{{ sex.label }}</span>
+            </label>
+          }
+        </div>
+        <p class="error" data-testid="prediction-sex-error">{{ errors().sex }}</p>
+      </fieldset>
+
+      <div class="field">
+        <label class="label" for="prediction-birth-date">Date de naissance</label>
+        <input
+          id="prediction-birth-date"
+          class="input"
+          type="date"
+          data-testid="prediction-birth-date"
+          formControlName="birthDate"
+          [min]="limits.birthDate.min"
+          [max]="limits.birthDate.max"
+          [attr.aria-invalid]="!!errors().birthDate"
+          aria-describedby="prediction-birth-date-error"
+        />
+        <p id="prediction-birth-date-error" class="error" data-testid="prediction-birth-date-error">
+          {{ errors().birthDate }}
+        </p>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="label" for="prediction-height">Taille (cm)</label>
+          <input
+            id="prediction-height"
+            class="input"
+            type="number"
+            inputmode="decimal"
+            data-testid="prediction-height"
+            formControlName="heightCm"
+            [min]="limits.heightCm.min"
+            [max]="limits.heightCm.max"
+            [attr.aria-invalid]="!!errors().heightCm"
+            aria-describedby="prediction-height-error"
+          />
+          <p id="prediction-height-error" class="error" data-testid="prediction-height-error">
+            {{ errors().heightCm }}
+          </p>
+        </div>
+        <div class="field">
+          <label class="label" for="prediction-weight">Poids (kg)</label>
+          <input
+            id="prediction-weight"
+            class="input"
+            type="number"
+            inputmode="decimal"
+            step="0.1"
+            data-testid="prediction-weight"
+            formControlName="weightKg"
+            [min]="limits.weightKg.min"
+            [max]="limits.weightKg.max"
+            [attr.aria-invalid]="!!errors().weightKg"
+            aria-describedby="prediction-weight-error"
+          />
+          <p id="prediction-weight-error" class="error" data-testid="prediction-weight-error">
+            {{ errors().weightKg }}
+          </p>
+        </div>
+      </div>
+
+      <fieldset class="field" [attr.aria-invalid]="!!errors().eyeColor">
+        <legend class="label">Couleur des yeux</legend>
+        <div class="choices">
+          @for (color of eyeColors; track color.value) {
+            <label class="choice">
+              <input
+                type="radio"
+                formControlName="eyeColor"
+                [value]="color.value"
+                [attr.data-testid]="'prediction-eye-' + color.value"
+              />
+              <span>{{ color.label }}</span>
+            </label>
+          }
+        </div>
+        <p class="error" data-testid="prediction-eye-error">{{ errors().eyeColor }}</p>
+      </fieldset>
+
+      <div class="field">
+        <label class="label" for="prediction-first-name">Prénom du bébé</label>
+        <input
+          id="prediction-first-name"
+          class="input"
+          data-testid="prediction-first-name"
+          formControlName="firstName"
+          autocomplete="off"
+          [attr.maxlength]="limits.firstNameMaxLength"
+          [attr.aria-invalid]="!!errors().firstName"
+          aria-describedby="prediction-first-name-error"
+        />
+        <p id="prediction-first-name-error" class="error" data-testid="prediction-first-name-error">
+          {{ errors().firstName }}
+        </p>
+      </div>
+
+      @if (serverError(); as message) {
+        <p class="server-error" data-testid="prediction-error" role="alert">{{ message }}</p>
+      }
+
+      <button
+        type="submit"
+        class="button-primary submit"
+        data-testid="prediction-submit"
+        [disabled]="status() === 'sending'"
+      >
+        {{ status() === "sending" ? "Envoi…" : "Envoyer mon pronostic" }}
+      </button>
+    </form>
+  }
+</section>

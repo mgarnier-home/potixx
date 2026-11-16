@@ -1,54 +1,35 @@
 :host {
   display: block;
-  min-height: 100dvh;
 }
 
-/* Écran de la carte : titre en haut, carte en dessous, centrées. */
-.map-screen {
+/* Deux onglets façon étiquettes de parchemin, posés sur le lagon en haut de page. */
+.tabs {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-3) 0;
+}
+
+.tab {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-3) var(--space-6);
-}
-
-.intro {
-  max-width: 26rem;
-  text-align: center;
-}
-
-.title {
-  font-size: var(--font-size-display);
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-4);
+  border: 2px solid var(--color-parchment-dark);
+  border-radius: var(--radius-control);
   color: var(--color-parchment-light);
-  text-shadow:
-    0 2px 0 rgb(2 48 71 / 0.7),
-    0 0 18px rgb(255 143 171 / 0.35);
-}
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+  transition: background-color 120ms ease;
 
-.lead {
-  margin-top: var(--space-2);
-  font-size: var(--font-size-body);
-  color: var(--color-parchment-light);
-}
-
-/* La carte occupe toute la largeur sur téléphone et la hauteur restante sur ordinateur. */
-.map {
-  width: 100%;
-  max-width: calc((100dvh - 9.5rem) * 3 / 4);
-  min-width: min(100%, 20rem);
-}
-
-.coming-soon {
-  font-size: var(--font-size-lead);
-  color: var(--color-ink-soft);
-}
-
-@media (min-width: 700px) {
-  .map-screen {
-    padding-top: var(--space-4);
+  &:hover {
+    background: rgb(255 243 214 / 0.12);
   }
 
-  .title {
-    font-size: 2.75rem;
+  &.active {
+    background: var(--color-parchment);
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+    box-shadow: 0 3px 0 var(--color-ink);
   }
 }

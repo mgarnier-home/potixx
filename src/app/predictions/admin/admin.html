@@ -1,0 +1,78 @@
+<section class="sheet" aria-labelledby="admin-title">
+  <header class="sheet-header">
+    <h1 id="admin-title" class="sheet-title">Administration</h1>
+  </header>
+
+  @if (predictions(); as list) {
+    <div>
+      <p class="count">{{ list.length }} pronostic{{ list.length > 1 ? "s" : "" }}</p>
+      @if (error(); as message) {
+        <p class="error" data-testid="admin-error" role="alert">{{ message }}</p>
+      }
+      <div class="table-scroll">
+        <table class="table" data-testid="admin-table">
+          <thead>
+            <tr>
+              <th scope="col">Nom</th>
+              <th scope="col">Sexe</th>
+              <th scope="col">Naissance</th>
+              <th scope="col">Taille</th>
+              <th scope="col">Poids</th>
+              <th scope="col">Yeux</th>
+              <th scope="col">Prénom</th>
+              <th scope="col">Envoyé le</th>
+              <th scope="col"><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of list; track p.id) {
+              <tr data-testid="admin-row">
+                <td>{{ p.name }}</td>
+                <td>{{ sexLabel(p.sex) }}</td>
+                <td>{{ birthDate(p.birthDate) }}</td>
+                <td>{{ number(p.heightCm) }} cm</td>
+                <td>{{ number(p.weightKg) }} kg</td>
+                <td>{{ eyeLabel(p.eyeColor) }}</td>
+                <td>{{ p.firstName }}</td>
+                <td>{{ sentAt(p.createdAt) }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="button-secondary delete"
+                    data-testid="admin-delete"
+                    (click)="remove(p)"
+                  >
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="9" class="empty">Aucun pronostic pour l'instant.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <form class="login" (submit)="login($event)">
+      <label class="label" for="admin-password">Mot de passe</label>
+      <input
+        id="admin-password"
+        class="input"
+        type="password"
+        autocomplete="current-password"
+        data-testid="admin-password"
+        [value]="password()"
+        (input)="password.set($any($event.target).value)"
+      />
+      @if (error(); as message) {
+        <p class="error" data-testid="admin-error" role="alert">{{ message }}</p>
+      }
+      <button type="submit" class="button-primary" data-testid="admin-login" [disabled]="loading()">
+        Se connecter
+      </button>
+    </form>
+  }
+</section>

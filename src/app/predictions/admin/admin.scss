@@ -1,0 +1,88 @@
+:host {
+  display: block;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  max-width: 24rem;
+}
+
+.label {
+  font-weight: var(--font-weight-strong);
+}
+
+.error {
+  color: var(--color-treasure-dark);
+}
+
+.count {
+  margin-bottom: var(--space-3);
+  color: var(--color-ink-soft);
+}
+
+/* Sur téléphone, le tableau défile dans son cadre plutôt que d'élargir la page. */
+.table-scroll {
+  /* Ancre le libellé masqué « Actions » : sans elle, il sort de la page et la fait déborder. */
+  position: relative;
+  overflow-x: auto;
+  border: 2px solid var(--color-parchment-dark);
+  border-radius: var(--radius-paper);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-small);
+  white-space: nowrap;
+
+  th,
+  td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-parchment-dark);
+  }
+
+  th {
+    font-weight: var(--font-weight-strong);
+    background: var(--color-parchment-dark);
+  }
+
+  tbody tr:nth-child(even) {
+    background: rgb(255 243 214 / 0.6);
+  }
+}
+
+.delete {
+  min-height: 36px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-small);
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-ink-soft);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Le tableau a besoin de plus de place que la largeur de lecture des autres feuillets. */
+.sheet > div,
+.sheet-header {
+  max-width: none;
+}
+
+@media (min-width: 700px) {
+  .sheet {
+    max-width: 68rem;
+  }
+}

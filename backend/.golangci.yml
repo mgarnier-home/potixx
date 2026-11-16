@@ -1,0 +1,20 @@
+version: "2"
+
+linters:
+  enable:
+    - funlen # fonctions trop longues
+    - gocognit # fonctions trop compliquées à lire
+    - nestif # if imbriqués
+    - unparam # paramètres jamais utilisés
+  settings:
+    funlen:
+      lines: 60
+      statements: 40
+    gocognit:
+      min-complexity: 15
+    nestif:
+      min-complexity: 4
+
+formatters:
+  enable:
+    - gofmt

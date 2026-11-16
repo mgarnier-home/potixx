@@ -1,0 +1,4 @@
+{
+  "/api": { "target": "http://localhost:18080", "secure": false },
+  "/version": { "target": "http://localhost:18080", "secure": false }
+}
