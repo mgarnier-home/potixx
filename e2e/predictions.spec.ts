@@ -17,7 +17,8 @@ const saved = {
 async function fillPrediction(page: Page): Promise<void> {
   await page.getByTestId("prediction-name").fill("Mamie");
   await page.getByTestId("prediction-sex-girl").check();
-  await page.getByTestId("prediction-birth-date").fill("2027-04-12");
+  await page.getByTestId("prediction-birth-day").selectOption("12");
+  await page.getByTestId("prediction-birth-month").selectOption({ label: "avril" });
   await page.getByTestId("prediction-height").fill("50");
   await page.getByTestId("prediction-weight").fill("3.4");
   await page.getByTestId("prediction-eye-hazel").check();
@@ -56,6 +57,23 @@ test("sends a prediction and thanks the visitor", async ({ page }) => {
     eyeColor: "hazel",
     firstName: "Zoé",
   });
+});
+
+test("remembers the prediction after a reload and allows another person", async ({ page }) => {
+  await page.route("**/api/predictions", (route) => route.fulfill({ status: 201, json: saved }));
+
+  await page.goto("/pronostics");
+  await fillPrediction(page);
+  await page.getByTestId("prediction-submit").click();
+  await expect(page.getByTestId("prediction-thanks")).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByTestId("prediction-thanks")).toBeVisible();
+  await expect(page.getByTestId("prediction-submit")).toBeHidden();
+
+  await page.getByTestId("prediction-another").click();
+  await expect(page.getByTestId("prediction-name")).toHaveValue("");
+  await expect(page.getByTestId("prediction-submit")).toBeVisible();
 });
 
 test("shows the server message when a prediction is rejected", async ({ page }) => {

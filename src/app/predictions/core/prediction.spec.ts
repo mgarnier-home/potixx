@@ -1,4 +1,4 @@
-import { basicAuthHeader, validatePrediction } from "./prediction";
+import { basicAuthHeader, birthDateOf, validatePrediction } from "./prediction";
 import type { PredictionFormValue } from "./prediction";
 
 function valid(): PredictionFormValue {
@@ -51,7 +51,7 @@ describe("validatePrediction", () => {
     expect(errorsFor({ birthDate: "2027-07-31" })).toEqual({});
     expect(errorsFor({ birthDate: "2026-12-31" }).birthDate).toBeDefined();
     expect(errorsFor({ birthDate: "2027-08-01" }).birthDate).toBeDefined();
-    expect(errorsFor({ birthDate: "2027-02-30" }).birthDate).toBeDefined();
+    expect(errorsFor({ birthDate: "2027-02-30" }).birthDate).toBe("Cette date n'existe pas.");
     expect(errorsFor({ birthDate: "30/03/2027" }).birthDate).toBeDefined();
   });
 
@@ -77,6 +77,17 @@ describe("validatePrediction", () => {
     for (const eyeColor of ["blue", "green", "brown", "grey", "hazel"]) {
       expect(errorsFor({ eyeColor })).toEqual({});
     }
+  });
+});
+
+describe("birthDateOf", () => {
+  it("ajoute l'année 2027 au jour et au mois choisis", () => {
+    expect(birthDateOf("12", "04")).toBe("2027-04-12");
+  });
+
+  it("reste vide tant que le jour ou le mois manque", () => {
+    expect(birthDateOf("", "04")).toBe("");
+    expect(birthDateOf("12", "")).toBe("");
   });
 });
 

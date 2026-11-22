@@ -35,6 +35,13 @@
   gap: var(--space-3);
 }
 
+/* Jour et mois côte à côte ; le mois, plus long à lire, prend plus de place. */
+.date {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-3);
+}
+
 .choices {
   display: flex;
   flex-wrap: wrap;
@@ -103,6 +110,10 @@
   border-radius: var(--radius-paper);
   background: var(--color-success-pale);
   text-align: center;
+}
+
+.another {
+  margin-top: var(--space-4);
 }
 
 .thanks-title {

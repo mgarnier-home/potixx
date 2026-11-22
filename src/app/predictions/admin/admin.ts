@@ -64,9 +64,10 @@ export class Admin {
     return EYE_COLORS.find((c) => c.value === value)?.label ?? value;
   }
 
-  /** AAAA-MM-JJ → JJ/MM/AAAA, sans passer par `Date` (pas de décalage de fuseau). */
+  /** AAAA-MM-JJ → JJ/MM (l'année est implicite), sans passer par `Date` (pas de fuseau). */
   protected birthDate(value: string): string {
-    return value.split("-").reverse().join("/");
+    const [, month, day] = value.split("-");
+    return `${day}/${month}`;
   }
 
   /** Décimale à la française : 3,4. */
