@@ -159,7 +159,8 @@ v1.4.0). Le healthcheck Docker interroge `/version`.
 - Pendant l'envoi : bouton désactivé. Succès : message de remerciement à la place du formulaire.
   Erreur 400 : le message du serveur est affiché ; erreur réseau ou 5xx : message générique,
   la saisie est conservée.
-- Pas de mémoire locale de l'envoi : un rechargement réaffiche un formulaire vide.
+- Depuis la 0.1.1, le navigateur retient l'envoi (`potixx.prediction.sent`) : au retour, le
+  remerciement s'affiche, avec un bouton pour saisir le pronostic d'une autre personne.
 
 ### Page admin
 

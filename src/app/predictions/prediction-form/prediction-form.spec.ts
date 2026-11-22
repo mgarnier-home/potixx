@@ -2,6 +2,7 @@ import { provideHttpClient } from "@angular/common/http";
 import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
 import type { ComponentFixture } from "@angular/core/testing";
 import { TestBed } from "@angular/core/testing";
+import { PROGRESS_STORAGE } from "../../hunt/hunt-progress.service";
 import { PredictionForm } from "./prediction-form";
 
 describe("PredictionForm", () => {
@@ -10,9 +11,18 @@ describe("PredictionForm", () => {
   let http: HttpTestingController;
 
   beforeEach(async () => {
+    const items = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => items.get(key) ?? null,
+      setItem: (key: string, value: string) => void items.set(key, value),
+    } as unknown as Storage;
     TestBed.configureTestingModule({
       imports: [PredictionForm],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: PROGRESS_STORAGE, useValue: storage },
+      ],
     });
     fixture = TestBed.createComponent(PredictionForm);
     element = fixture.nativeElement as HTMLElement;
@@ -80,6 +90,35 @@ describe("PredictionForm", () => {
     await fixture.whenStable();
     expect(byTestId("prediction-thanks")).not.toBeNull();
     expect(byTestId("prediction-submit")).toBeNull();
+  });
+
+  async function sendValid(): Promise<void> {
+    fillValid();
+    await submit();
+    const req = http.expectOne("/api/predictions");
+    req.flush({ ...req.request.body, id: "1", createdAt: "2026-11-14T10:00:00Z" });
+    await fixture.whenStable();
+  }
+
+  it("remercie au retour d'un visiteur qui a déjà envoyé son pronostic", async () => {
+    await sendValid();
+    fixture = TestBed.createComponent(PredictionForm);
+    element = fixture.nativeElement as HTMLElement;
+    await fixture.whenStable();
+    expect(byTestId("prediction-thanks")).not.toBeNull();
+    expect(byTestId("prediction-submit")).toBeNull();
+  });
+
+  it("laisse une autre personne du même appareil saisir son pronostic", async () => {
+    await sendValid();
+    byTestId<HTMLButtonElement>("prediction-another")!.click();
+    await fixture.whenStable();
+    expect(byTestId("prediction-thanks")).toBeNull();
+    expect(byTestId<HTMLInputElement>("prediction-name")!.value).toBe("");
+    expect(byTestId("prediction-name-error")?.textContent?.trim()).toBe("");
+
+    await sendValid();
+    expect(byTestId("prediction-thanks")).not.toBeNull();
   });
 
   it("propose uniquement les mois de janvier à juillet, sans année", () => {

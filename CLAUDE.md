@@ -63,7 +63,8 @@ e2e/                        tests Playwright
   contrôle de flux `@if` / `@for`. Nommage de fichiers « 2025 » (`crossword.ts`, pas
   `crossword.component.ts`).
 - La logique métier va dans `core/` (fonctions pures, testées) ; les composants restent minces.
-- Les composants ne lisent jamais `localStorage` : ils passent par `HuntProgressService`. Le mot
+- Les composants ne lisent jamais `localStorage` : ils passent par `HuntProgressService` ou
+  `PredictionsApi`. Le mot
   de passe admin reste en mémoire, jamais stocké.
 - Le serveur Go fait foi pour la validation des pronostics : changer une borne dans
   `prediction-content.ts` impose de la changer dans `backend/predictions/prediction.go`.

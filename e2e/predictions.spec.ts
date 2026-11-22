@@ -59,6 +59,23 @@ test("sends a prediction and thanks the visitor", async ({ page }) => {
   });
 });
 
+test("remembers the prediction after a reload and allows another person", async ({ page }) => {
+  await page.route("**/api/predictions", (route) => route.fulfill({ status: 201, json: saved }));
+
+  await page.goto("/pronostics");
+  await fillPrediction(page);
+  await page.getByTestId("prediction-submit").click();
+  await expect(page.getByTestId("prediction-thanks")).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByTestId("prediction-thanks")).toBeVisible();
+  await expect(page.getByTestId("prediction-submit")).toBeHidden();
+
+  await page.getByTestId("prediction-another").click();
+  await expect(page.getByTestId("prediction-name")).toHaveValue("");
+  await expect(page.getByTestId("prediction-submit")).toBeVisible();
+});
+
 test("shows the server message when a prediction is rejected", async ({ page }) => {
   await page.route("**/api/predictions", (route) =>
     route.fulfill({

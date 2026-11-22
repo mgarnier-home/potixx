@@ -8,6 +8,14 @@
     <div class="thanks" data-testid="prediction-thanks" role="status">
       <p class="thanks-title">Merci, votre pronostic est bien enregistré&nbsp;!</p>
       <p>Rendez-vous à la naissance pour découvrir qui avait vu juste.</p>
+      <button
+        type="button"
+        class="button-secondary another"
+        data-testid="prediction-another"
+        (click)="addAnother()"
+      >
+        Ajouter le pronostic d'une autre personne
+      </button>
     </div>
   } @else {
     <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>

@@ -49,12 +49,22 @@ export class PredictionForm {
     this.attempted() ? validatePrediction(this.value()) : {},
   );
 
-  protected readonly status = signal<"editing" | "sending" | "sent">("editing");
+  protected readonly status = signal<"editing" | "sending" | "sent">(
+    this.api.hasSent() ? "sent" : "editing",
+  );
   protected readonly serverError = signal<string | null>(null);
 
   private formValue(): PredictionFormValue {
     const { birthDay, birthMonth, ...rest } = this.form.getRawValue();
     return { ...rest, birthDate: birthDateOf(birthDay, birthMonth) };
+  }
+
+  /** Plusieurs personnes peuvent partager un téléphone : on repart d'un formulaire vierge. */
+  protected addAnother(): void {
+    this.form.reset();
+    this.attempted.set(false);
+    this.serverError.set(null);
+    this.status.set("editing");
   }
 
   protected submit(): void {
