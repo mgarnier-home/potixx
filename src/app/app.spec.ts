@@ -1,5 +1,5 @@
 import { provideHttpClient } from "@angular/common/http";
-import { provideHttpClientTesting } from "@angular/common/http/testing";
+import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
 import type { ComponentFixture } from "@angular/core/testing";
 import { TestBed } from "@angular/core/testing";
 import { Router, provideRouter } from "@angular/router";
@@ -54,6 +54,28 @@ describe("App (onglets)", () => {
     await navigate("/admin");
     expect(element.querySelector("app-admin")).not.toBeNull();
     expect(element.querySelector('[aria-current="page"]')).toBeNull();
+  });
+
+  it("écrit la version publiée dans la console au chargement", () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    TestBed.inject(HttpTestingController).expectOne("/version").flush({
+      version: "0.2.0",
+      commit: "ee741c4461ec40454f2826f82a1efad846addc6e",
+      date: "2026-11-22T19:57:38Z",
+    });
+    expect(info).toHaveBeenCalledExactlyOnceWith("Potixx v0.2.0 (ee741c4, 2026-11-22T19:57:38Z)");
+    info.mockRestore();
+  });
+
+  it("n'écrit rien et garde le site utilisable si la version est indisponible", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    TestBed.inject(HttpTestingController)
+      .expectOne("/version")
+      .flush(null, { status: 502, statusText: "Bad Gateway" });
+    await navigate("/");
+    expect(info).not.toHaveBeenCalled();
+    expect(element.querySelector("app-hunt")).not.toBeNull();
+    info.mockRestore();
   });
 
   it("ramène une route inconnue vers la chasse", async () => {
